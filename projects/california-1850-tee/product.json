@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "product_id": "california-1850-tee",
+  "name": "California 1850 Original Golden State Tee",
+  "model": "pod",
+  "reference_images": ["frames/product.jpg"],
+  "design_files": [],
+  "invariants": [
+    "Black crew-neck short-sleeve tee",
+    "Arched word CALIFORNIA in sand-cream block letters across the top of the print",
+    "Numbers 18 (left) and 50 (right) in teal beside an arch-shaped scene",
+    "Arch scene: big pale sun, birds, curling teal wave, beach, two palm trees, mountains",
+    "Word ORIGINAL in sand-cream block letters under the arch",
+    "Script text Golden State in teal between two teal lines, small sand-cream bear icon below",
+    "Distressed vintage print texture, palette sand-cream, teal, pale yellow on black"
+  ],
+  "facts": [
+    {"key": "garment", "value": "Black crew-neck short-sleeve t-shirt", "source": "image"},
+    {"key": "graphic", "value": "Vintage-style California beach graphic: CALIFORNIA 1850 ORIGINAL Golden State, wave, palm trees, sun, bear icon", "source": "image"},
+    {"key": "print_style", "value": "Distressed, retro surf look", "source": "image"},
+    {"key": "neck_label", "value": "Gildan label visible at the neck", "source": "image"}
+  ],
+  "inferred": [
+    {"key": "self_buyer", "value": "Men 20-40 who love surf, beach, road-trip and West Coast vibes"},
+    {"key": "gift_buyer", "value": "Someone buying for a friend or partner who lives in, moved from or loves California (BFCM, Christmas)"},
+    {"key": "desire", "value": "Wear the laid-back Golden State feeling every day"},
+    {"key": "pain", "value": "Souvenir tees look cheap and touristy"},
+    {"key": "season", "value": "Late October: evergreen lifestyle tee; gift angle rises toward BFCM and Christmas"}
+  ],
+  "unknown": ["fabric and weight", "sizes", "price", "shipping time", "other colours", "print method and durability"],
+  "claims": [
+    {"text": "Vintage wave, palm trees, 1850", "evidence": "graphic"}
+  ]
+}

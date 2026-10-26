@@ -1,0 +1,13 @@
+[project]
+name = "ecom-video-studio"
+version = "0.1.0"
+description = "Scripts cho Agent Creative + Agent Editor: dựng video quảng cáo ecommerce từ clip Veo 3"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "librosa>=0.10",
+    "soundfile>=0.12",
+    "mlx-whisper>=0.4",
+    "jsonschema>=4.21",
+    "pillow>=10",
+    "yt-dlp[default,curl-cffi]>=2025.1",
+]

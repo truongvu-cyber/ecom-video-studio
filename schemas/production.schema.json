@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "production.schema.json",
+  "title": "production.json — hợp đồng giữa Agent 1 (Creative) và Agent 2 (Editor)",
+  "type": "object",
+  "required": ["schema_version", "project_id", "product_ref", "spec", "audio", "music", "shots"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "project_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+    "product_ref": { "type": "string", "description": "Đường dẫn tương đối tới product.json" },
+    "platform": { "enum": ["tiktok_reels", "meta_reels", "youtube_shorts"], "default": "tiktok_reels" },
+    "stage": {
+      "enum": ["draft", "concept_approved", "prompts_ready", "clips_ready", "rendered", "approved"],
+      "default": "draft"
+    },
+    "gen_model": {
+      "type": "object",
+      "properties": {
+        "image": { "type": "string", "default": "nano-banana" },
+        "video": { "type": "string", "default": "veo-3" }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": ["ratio", "fps", "target_sec"],
+      "properties": {
+        "ratio": { "enum": ["9:16", "1:1", "4:5"] },
+        "resolution": { "type": "string", "pattern": "^[0-9]+x[0-9]+$", "default": "1080x1920" },
+        "fps": { "type": "integer", "minimum": 24, "maximum": 60 },
+        "target_sec": { "type": "number", "minimum": 5, "maximum": 90 },
+        "safe_zone": {
+          "type": "object",
+          "description": "Preset, có thể đổi theo placement",
+          "properties": {
+            "top": { "type": "number", "minimum": 0, "maximum": 0.4, "default": 0.15 },
+            "bottom": { "type": "number", "minimum": 0, "maximum": 0.4, "default": 0.20 }
+          }
+        }
+      }
+    },
+    "audio": {
+      "type": "object",
+      "required": ["source"],
+      "properties": {
+        "source": { "const": "native", "description": "Không lồng tiếng: tiếng có sẵn từ clip Veo" },
+        "music_duck_db": { "type": "number", "maximum": 0, "default": -12 },
+        "target_lufs": { "type": "number", "default": -14 },
+        "true_peak_db": { "type": "number", "default": -1 },
+        "export_no_music": { "type": "boolean", "default": true }
+      }
+    },
+    "music": {
+      "type": "object",
+      "required": ["source"],
+      "properties": {
+        "source": { "enum": ["auto", "file", "none"], "description": "auto = chọn từ music-library có license" },
+        "file": { "type": ["string", "null"] },
+        "mood": { "type": "string", "description": "Từ khoá mood, cũng dùng làm từ khoá tìm nhạc" },
+        "allow_fetch": { "type": "boolean", "default": true, "description": "auto: thư viện không có bài hợp thì tự tìm và tải (nội bộ)" },
+        "bpm_range": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+      }
+    },
+    "captions": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "style": { "enum": ["word-highlight", "phrase", "none"], "default": "word-highlight" }
+      }
+    },
+    "variants": {
+      "type": "array",
+      "description": "Biến thể rẻ: chỉ đổi overlay/hook/nhạc/thứ tự, không cần gen lại clip",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "overlay_overrides": { "type": "object", "additionalProperties": { "type": "string" } },
+          "music_file": { "type": "string" },
+          "shot_order": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "role", "file_pattern", "use_sec", "audio_type"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^s[0-9]{2}$" },
+          "role": { "enum": ["hook", "problem", "demo", "personalize", "proof", "lifestyle", "offer", "cta"] },
+          "file_pattern": {
+            "type": "string",
+            "description": "Mẫu tên clip trong clips/, vd c01*.mp4 (nhiều take). Nhiều shot có thể dùng chung một clip thoại."
+          },
+          "gen_sec": { "type": "number", "default": 8, "description": "Thời lượng clip Veo gen ra" },
+          "use_sec": { "type": "number", "exclusiveMinimum": 0, "description": "Thời lượng dùng trong video cuối" },
+          "audio_type": { "enum": ["dialogue", "sfx", "music_only"] },
+          "dialogue": {
+            "type": ["string", "null"],
+            "description": "Với clip thoại dùng chung: đoạn lời của shot này, dùng để tìm điểm vào/ra trong transcript"
+          },
+          "overlay": { "type": ["string", "null"] },
+          "overlay_pos": {
+            "enum": ["top", "center", "lower", "bottom"], "default": "top",
+            "description": "Vị trí chữ overlay; đổi khi chữ đè mặt người hoặc hình in; bottom = sát vùng an toàn dưới"
+          },
+          "print_fidelity": { "enum": ["strict", "normal"], "default": "normal", "description": "strict = cảnh có chữ/số/logo in, bắt buộc QC so với file thiết kế" },
+          "status": { "enum": ["pending", "pass", "review", "reject"], "default": "pending" },
+          "chosen_take": { "type": ["string", "null"], "description": "Người dùng chỉ định take (vd c01_b.mp4); để trống thì Agent 2 tự chọn" },
+          "override": {
+            "type": "object",
+            "description": "Chỉnh tay điểm cắt trong clip nguồn (giây); dùng trong vòng sửa",
+            "additionalProperties": false,
+            "properties": {
+              "src_in": { "type": "number", "minimum": 0 },
+              "src_out": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

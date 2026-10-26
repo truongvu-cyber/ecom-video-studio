@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "product.schema.json",
+  "title": "product.json — Product Truth: tách sự thật, suy luận và điều chưa biết",
+  "type": "object",
+  "required": ["schema_version", "product_id", "name", "facts", "inferred", "unknown", "claims"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "product_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+    "name": { "type": "string" },
+    "model": { "enum": ["pod_custom", "pod", "dropship"] },
+    "reference_images": { "type": "array", "items": { "type": "string" }, "description": "Ảnh sản phẩm thật trong frames/" },
+    "design_files": { "type": "array", "items": { "type": "string" }, "description": "File thiết kế PNG/SVG gốc, dùng cho keyframe và QC hình in" },
+    "invariants": {
+      "type": "array",
+      "description": "Chi tiết không được sai: chữ, số, logo, màu, vị trí in",
+      "items": { "type": "string" }
+    },
+    "facts": {
+      "type": "array",
+      "description": "Đã xác minh: thấy trong ảnh hoặc người dùng cung cấp",
+      "items": {
+        "type": "object",
+        "required": ["key", "value", "source"],
+        "properties": {
+          "key": { "type": "string" },
+          "value": { "type": "string" },
+          "source": { "enum": ["image", "user"] }
+        }
+      }
+    },
+    "inferred": {
+      "type": "array",
+      "description": "Suy luận marketing (chân dung khách, dịp, góc bán) — được dùng nhưng ghi rõ là giả định",
+      "items": {
+        "type": "object",
+        "required": ["key", "value"],
+        "properties": { "key": { "type": "string" }, "value": { "type": "string" } }
+      }
+    },
+    "unknown": {
+      "type": "array",
+      "description": "Chưa biết: chất liệu, kích thước, giá, ship... — không được đưa thành claim",
+      "items": { "type": "string" }
+    },
+    "claims": {
+      "type": "array",
+      "description": "Câu quảng cáo dự định dùng; claim không có evidence bị chặn ở bước xuất prompt",
+      "items": {
+        "type": "object",
+        "required": ["text", "evidence"],
+        "properties": {
+          "text": { "type": "string" },
+          "evidence": { "type": ["string", "null"], "description": "key trong facts, null = bị chặn" }
+        }
+      }
+    }
+  }
+}

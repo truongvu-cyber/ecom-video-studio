@@ -1,0 +1,316 @@
+{
+  "_note": "Typical limits as of mid-2026. Video tools change often: if the user says their tool differs, believe the user. Durations are seconds per generation.",
+  "kling": {
+    "label": "Kling 2.x (single shot)",
+    "durations": [
+      5,
+      10
+    ],
+    "multishot": false,
+    "max_shots": 1,
+    "audio": false,
+    "negative_field": true,
+    "words": [
+      15,
+      80
+    ],
+    "dialogue": "none - dub in post",
+    "formula": "camera + light, subject, subject motion, scene, atmosphere",
+    "kind": "video"
+  },
+  "kling3": {
+    "label": "Kling 3.0 / Omni",
+    "durations": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "multishot": true,
+    "max_shots": 6,
+    "audio": true,
+    "negative_field": true,
+    "words": [
+      15,
+      160
+    ],
+    "dialogue": "state who speaks and when; tone as a modifier",
+    "formula": "camera + light, subject, subject motion, scene, atmosphere; label shots for multi-shot",
+    "kind": "video"
+  },
+  "veo": {
+    "label": "Google Veo 3 / 3.1",
+    "durations": [
+      4,
+      6,
+      8
+    ],
+    "multishot": false,
+    "max_shots": 1,
+    "audio": true,
+    "negative_field": true,
+    "words": [
+      30,
+      200
+    ],
+    "dialogue": "Name says: line  (colon form, no quotes - quotes tend to burn captions)",
+    "formula": "subject, action, style, camera, composition, focus/lens, ambiance, audio",
+    "kind": "video"
+  },
+  "sora": {
+    "label": "Sora 2",
+    "durations": [
+      4,
+      8,
+      12,
+      16,
+      20
+    ],
+    "multishot": true,
+    "max_shots": 6,
+    "audio": true,
+    "negative_field": false,
+    "words": [
+      40,
+      220
+    ],
+    "dialogue": "labeled Dialogue: block, quotes are fine",
+    "formula": "prose scene, then Cinematography / Actions / Dialogue / Background Sound sections",
+    "kind": "video"
+  },
+  "seedance": {
+    "label": "Seedance 1.0 / 1.5",
+    "durations": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "multishot": false,
+    "max_shots": 1,
+    "audio": false,
+    "negative_field": false,
+    "words": [
+      60,
+      100
+    ],
+    "dialogue": "none - dub in post",
+    "formula": "subject + action, scene, camera, style/atmosphere; one camera move; avoid the word fast",
+    "kind": "video"
+  },
+  "seedance2": {
+    "label": "Seedance 2.0 / 2.5",
+    "durations": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "multishot": true,
+    "max_shots": 4,
+    "audio": true,
+    "negative_field": false,
+    "words": [
+      60,
+      120
+    ],
+    "dialogue": "plain quoted line after the speaker; refs as @Image1..@Image9",
+    "formula": "subject, action, environment, camera, style, constraints (Avoid: ...)",
+    "kind": "video"
+  },
+  "hailuo": {
+    "label": "Hailuo / MiniMax",
+    "durations": [
+      6,
+      10
+    ],
+    "multishot": false,
+    "max_shots": 1,
+    "audio": false,
+    "negative_field": false,
+    "words": [
+      20,
+      100
+    ],
+    "dialogue": "none - dub in post",
+    "formula": "camera commands in [brackets], up to 3; subject, action, environment",
+    "kind": "video"
+  },
+  "runway": {
+    "label": "Runway Gen-4 family",
+    "durations": [
+      5,
+      10
+    ],
+    "multishot": false,
+    "max_shots": 1,
+    "audio": false,
+    "negative_field": false,
+    "words": [
+      15,
+      80
+    ],
+    "dialogue": "none - dub in post",
+    "formula": "camera + subject motion; keep subject words identical across clips",
+    "kind": "video"
+  },
+  "luma": {
+    "label": "Luma Ray",
+    "durations": [
+      5,
+      9,
+      10
+    ],
+    "multishot": false,
+    "max_shots": 1,
+    "audio": false,
+    "negative_field": false,
+    "words": [
+      15,
+      90
+    ],
+    "dialogue": "none - dub in post",
+    "formula": "start/end keyframes carry continuity; prompt describes motion",
+    "kind": "video"
+  },
+  "wan": {
+    "label": "Wan 2.x",
+    "durations": [
+      5,
+      10
+    ],
+    "multishot": false,
+    "max_shots": 1,
+    "audio": false,
+    "negative_field": true,
+    "words": [
+      30,
+      120
+    ],
+    "dialogue": "none - dub in post",
+    "formula": "subject, scene, motion, camera, style",
+    "kind": "video"
+  },
+  "generic": {
+    "label": "Any other tool",
+    "durations": [
+      4,
+      5,
+      6,
+      8,
+      10
+    ],
+    "multishot": false,
+    "max_shots": 1,
+    "audio": false,
+    "negative_field": false,
+    "words": [
+      20,
+      120
+    ],
+    "dialogue": "check the tool; default to voiceover in post",
+    "formula": "shot + angle, subject, action, setting, light, camera move, style, mood",
+    "kind": "video"
+  },
+  "nano-banana-pro": {
+    "label": "Nano Banana Pro / Nano Banana 2",
+    "kind": "image",
+    "refs": 14,
+    "ratios": "21:9, 16:9, 4:3, 1:1, 3:4, 9:16",
+    "words": [
+      40,
+      260
+    ],
+    "negative_field": false
+  },
+  "nano-banana": {
+    "label": "Nano Banana",
+    "kind": "image",
+    "refs": 3,
+    "ratios": "follows the first reference",
+    "words": [
+      30,
+      180
+    ],
+    "negative_field": false
+  },
+  "seedream": {
+    "label": "Seedream 4.x",
+    "kind": "image",
+    "refs": 14,
+    "ratios": "presets; confirm 9:16",
+    "words": [
+      30,
+      240
+    ],
+    "negative_field": false
+  },
+  "gpt-image": {
+    "label": "GPT Image (ChatGPT)",
+    "kind": "image",
+    "refs": 10,
+    "ratios": "portrait 2:3, then extend to 9:16",
+    "words": [
+      30,
+      260
+    ],
+    "negative_field": false
+  },
+  "flux-kontext": {
+    "label": "Flux Kontext",
+    "kind": "image",
+    "refs": 1,
+    "ratios": "follows the input",
+    "words": [
+      15,
+      120
+    ],
+    "negative_field": false
+  },
+  "midjourney": {
+    "label": "Midjourney",
+    "kind": "image",
+    "refs": 1,
+    "ratios": "--ar 9:16",
+    "words": [
+      15,
+      120
+    ],
+    "negative_field": true
+  },
+  "image-generic": {
+    "label": "Any image model",
+    "kind": "image",
+    "refs": 3,
+    "ratios": "set 9:16",
+    "words": [
+      30,
+      240
+    ],
+    "negative_field": false
+  }
+}

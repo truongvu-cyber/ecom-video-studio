@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "product_id": "demo-hoodie",
+  "name": "Custom Name Hoodie",
+  "model": "pod_custom",
+  "reference_images": [],
+  "design_files": [],
+  "invariants": [
+    "Tên in ở ngực trái, chữ trắng"
+  ],
+  "facts": [
+    {
+      "key": "personalization",
+      "value": "In tên theo yêu cầu",
+      "source": "user"
+    }
+  ],
+  "inferred": [
+    {
+      "key": "persona",
+      "value": "Người mua làm quà cho bạn trai"
+    }
+  ],
+  "unknown": [
+    "chất liệu",
+    "giá",
+    "thời gian ship"
+  ],
+  "claims": [
+    {
+      "text": "Any name, any color",
+      "evidence": "personalization"
+    }
+  ]
+}

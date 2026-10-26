@@ -1,0 +1,94 @@
+{
+  "_note": "Mỗi bài nhạc thêm vào đây. Chỉ dùng nhạc có license quảng cáo. bpm và drop_sec để trống thì scripts/beat_detect.py tự điền.",
+  "tracks": [
+    {
+      "file": "test-beat-120.wav",
+      "mood": [
+        "upbeat",
+        "warm"
+      ],
+      "bpm": 120,
+      "drop_sec": 8.0,
+      "license": "TEST ONLY - synthetic track made by tests/make_fixtures.py, not for real ads",
+      "allowed_platforms": [],
+      "expires": null
+    },
+    {
+      "file": "softwood-soul-vintage-lofi-grooves-to-ease-your-da-vuE9mhrPdos.mp3",
+      "title": "Softwood Soul 🌿📻 – Vintage Lofi Grooves to Ease Your Day",
+      "source_url": "https://www.youtube.com/watch?v=vuE9mhrPdos",
+      "mood": [
+        "chill",
+        "lofi",
+        "indie",
+        "surf",
+        "warm"
+      ],
+      "bpm": 89.0,
+      "drop_sec": 35.782,
+      "duration": 90.0,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=vuE9mhrPdos, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "chill-summer-lofi-chill-lo-fi-hip-hop-beats-kyqpSycLASY.mp3",
+      "title": "Chill Summer Lofi [chill lo-fi hip hop beats]",
+      "source_url": "https://www.youtube.com/watch?v=kyqpSycLASY",
+      "mood": [
+        "chill",
+        "lofi",
+        "indie",
+        "surf",
+        "warm"
+      ],
+      "bpm": 86.2,
+      "drop_sec": 37.036,
+      "duration": 90.0,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=kyqpSycLASY, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "coastal-lofi-sound-beach-coffee-for-summer-relaxin-vIlzvUsB6H0.mp3",
+      "title": "Coastal Lofi Sound 🎧 Beach Coffee for Summer Relaxing 🌊 Lofi Hip Hop for Study & Relax",
+      "source_url": "https://www.youtube.com/watch?v=vIlzvUsB6H0",
+      "mood": [
+        "chill",
+        "lofi",
+        "indie",
+        "surf",
+        "warm"
+      ],
+      "bpm": 89.0,
+      "drop_sec": 12.748,
+      "duration": 90.0,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=vIlzvUsB6H0, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "replying-to-nfl-they-not-like-us-part-2-kendrickla.mp3",
+      "title": "Replying to @NFL THEY NOT LIKE US (part 2) #KendrickLamar #AppleMusic...",
+      "source_url": "https://vt.tiktok.com/ZSgmLDxLb/",
+      "mood": [
+        "tiktok",
+        "trend"
+      ],
+      "bpm": 132.6,
+      "drop_sec": 33.506,
+      "duration": 52.689,
+      "license": "INTERNAL ONLY — fetched from https://vt.tiktok.com/ZSgmLDxLb/, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    }
+  ]
+}

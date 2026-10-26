@@ -1,0 +1,7 @@
+{
+  "shop_name": "TODO",
+  "logo": "logo.png",
+  "fonts": { "headline": "Inter", "caption": "Inter" },
+  "colors": { "primary": "#FFFFFF", "accent": "#FF3B30", "text_stroke": "#000000" },
+  "default_cta": "Personalize yours ↓"
+}

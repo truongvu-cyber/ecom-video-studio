@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "product_id": "example-name-hoodie",
+  "name": "Custom Name Hoodie",
+  "model": "pod_custom",
+  "reference_images": ["frames/product.jpg"],
+  "design_files": ["frames/design.png"],
+  "invariants": [
+    "Name 'Jake' printed white across the chest, centred, one word",
+    "Hoodie colour heather grey, kangaroo-free front, ribbed cuffs"
+  ],
+  "facts": [
+    {"key": "personalization", "value": "Any name printed on the chest to order", "source": "user"},
+    {"key": "colors", "value": "Grey hoodie with white print shown in photo", "source": "image"}
+  ],
+  "inferred": [
+    {"key": "gift_buyer", "value": "Girlfriend buying for boyfriend: anniversary, birthday, Christmas"},
+    {"key": "self_buyer", "value": "Young man who likes clean basics with a personal touch"},
+    {"key": "pain", "value": "Gifts for him feel generic or end up unused"},
+    {"key": "desire", "value": "A gift that feels personal and that he will actually wear"}
+  ],
+  "unknown": ["fabric and weight", "sizes", "price", "shipping time", "other colours"],
+  "claims": [
+    {"text": "Any name", "evidence": "personalization"}
+  ]
+}
