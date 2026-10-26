@@ -202,7 +202,10 @@ def composition(plan: dict, hf: Path) -> None:
 
     els, js = [], []
     for k, o in enumerate(plan["overlays"]):
-        cls = "cta" if o["kind"] == "cta" else f"headline pos-{o.get('pos', 'top')}"
+        if o["kind"] == "cta":
+            cls = f"cta pos-{o['pos']}" if o.get("pos") else "cta"
+        else:
+            cls = f"headline pos-{o.get('pos', 'top')}"
         d = round(o["end"] - o["start"], 3)
         # *word* in an overlay is drawn in the second colour (white) for contrast
         text = re.sub(r"\*(.+?)\*", r"<em>\1</em>", html.escape(o["text"]))
@@ -250,6 +253,9 @@ html, body {{ width:{W}px; height:{H}px; overflow:hidden; background:#000; }}
 .headline.pos-bottom {{ bottom:{bottom + (190 if plan["captions"] else 40)}px; }}
 .headline span {{ background:rgba(0,0,0,0.55); color:{ink}; font-size:54px; font-weight:800; line-height:1.15; padding:16px 28px; border-radius:22px; }}
 .cta {{ bottom:{bottom + 220}px; }}
+.cta.pos-top {{ top:{top + 40}px; bottom:auto; }}
+.cta.pos-center {{ top:{H // 2 - 60}px; bottom:auto; }}
+.cta.pos-bottom {{ bottom:{bottom + 40}px; }}
 .cta span {{ background:{accent}; color:#111; font-size:58px; font-weight:900; padding:22px 44px; white-space:nowrap; border-radius:999px; }}
 {BOLD_CSS.format(accent=accent, stroke=stroke, ink=ink) if bold else ""}
 .caption {{ bottom:{bottom + 40}px; flex-wrap:wrap; gap:0 18px; color:{ink}; font-size:84px; font-weight:900; line-height:1.1;

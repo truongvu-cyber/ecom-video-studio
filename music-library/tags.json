@@ -277,6 +277,63 @@
         "internal"
       ],
       "expires": null
+    },
+    {
+      "file": "happy-bouncy-hip-hop-instrumental-rap-beat-jump-6ZdAvroyvdk.mp3",
+      "title": "HAPPY BOUNCY HIP HOP INSTRUMENTAL RAP BEAT ~ JUMP",
+      "source_url": "https://www.youtube.com/watch?v=6ZdAvroyvdk",
+      "mood": [
+        "upbeat",
+        "bouncy",
+        "hip",
+        "hop"
+      ],
+      "bpm": 89.6,
+      "drop_sec": 106.789,
+      "duration": 162.005,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=6ZdAvroyvdk, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "bounce-westcoast-hip-hop-rap-beat-instrumental-XuntckG7Utg.mp3",
+      "title": "Bounce - WestCoast Hip Hop Rap Beat Instrumental",
+      "source_url": "https://www.youtube.com/watch?v=XuntckG7Utg",
+      "mood": [
+        "upbeat",
+        "bouncy",
+        "hip",
+        "hop"
+      ],
+      "bpm": 92.0,
+      "drop_sec": 125.295,
+      "duration": 191.979,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=XuntckG7Utg, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "energy-bouncy-uplifting-rap-beat-hip-hop-instrumen-2wHSORf3mtk.mp3",
+      "title": "\"Energy\" - Bouncy Uplifting Rap Beat | Hip Hop Instrumental Music 2021 | TheKrowne #Instrumentals",
+      "source_url": "https://www.youtube.com/watch?v=2wHSORf3mtk",
+      "mood": [
+        "upbeat",
+        "bouncy",
+        "hip",
+        "hop"
+      ],
+      "bpm": 104.4,
+      "drop_sec": 86.657,
+      "duration": 177.006,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=2wHSORf3mtk, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
     }
   ]
 }

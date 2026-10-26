@@ -120,7 +120,10 @@ Follow the Veo section of `models.md` and `house-rules.md`:
    ```bash
    .venv/bin/python scripts/creative_check.py <id>
    ```
-3. Deliver in chat (short): files written; work order — save product photo +
+3. Send the user, as files (SendUserFile), `prompts.md` **and every reference
+   image it tells them to upload** (`frames/…`): links inside prompts.md are
+   project paths and do not open on the user's phone or web view.
+4. Deliver in chat (short): files written; work order — save product photo +
    design → generate keyframes in Nano Banana → check them letter by letter →
    generate clips in Veo (c01 with Ingredients, others first-frame) → save as
    `cNN_a.mp4` in `projects/<id>/clips/` (second try `_b`) → tell ad-editor to

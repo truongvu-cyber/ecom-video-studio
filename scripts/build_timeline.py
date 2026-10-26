@@ -202,6 +202,7 @@ def main() -> None:
         seg.update({"shot": shot["id"], "role": shot["role"], "take": take_name,
                     "audio_type": shot["audio_type"], "overlay": shot.get("overlay"),
                     "overlay_pos": shot.get("overlay_pos", "top"),
+                    "cta_pos": shot.get("overlay_pos"),  # CTA keeps its own spot unless set
                     "print_fidelity": shot.get("print_fidelity", "normal")})
         segments.append(seg)
 
@@ -282,7 +283,7 @@ def main() -> None:
             start = s["tl_start"] + 0.1
             overlays.append({"shot": s["shot"], "text": s["overlay"],
                              "kind": "cta" if s["role"] == "cta" else "headline",
-                             "pos": s["overlay_pos"],
+                             "pos": s["cta_pos"] if s["role"] == "cta" else s["overlay_pos"],
                              "start": round(start, 3),
                              "end": round(max(start + 0.6, s["tl_end"] - 0.05), 3)})
     duck = []
@@ -309,7 +310,7 @@ def main() -> None:
                   "bpm": music.get("bpm"), "drop_sec": music.get("drop_sec"),
                   "license": music.get("license")},
         "segments": [{k: (round(v, 3) if isinstance(v, float) else v) for k, v in s.items()
-                      if k not in ("out_min", "out_max")} for s in segments],
+                      if k not in ("out_min", "out_max", "cta_pos")} for s in segments],
         "cuts": cuts, "captions": captions, "overlays": overlays, "issues": issues,
         "text_style": prod.get("text_style", {"preset": "pill"}),
         "fx": prod.get("fx", {"preset": "none"}),

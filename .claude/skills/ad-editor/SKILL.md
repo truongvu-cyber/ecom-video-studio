@@ -49,7 +49,7 @@ Chỉ sửa đúng phần được nhắc, rồi chạy lại từ bước thấ
 |---|---|---|
 | "Cảnh 2 ngắn/dài hơn" | `shots[].use_sec` | timeline |
 | "Cắt chỗ này sớm hơn" | `shots[].override.src_in/src_out` (giây trong clip nguồn) | timeline |
-| "Đổi chữ / đổi vị trí chữ" | `overlay`, `overlay_pos` | timeline |
+| "Đổi chữ / đổi vị trí chữ" | `overlay`, `overlay_pos` (`top`/`center`/`lower`/`bottom`; với cảnh CTA, `overlay_pos` dời luôn nút CTA) | timeline |
 | "Dùng take khác" | `chosen_take` | inspect |
 | "Đổi nhạc" | `music.file` hoặc `music.mood` + `source: auto` | beats |
 | "Đổi màu/font" | `brand/brand.json` | render |
