@@ -31,7 +31,7 @@ Trong tab Code, nói với Claude (skill `ad-creative` tự kích hoạt), ví d
 .venv/bin/python scripts/creative_check.py <project-id>                 # kiểm tra prompts.md + production.json trước khi gen
 ```
 
-Ví dụ đầy đủ một lần chạy: `projects/example-name-hoodie/` (brief.md, product.json, prompts.md, production.json).
+Ví dụ đầy đủ một lần chạy: `projects/cubs-car-door-light/` (brief.md, product.json, prompts.md, production.json, format `demo_steps`).
 
 ## Chạy Agent 2 (Editor)
 
