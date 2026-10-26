@@ -116,6 +116,50 @@ def broll_segment(shot: dict, take: dict, issues: list[str]) -> dict:
             "out_min": start + MIN_SHOT * speed, "out_max": end_limit, "words": []}
 
 
+def moment_start(moments: dict, take: str, shot: dict, speed: float, issues: list[str]) -> float | None:
+    """Start time for shot.moment from edit/moments.json (find_moments.py)."""
+    m = moments.get(take)
+    if not m:
+        issues.append(f"{shot['id']}: moment='{shot['moment']}' nhưng chưa chạy find_moments.py cho {take}")
+        return None
+    key = str(round(float(shot["use_sec"]) * speed, 2))
+    win = m["windows"].get(key) or next(iter(m["windows"].values()))
+    return float(win[shot["moment"]])
+
+
+BANDS = {  # normalised y-ranges the overlay styles occupy (see render.py CSS)
+    "top": (0.17, 0.27), "center": (0.47, 0.57), "lower": (0.52, 0.61), "bottom": (0.70, 0.79),
+}
+
+
+def auto_overlay_pos(project, seg: dict, captions_on: bool, kind: str) -> str:
+    """Pick the band of the frame with the least detail at the shot's middle frame.
+
+    Edge density is a cheap stand-in for 'something important is here': faces,
+    printed text, hands and products are edge-dense; sky, asphalt and walls are not.
+    """
+    import numpy as np
+
+    from common import run as _run
+
+    t = (seg["src_in"] + seg["src_out"]) / 2
+    raw = _run(["ffmpeg", "-v", "error", "-ss", f"{t:.3f}", "-i", str(project / "clips" / seg["take"]),
+                "-frames:v", "1", "-vf", "scale=108:192,format=gray", "-f", "rawvideo", "-"], text=False).stdout
+    if len(raw) < 108 * 192:
+        return "top"
+    img = np.frombuffer(raw[:108 * 192], dtype=np.uint8).reshape(192, 108).astype(np.float32)
+    edges = np.abs(np.diff(img, axis=0))[:, :-1] + np.abs(np.diff(img, axis=1))[:-1, :]
+    bands = dict(BANDS)
+    if captions_on:
+        bands["bottom"] = (0.62, 0.71)
+    if kind == "cta":
+        bands = {"top": bands["top"], "center": bands["center"], "bottom": bands["bottom"]}
+    scores = {name: float(edges[int(a * 191):int(b * 191)].mean()) for name, (a, b) in bands.items()}
+    order = ["top", "bottom", "lower", "center"]  # tie-break: least intrusive first
+    best = min(order, key=lambda n: (round(scores.get(n, 9e9), 1), order.index(n)) if n in scores else (9e9, 9))
+    return best
+
+
 def layout(segments: list[dict]) -> float:
     t = 0.0
     for s in segments:
@@ -167,6 +211,8 @@ def main() -> None:
     issues: list[str] = []
 
     keep_native = prod["audio"].get("keep_native", True)
+    mpath = project / "edit" / "moments.json"
+    moments = load_json(mpath) if mpath.exists() else {}
     cursors: dict[str, int] = {}
     segments = []
     for shot in prod["shots"]:
@@ -186,6 +232,21 @@ def main() -> None:
                 seg["out_max"] = take["duration"]
         else:
             seg = broll_segment(shot, take, issues)
+        if "speed" in shot and (shot["audio_type"] != "dialogue" or not keep_native):
+            sp = float(shot["speed"])
+            seg["speed"] = sp
+            seg["src_out"] = min(take["duration"], seg["src_in"] + shot["use_sec"] * sp)
+            seg["out_min"] = seg["src_in"] + MIN_SHOT * sp
+            seg["out_max"] = take["duration"]
+        if shot.get("moment") and not (shot.get("override") or {}).get("src_in"):
+            start = moment_start(moments, take_name, shot, seg["speed"], issues)
+            if start is not None:
+                seg["src_in"] = start
+                seg["src_out"] = min(take["duration"], start + shot["use_sec"] * seg["speed"])
+                seg["out_min"] = start + MIN_SHOT * seg["speed"]
+                seg["out_max"] = take["duration"]
+                if shot["moment"] == "a" and moments[take_name]["split_reliable"]:
+                    seg["out_max"] = max(seg["out_min"], min(take["duration"], moments[take_name]["split"] - 0.05))
         ov = shot.get("override") or {}
         if "src_out" in ov:
             seg["src_in"] = ov.get("src_in", seg["src_in"])
@@ -278,12 +339,16 @@ def main() -> None:
             if s["audio_type"] == "dialogue":
                 captions += phrases(s["words"], s)
     overlays = []
+    captions_on = bool(captions)
     for s in segments:
         if s["overlay"]:
             start = s["tl_start"] + 0.1
-            overlays.append({"shot": s["shot"], "text": s["overlay"],
-                             "kind": "cta" if s["role"] == "cta" else "headline",
-                             "pos": s["cta_pos"] if s["role"] == "cta" else s["overlay_pos"],
+            kind = "cta" if s["role"] == "cta" else "headline"
+            pos = s["cta_pos"] if kind == "cta" else s["overlay_pos"]
+            if pos == "auto":
+                pos = auto_overlay_pos(project, s, captions_on, kind)
+                s["overlay_pos_auto"] = pos
+            overlays.append({"shot": s["shot"], "text": s["overlay"], "kind": kind, "pos": pos,
                              "start": round(start, 3),
                              "end": round(max(start + 0.6, s["tl_end"] - 0.05), 3)})
     duck = []
@@ -315,12 +380,15 @@ def main() -> None:
         "text_style": prod.get("text_style", {"preset": "pill"}),
         "fx": prod.get("fx", {"preset": "none"}),
         "beats_tl": [round(b, 3) for b in beats_tl if 0 <= b <= total],
+        "variants": prod.get("variants", []),
     }
     save_json(project / "edit" / "edit-plan.json", plan)
 
     for s in plan["segments"]:
+        extra = f" x{s['speed']}" if s["speed"] != 1.0 else ""
+        extra += f" chữ→{s['overlay_pos_auto']}" if s.get("overlay_pos_auto") else ""
         print(f"{s['shot']} {s['take']:10} src {s['src_in']:5.2f}-{s['src_out']:5.2f} "
-              f"tl {s['tl_start']:5.2f}-{s['tl_end']:5.2f} {s['audio_type']}")
+              f"tl {s['tl_start']:5.2f}-{s['tl_end']:5.2f} {s['audio_type']}{extra}")
     for c in cuts:
         if c["on_beat"] is None:
             print(f"cắt sau {c['after']} lúc {c['at']}s: trước khi nhạc vào")

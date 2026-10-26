@@ -77,7 +77,8 @@
       "description": "Hiệu ứng hình khi dựng",
       "properties": {
         "preset": { "enum": ["none", "hype"], "default": "none", "description": "hype = mỗi nhát cắt có flash + zoom đập + rung + mờ chuyển động, mỗi beat có nhịp zoom nhẹ" },
-        "intensity": { "type": "number", "minimum": 0.3, "maximum": 2, "default": 1 }
+        "intensity": { "type": "number", "minimum": 0.3, "maximum": 2, "default": 1 },
+        "sfx": { "type": "boolean", "description": "Whoosh trước + impact tại mỗi nhát cắt, riser vào drop. Mặc định bật khi preset = hype." }
       }
     },
     "captions": {
@@ -89,7 +90,7 @@
     },
     "variants": {
       "type": "array",
-      "description": "Biến thể rẻ: chỉ đổi overlay/hook/nhạc/thứ tự, không cần gen lại clip",
+      "description": "Biến thể rẻ, render thêm từ cùng footage. Hiện render.py áp dụng overlay_overrides (shot id → chữ mới); music_file và shot_order chưa render.",
       "items": {
         "type": "object",
         "required": ["id"],
@@ -116,6 +117,11 @@
             "description": "Mẫu tên clip trong clips/, vd c01*.mp4 (nhiều take). Nhiều shot có thể dùng chung một clip thoại."
           },
           "gen_sec": { "type": "number", "default": 8, "description": "Thời lượng clip Veo gen ra" },
+          "moment": {
+            "enum": ["a", "b", "peak", "calm"],
+            "description": "Đoạn nào của clip: a = đầu clip, b = sau lúc đổi hành động, peak = chuyển động mạnh nhất, calm = tĩnh nhất (cho hình in). Bị override.src_in ghi đè."
+          },
+          "speed": { "type": "number", "minimum": 0.5, "maximum": 2, "description": "Tốc độ phát: 0.6–0.8 slow-mo cho cảnh reveal, 1.2 cho bước lắp nhanh. Không áp dụng cho cảnh thoại còn giữ tiếng." },
           "use_sec": { "type": "number", "exclusiveMinimum": 0, "description": "Thời lượng dùng trong video cuối" },
           "audio_type": { "enum": ["dialogue", "sfx", "music_only"] },
           "dialogue": {
@@ -124,8 +130,8 @@
           },
           "overlay": { "type": ["string", "null"] },
           "overlay_pos": {
-            "enum": ["top", "center", "lower", "bottom"], "default": "top",
-            "description": "Vị trí chữ overlay; đổi khi chữ đè mặt người hoặc hình in; bottom = sát vùng an toàn dưới"
+            "enum": ["top", "center", "lower", "bottom", "auto"], "default": "top",
+            "description": "Vị trí chữ overlay; auto = tự chọn dải khung thưa chi tiết nhất; bottom = sát vùng an toàn dưới"
           },
           "print_fidelity": { "enum": ["strict", "normal"], "default": "normal", "description": "strict = cảnh có chữ/số/logo in, bắt buộc QC so với file thiết kế" },
           "status": { "enum": ["pending", "pass", "review", "reject"], "default": "pending" },

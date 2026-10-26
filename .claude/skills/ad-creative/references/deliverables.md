@@ -70,7 +70,16 @@ and clip so the user knows what each prompt makes without reading English.
   `"music_only"`, `print_fidelity: "strict"` where the print must be legible
 - `overlay` text only from approved claims or framing; `overlay_pos` `top`
   unless the keyframe puts a face or the print there
-- `music`: `{"source": "auto", "mood": "...", "bpm_range": [..]}` unless the
-  user gives a track
+- `music`: `{"source": "auto", "mood": "...", "bpm_range": [..], "drop_on": "<payoff shot>"}`
+  unless the user gives a track
+- per shot: `moment` (`a`/`b` for the two halves you wrote into the clip,
+  `peak` for action, `calm` for print close-ups), `speed` 0.6–0.8 on the
+  payoff shot only, `overlay_pos: "auto"`; `use_sec` uneven on purpose
+  (steps 1.2–1.6 s, payoff 2–2.5 s)
+- `fx`: `{"preset": "hype", "intensity": 0.8}` for hype/montage formats,
+  omit for calm formats
+- `variants`: three hooks of different *types* (see `viral-playbook.md` §2),
+  e.g. `[{"id": "hookB", "overlay_overrides": {"s01": "POV: ..."}}, ...]`;
+  the Editor renders one file per variant
 
 Then run the checks in SKILL.md Stage 6.

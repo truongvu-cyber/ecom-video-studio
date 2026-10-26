@@ -27,8 +27,11 @@ Thiếu gì thì hỏi người dùng, không tự bịa clip hay nhạc.
 
 ## Quy trình
 
+Trước khi quyết định cắt ở đâu, giữ bao lâu, chữ đặt đâu, nhanh hay chậm: đọc `references/editing-playbook.md` (tư duy của editor short-form: mỗi nhát cắt phải thêm thông tin mới, nhịp nhanh-nhanh-nhanh-giữ, drop dành cho hình mạnh nhất, bảo vệ chữ in, kết thúc có sản phẩm trong khung).
+
 1. **validate** — sai schema hoặc thiếu file thì dừng, báo đúng lỗi.
 2. **inspect** — loại take sai tỉ lệ, quá ngắn, mất tiếng; chấm điểm khung đen; chọn take tốt nhất theo kỹ thuật → `edit/media.json`.
+2b. **moments** — đo chuyển động từng clip: lúc đổi hành động (`split`/`settled`), cửa sổ động nhất (`peak`), tĩnh nhất (`calm`) → `edit/moments.json`. Shot dùng `moment: a|b|peak|calm` sẽ tự lấy đúng đoạn; `override.src_in` vẫn ghi đè khi bạn nhìn thấy điểm tốt hơn trên sheet.
 3. **Tự xem take bằng mắt (bắt buộc với cảnh `print_fidelity: strict` và mọi clip thoại).** Dùng skill `/watch` ở chế độ **local** (không dùng Gemini cho sản phẩm chưa ra mắt) hoặc trích frame bằng ffmpeg rồi đọc ảnh. Tìm: sản phẩm méo so với ảnh khung đầu, chữ/số/logo in sai, tay biến dạng, phụ đề Veo tự in vào hình, giọng lệch hẳn so với clip khác. Take lỗi thì đặt `chosen_take` sang take khác trong production.json; không còn take tốt thì báo người dùng gen lại cảnh đó (ghi rõ shot và lỗi).
 4. **transcribe** — mlx-whisper chép lời từng chữ (lần đầu tải model ~1.6GB).
 5. **beats** — dò beat và drop của nhạc.
@@ -49,6 +52,11 @@ Chỉ sửa đúng phần được nhắc, rồi chạy lại từ bước thấ
 |---|---|---|
 | "Cảnh 2 ngắn/dài hơn" | `shots[].use_sec` | timeline |
 | "Cắt chỗ này sớm hơn" | `shots[].override.src_in/src_out` (giây trong clip nguồn) | timeline |
+| "Lấy đoạn sau / đoạn động nhất / đoạn tĩnh của clip" | `shots[].moment: "b" / "peak" / "calm"` (đọc từ `edit/moments.json`) | timeline |
+| "Cảnh này chậm lại (slow-mo) / nhanh lên" | `shots[].speed: 0.6–0.8` cho reveal, `1.2–1.3` cho bước lắp; không dùng cho cảnh thoại còn tiếng | timeline |
+| "Chữ tự tránh mặt/sản phẩm" | `overlay_pos: "auto"` (đo dải khung thưa chi tiết nhất; sai thì đặt tay) | timeline |
+| "Thêm/bớt tiếng whoosh, impact" | `fx.sfx: true/false` (mặc định bật khi `fx.preset = hype`) | render |
+| "Ra 3 bản hook để test" | `variants: [{id, overlay_overrides: {s01: "chữ mới"}}]` → `out/final_<id>_<variant>.mp4`; `--no-variants` để bỏ qua khi sửa nhanh | render |
 | "Đổi chữ / đổi vị trí chữ" | `overlay`, `overlay_pos` (`top`/`center`/`lower`/`bottom`; với cảnh CTA, `overlay_pos` dời luôn nút CTA) | timeline |
 | "Dùng take khác" | `chosen_take` | inspect |
 | "Đổi nhạc" | `music.file` hoặc `music.mood` + `source: auto` | beats |

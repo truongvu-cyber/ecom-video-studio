@@ -18,7 +18,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from common import BRAND, HYPERFRAMES, load_json, loudness, project_dir, run
+from common import BRAND, HYPERFRAMES, MUSIC_LIBRARY, load_json, loudness, media_info, project_dir, run
 
 SR = 48000
 CLIP_TARGET_LUFS = {"dialogue": -18.0, "sfx": -24.0}
@@ -29,11 +29,16 @@ MUSIC_BED_DB = -6.0  # music level relative to its own loudness before ducking
 def cut_segments(project: Path, plan: dict, work: Path) -> Path:
     w, h, fps = plan["width"], plan["height"], plan["fps"]
     parts = []
+    src_h: dict[str, int] = {}
     for i, s in enumerate(plan["segments"]):
         src = project / "clips" / s["take"]
+        if s["take"] not in src_h:
+            src_h[s["take"]] = int(media_info(src).get("height") or h)
         dur = s["src_out"] - s["src_in"]
+        # Veo usually delivers 720p: a light unsharp after the upscale brings edges back
+        sharpen = ",unsharp=5:5:0.6:5:5:0.0" if src_h[s["take"]] < h else ""
         vf = (f"trim=start={s['src_in']}:duration={dur},setpts=(PTS-STARTPTS)/{s['speed']},"
-              f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1,fps={fps}")
+              f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1{sharpen},fps={fps}")
         out = work / f"seg{i:02d}.mp4"
         run(["ffmpeg", "-y", "-v", "error", "-i", str(src), "-an", "-vf", vf,
              "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-pix_fmt", "yuv420p", str(out)])
@@ -110,6 +115,87 @@ def music_track(plan: dict, work: Path) -> Path | None:
           f"volume='{expr}':eval=frame")
     out = work / "music.wav"
     run(["ffmpeg", "-y", "-v", "error", "-i", m["file"], "-af", af, "-t", str(total), str(out)])
+    return out
+
+
+def _noise_sweep(n: int, a_from: float, a_to: float, seed: int) -> "np.ndarray":
+    """White noise through a one-pole low-pass whose coefficient glides a_from -> a_to
+    (0.99 = dark rumble, 0.5 = bright hiss): the classic whoosh/riser colour."""
+    import numpy as np
+
+    x = np.random.default_rng(seed).normal(0, 1, n).astype(np.float32)
+    a = np.linspace(a_from, a_to, n, dtype=np.float32)
+    y = np.empty(n, dtype=np.float32)
+    acc = 0.0
+    for i in range(n):
+        acc = a[i] * acc + (1.0 - a[i]) * x[i]
+        y[i] = acc
+    return y / (np.abs(y).max() + 1e-9)
+
+
+def sfx_bank() -> dict:
+    """Synthesised cut sounds, cached in music-library/sfx (no external files needed)."""
+    import numpy as np
+    import soundfile as sf
+
+    d = MUSIC_LIBRARY / "sfx"
+    d.mkdir(exist_ok=True)
+    out = {}
+    specs = {"whoosh": 0.36, "impact": 0.30, "riser": 1.6}
+    for name, sec in specs.items():
+        f = d / f"{name}.wav"
+        if not f.exists():
+            n = int(sec * SR)
+            t = np.arange(n) / SR
+            if name == "whoosh":
+                env = np.minimum(t / (sec * 0.82), 1.0) ** 2 * np.exp(-np.maximum(t - sec * 0.82, 0) / 0.03)
+                y = _noise_sweep(n, 0.985, 0.55, 1) * env * 0.28
+            elif name == "impact":
+                freq = 42 + 70 * np.exp(-t / 0.045)             # pitch drop 112 -> 42 Hz
+                body = np.sin(2 * np.pi * np.cumsum(freq) / SR) * np.exp(-t / 0.09)
+                click = np.random.default_rng(2).normal(0, 1, n) * np.exp(-t / 0.006)
+                y = (0.34 * body + 0.07 * click)
+            else:
+                env = (t / sec) ** 2.2
+                y = _noise_sweep(n, 0.995, 0.6, 3) * env * 0.55
+            y = np.clip(y, -0.95, 0.95).astype(np.float32)
+            sf.write(f, np.stack([y, y], axis=1), SR)
+        out[name] = f
+    return out
+
+
+def sfx_track(plan: dict, work: Path) -> Path | None:
+    """Whoosh before + impact on every cut, a riser into the drop (fx.sfx)."""
+    import numpy as np
+    import soundfile as sf
+
+    fx = plan.get("fx") or {}
+    if not fx.get("sfx", fx.get("preset") == "hype"):
+        return None
+    k = float(fx.get("intensity", 1))
+    bank = {n: sf.read(p, dtype="float32")[0] for n, p in sfx_bank().items()}
+    total = plan["total_sec"]
+    buf = np.zeros((int(total * SR) + SR, 2), dtype=np.float32)
+
+    def put(name: str, at: float, gain: float) -> None:
+        y = bank[name] * gain
+        s = int(max(0.0, at) * SR)
+        e = min(len(buf), s + len(y))
+        if e > s:
+            buf[s:e] += y[: e - s]
+
+    cuts = [s["tl_start"] for s in plan["segments"][1:]]
+    for t in cuts:
+        put("whoosh", t - 0.30, 0.9 * k)
+        put("impact", t, 1.0 * k)
+    m = plan["music"]
+    if m.get("file") and m.get("drop_sec") is not None:
+        drop_tl = m["drop_sec"] - m["offset"] + m["delay"]
+        if 1.0 < drop_tl < total:
+            put("riser", drop_tl - 1.6, 0.8 * k)
+            put("impact", drop_tl, 1.1 * k)
+    out = work / "sfx.wav"
+    sf.write(out, np.clip(buf[: int(total * SR)], -1, 1), SR)
     return out
 
 
@@ -304,6 +390,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("project")
     ap.add_argument("--quality", default="delivery", choices=["draft", "looks", "delivery"])
+    ap.add_argument("--no-variants", action="store_true", help="chỉ render bản chính")
     args = ap.parse_args()
 
     project = project_dir(args.project)
@@ -322,12 +409,14 @@ def main() -> None:
     print("2/4 dựng âm thanh...")
     native = native_audio(project, plan, work)
     music = music_track(plan, work)
+    sfx = sfx_track(plan, work)
+    extra = [sfx] if sfx else []
     pid = plan["project_id"]
     mixes = {}
     if music:
-        mixes["final"] = master([native, music], plan, work / "mix_music.wav")
+        mixes["final"] = master([native, music, *extra], plan, work / "mix_music.wav")
     if (plan["audio"].get("export_no_music", True) and plan["audio"].get("keep_native", True)) or not music:
-        mixes["no-music"] = master([native], plan, work / "mix_nomusic.wav")
+        mixes["no-music"] = master([native, *extra], plan, work / "mix_nomusic.wav")
 
     print("3/4 vẽ phụ đề và chữ (HyperFrames)...")
     composition(plan, hf)
@@ -340,6 +429,23 @@ def main() -> None:
         out = project / "out" / (f"final_{pid}.mp4" if name == "final" else f"final_{pid}_no-music.mp4")
         mux(visual, audio, out)
         outputs.append(out)
+
+    variants = [] if args.no_variants else plan.get("variants", [])
+    main_audio = mixes.get("final") or next(iter(mixes.values()))
+    for v in variants:
+        overrides = v.get("overlay_overrides") or {}
+        if not overrides:
+            continue
+        print(f"   biến thể {v['id']}: đổi chữ {', '.join(overrides)}")
+        plan_v = {**plan, "overlays": [{**o, "text": overrides.get(o["shot"], o["text"])} for o in plan["overlays"]]}
+        composition(plan_v, hf)
+        visual_v = project / "edit" / f"visual_{v['id']}.mp4"
+        render_overlay(hf, visual_v, plan["fps"], args.quality)
+        out = project / "out" / f"final_{pid}_{v['id']}.mp4"
+        mux(visual_v, main_audio, out)
+        outputs.append(out)
+    if variants:
+        composition(plan, hf)  # leave the main composition on disk for inspection
     shutil.rmtree(work, ignore_errors=True)
     for o in outputs:
         print("->", o.relative_to(project))

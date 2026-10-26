@@ -45,7 +45,13 @@ ALLOW_TEST_MUSIC=1 .venv/bin/python scripts/edit_pipeline.py <id>       # cho ph
 .venv/bin/python scripts/fetch_music.py --url <link> --mood "lofi"     # tải một bài cụ thể
 ```
 
-Kết quả: `out/final_<id>.mp4`, `out/final_<id>_no-music.mp4`, `out/edit-report.md`, ảnh kiểm tra `edit/qc/sheet.jpg`.
+Kết quả: `out/final_<id>.mp4`, `out/final_<id>_no-music.mp4`, `out/final_<id>_<variant>.mp4` (biến thể hook), `out/edit-report.md`, ảnh kiểm tra `edit/qc/sheet.jpg`.
+
+Các bước: validate → inspect (chọn take) → moments (đo chuyển động, tìm lúc đổi hành động) → transcribe → beats → timeline → render → qc.
+
+Trường điều khiển dựng trong `production.json` (xem `schemas/production.schema.json`): `shots[].moment` (`a`/`b`/`peak`/`calm`), `shots[].speed` (slow-mo 0.6–0.8), `shots[].overlay_pos` (`auto` tự tránh mặt/sản phẩm), `fx` (`hype` + `sfx`), `music.drop_on`, `variants` (3 hook để A/B).
+
+Tư duy chuyên gia nằm trong `.claude/skills/ad-creative/references/viral-playbook.md` (viết) và `.claude/skills/ad-editor/references/editing-playbook.md` (dựng).
 
 ## Quy ước clip
 

@@ -44,7 +44,8 @@
   },
   "fx": {
     "preset": "hype",
-    "intensity": 1
+    "intensity": 0.8,
+    "sfx": true
   },
   "shots": [
     {
@@ -55,7 +56,7 @@
       "use_sec": 2,
       "audio_type": "sfx",
       "overlay": "OPEN THE *DOOR*…",
-      "overlay_pos": "top",
+      "overlay_pos": "auto",
       "print_fidelity": "strict"
     },
     {
@@ -66,11 +67,9 @@
       "use_sec": 1.8,
       "audio_type": "sfx",
       "overlay": "*GAME DAY* EVERY DAY",
-      "overlay_pos": "top",
+      "overlay_pos": "auto",
       "print_fidelity": "strict",
-      "override": {
-        "src_in": 5.0
-      }
+      "moment": "b"
     },
     {
       "id": "s03",
@@ -80,7 +79,7 @@
       "use_sec": 1.6,
       "audio_type": "sfx",
       "overlay": "1. *BATTERIES*",
-      "overlay_pos": "top"
+      "overlay_pos": "auto"
     },
     {
       "id": "s04",
@@ -90,10 +89,8 @@
       "use_sec": 1.6,
       "audio_type": "sfx",
       "overlay": "2. *WIPE*",
-      "overlay_pos": "top",
-      "override": {
-        "src_in": 5.6
-      }
+      "overlay_pos": "auto",
+      "moment": "b"
     },
     {
       "id": "s05",
@@ -103,10 +100,8 @@
       "use_sec": 1.6,
       "audio_type": "sfx",
       "overlay": "3. *PEEL*",
-      "overlay_pos": "top",
-      "override": {
-        "src_in": 0.8
-      }
+      "overlay_pos": "auto",
+      "moment": "a"
     },
     {
       "id": "s06",
@@ -116,10 +111,8 @@
       "use_sec": 1.8,
       "audio_type": "sfx",
       "overlay": "4. STICK — *NO TOOLS*",
-      "overlay_pos": "top",
-      "override": {
-        "src_in": 5.0
-      }
+      "overlay_pos": "auto",
+      "moment": "b"
     },
     {
       "id": "s07",
@@ -129,8 +122,9 @@
       "use_sec": 2.2,
       "audio_type": "sfx",
       "overlay": "*60 SECOND* INSTALL",
-      "overlay_pos": "top",
-      "print_fidelity": "strict"
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "speed": 0.75
     },
     {
       "id": "s08",
@@ -140,10 +134,22 @@
       "use_sec": 2.2,
       "audio_type": "sfx",
       "overlay": "GET YOURS — *LINK BELOW* ↓",
-      "override": {
-        "src_in": 4.6
-      },
-      "overlay_pos": "top"
+      "overlay_pos": "auto",
+      "moment": "b"
+    }
+  ],
+  "variants": [
+    {
+      "id": "hookB",
+      "overlay_overrides": {
+        "s01": "POV: *YOUR* CAR NOW"
+      }
+    },
+    {
+      "id": "hookC",
+      "overlay_overrides": {
+        "s01": "*WAIT* FOR IT…"
+      }
     }
   ]
 }

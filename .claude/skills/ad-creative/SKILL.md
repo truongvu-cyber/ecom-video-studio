@@ -68,6 +68,10 @@ unconfirmed. Otherwise decide and list assumptions.
 
 ## Stage 2 — Direction and story draft → STOP
 
+- Read `references/viral-playbook.md` first: frame 1 carries the payoff,
+  re-hook every 2–4 s, uneven rhythm (fast setup, held payoff), text = claim
+  and picture = proof, drop on the payoff shot, three hook variants. Run its
+  **draft checklist** on the story table before showing it.
 - Mode C first: run `scripts/analyze_ref.py`, read `refs/<stem>/sheet.jpg`,
   build the beat table.
 - Pick angle, genre (POD → `pod-customize.md` #22), style, length (15-20 s),
@@ -115,7 +119,12 @@ Follow the Veo section of `models.md` and `house-rules.md`:
 
 1. Write `production.json` per `deliverables.md` Step 2. Every claim in
    `dialogue` or `overlay` must be a `product.json` claim with evidence, or
-   framing from `inferred` (never a fact from `unknown`).
+   framing from `inferred` (never a fact from `unknown`). Encode the edit
+   intent the Editor cannot guess: `moment` (`a` first half, `b` second
+   half, `peak` busiest, `calm` stillest — for print shots), uneven
+   `use_sec` (setup short, payoff long), `speed` 0.6–0.8 on the payoff,
+   `overlay_pos: "auto"`, `music.drop_on` = the payoff shot, and **three hook
+   `variants`** of different hook types.
 2. Run and fix every FAIL (fix WARNs unless there is a reason):
    ```bash
    .venv/bin/python scripts/creative_check.py <id>
