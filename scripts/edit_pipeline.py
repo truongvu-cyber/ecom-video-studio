@@ -1,6 +1,6 @@
 """Run the whole Editor pipeline, or resume from a step.
 
-Usage: edit_pipeline.py <project> [--from validate|inspect|moments|transcribe|beats|timeline|render|qc]
+Usage: edit_pipeline.py <project> [--from validate|inspect|takes|moments|transcribe|beats|timeline|render|qc]
                                   [--quality draft|looks|delivery]
 
 A revision (đổi use_sec, overlay, override, nhạc) usually only needs --from timeline.
@@ -16,6 +16,7 @@ HERE = Path(__file__).resolve().parent
 STEPS = [
     ("validate", "validate.py"),
     ("inspect", "inspect_media.py"),
+    ("takes", "takes_sheet.py"),
     ("moments", "find_moments.py"),
     ("transcribe", "transcribe.py"),
     ("beats", "beat_detect.py"),

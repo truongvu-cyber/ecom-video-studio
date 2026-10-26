@@ -27,7 +27,17 @@ file in `frames/`.
 
 **Chi phí gen:** <k> keyframes + <c> clips × 8s (Veo) · biến thể: <list with cost>
 **Hướng khác:** 1) ... 2) ...
+
+## Checklist (viral-playbook)
+| # | test | kết quả |
+|---|---|---|
+| 1 | Thumb (frame 1) | ✅ logo bừng sáng ngay frame đầu |
+| 2 | New-info mỗi cảnh | ⚠️ s03 và s04 cùng góc → đổi s04 sang cận |
+| … | … | … |
 ```
+
+The checklist is filled honestly: a ⚠️ line names the fix made, a ❌ line
+means the draft is not ready to show.
 
 Stop here and ask for approval (or changes). Nothing below is written before
 the user says yes.
@@ -62,7 +72,7 @@ and clip so the user knows what each prompt makes without reading English.
 
 **`production.json`** (schema `schemas/production.schema.json`):
 
-- `stage: "prompts_ready"`, `gen_model: {image: "nano-banana-pro", video: "veo-3"}`
+- `format` (from `formats.md`), `stage: "prompts_ready"`, `gen_model: {image: "nano-banana-pro", video: "veo-3"}`
 - one shot per row of the story table, in timeline order
 - dialogue shots: `file_pattern: "c01*.mp4"`, `audio_type: "dialogue"`,
   `dialogue` = exactly the line written in clip 1's prompt

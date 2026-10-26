@@ -51,12 +51,17 @@ written anyway (it helps a regenerate stay close) but it is not trusted.
 - Shots with a printed name, number or logo: follow `pod-customize.md`
   section 2 and mark them `print_fidelity: strict`.
 
-## Lengths in production.json
+## Lengths and settings in production.json
+
+Pick the format first (`references/formats.md`) and copy its preset row:
+clip design, shot count, `use_sec` ranges, `moment`, `speed`, audio, captions,
+text style, fx, music mood and BPM, `drop_on`, variants. Universal limits:
 
 - `gen_sec`: 8 for every clip (or what the user actually generated).
-- `use_sec`: B-roll 2-4 s; a dialogue shot = its line at 2.5 words/s + 0.5 s.
 - `use_sec <= gen_sec - 1` always (margin for the Editor's beat snapping).
 - Sum of `use_sec` within ±2 s of `spec.target_sec`.
+- Montage formats write **two actions into every clip** (first action 0–4 s,
+  the camera settles, second action 4–8 s) so one generation yields two shots.
 
 ## Never
 

@@ -133,6 +133,9 @@ def main() -> None:
     lines += ["", "Ảnh kiểm tra: `edit/qc/sheet.jpg`" + (", `edit/qc/print_*.jpg`" if strict else "")]
     (project / "out" / "edit-report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     save_json(qc_dir / "qc.json", {"verdict": verdict, "reject": reject, "review": review, "notes": notes})
+    if verdict != "REJECT" and prod.get("stage") != "approved":
+        prod["stage"] = "rendered"
+        save_json(project / "production.json", prod)
 
     print(f"QC: {verdict}")
     for r in reject + review:

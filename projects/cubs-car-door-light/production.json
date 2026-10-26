@@ -57,7 +57,8 @@
       "audio_type": "sfx",
       "overlay": "OPEN THE *DOOR*…",
       "overlay_pos": "auto",
-      "print_fidelity": "strict"
+      "print_fidelity": "strict",
+      "moment": "a"
     },
     {
       "id": "s02",
@@ -79,7 +80,8 @@
       "use_sec": 1.6,
       "audio_type": "sfx",
       "overlay": "1. *BATTERIES*",
-      "overlay_pos": "auto"
+      "overlay_pos": "auto",
+      "moment": "a"
     },
     {
       "id": "s04",
@@ -124,7 +126,8 @@
       "overlay": "*60 SECOND* INSTALL",
       "overlay_pos": "auto",
       "print_fidelity": "strict",
-      "speed": 0.75
+      "speed": 0.75,
+      "moment": "a"
     },
     {
       "id": "s08",
@@ -151,5 +154,6 @@
         "s01": "*WAIT* FOR IT…"
       }
     }
-  ]
+  ],
+  "format": "demo_steps"
 }

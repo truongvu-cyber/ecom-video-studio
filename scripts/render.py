@@ -380,6 +380,21 @@ def render_overlay(hf: Path, out: Path, fps: int, quality: str) -> None:
         raise RuntimeError("HyperFrames render lỗi:\n" + "\n".join((res.stderr + res.stdout).splitlines()[-25:]))
 
 
+def archive_previous(out_dir: Path) -> None:
+    """Move the previous render into out/v<N>/ so the user can compare versions."""
+    finals = sorted(out_dir.glob("final_*.mp4")) + sorted(out_dir.glob("preview_*.mp4"))
+    if not finals:
+        return
+    n = 1
+    while (out_dir / f"v{n}").exists():
+        n += 1
+    vdir = out_dir / f"v{n}"
+    vdir.mkdir()
+    for f in finals + [p for p in [out_dir / "edit-report.md"] if p.exists()]:
+        shutil.move(str(f), vdir / f.name)
+    print(f"   bản trước -> out/v{n}/")
+
+
 def mux(video: Path, audio: Path, out: Path) -> None:
     run(["ffmpeg", "-y", "-v", "error", "-i", str(video), "-i", str(audio),
          "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
@@ -401,6 +416,7 @@ def main() -> None:
         shutil.rmtree(d, ignore_errors=True)
         d.mkdir(parents=True)
     (project / "out").mkdir(exist_ok=True)
+    archive_previous(project / "out")
 
     print("1/4 cắt và ghép hình...")
     base = cut_segments(project, plan, work)
@@ -446,6 +462,13 @@ def main() -> None:
         outputs.append(out)
     if variants:
         composition(plan, hf)  # leave the main composition on disk for inspection
+
+    # a small copy that fits chat/phone upload limits; the full-quality file stays final_*
+    main_out = project / "out" / f"final_{pid}.mp4"
+    if main_out.exists():
+        run(["ffmpeg", "-y", "-v", "error", "-i", str(main_out), "-c:v", "libx264", "-crf", "24",
+             "-preset", "medium", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart",
+             str(project / "out" / f"preview_{pid}.mp4")])
     shutil.rmtree(work, ignore_errors=True)
     for o in outputs:
         print("->", o.relative_to(project))

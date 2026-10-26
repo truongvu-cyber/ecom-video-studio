@@ -10,6 +10,10 @@
     "project_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
     "product_ref": { "type": "string", "description": "Đường dẫn tương đối tới product.json" },
     "platform": { "enum": ["tiktok_reels", "meta_reels", "youtube_shorts"], "default": "tiktok_reels" },
+    "format": {
+      "enum": ["ugc_dialogue", "hype_montage", "calm_lofi", "demo_steps"],
+      "description": "Preset dựng (xem ad-creative/references/formats.md); creative_check kiểm tra các trường còn lại khớp preset"
+    },
     "stage": {
       "enum": ["draft", "concept_approved", "prompts_ready", "clips_ready", "rendered", "approved"],
       "default": "draft"

@@ -68,6 +68,10 @@ unconfirmed. Otherwise decide and list assumptions.
 
 ## Stage 2 — Direction and story draft → STOP
 
+- Choose the **format** from `references/formats.md` §1 (`ugc_dialogue`,
+  `hype_montage`, `calm_lofi`, `demo_steps`) and take every edit setting from
+  its preset row; the colour, character, music-keyword and file-naming rules
+  in the same file are fixed. What stays creative is listed in its §7.
 - Read `references/viral-playbook.md` first: frame 1 carries the payoff,
   re-hook every 2–4 s, uneven rhythm (fast setup, held payoff), text = claim
   and picture = proof, drop on the payoff shot, three hook variants. Run its

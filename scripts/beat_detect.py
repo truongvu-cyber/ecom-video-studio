@@ -21,7 +21,7 @@ def pick_auto(music: dict) -> tuple[Path | None, str, int]:
     tags = load_json(MUSIC_LIBRARY / "tags.json").get("tracks", [])
     moods = set((music.get("mood") or "").lower().replace(",", " ").split())
     lo, hi = (music.get("bpm_range") or [0, 999])
-    best, best_score = None, -1.0
+    best, best_key, best_score = None, None, -1
     for t in tags:
         f = MUSIC_LIBRARY / t["file"]
         lic = t.get("license") or ""
@@ -34,8 +34,11 @@ def pick_auto(music: dict) -> tuple[Path | None, str, int]:
         if overlap == 0:
             continue  # right tempo but wrong mood (e.g. a rap track for a lo-fi ad) is not a match
         score = overlap * 2 + (1 if t.get("bpm") and lo <= t["bpm"] <= hi else 0)
-        if score > best_score:
-            best, best_score = (f, lic), score
+        # ties: closest tempo to the middle of the range, then file name (never insertion order)
+        mid = (lo + hi) / 2
+        key = (score, -abs((t.get("bpm") or mid) - mid), t["file"])
+        if best is None or key > best_key:
+            best, best_key, best_score = (f, lic), key, score
     if not best:
         return None, "không có bài nào trong music-library khớp mood", -1
     return best[0], best[1], int(best_score)

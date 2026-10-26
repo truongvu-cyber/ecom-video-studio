@@ -50,6 +50,74 @@ def clip_blocks(md: str) -> dict[int, str]:
     return out
 
 
+# formats.md §2, the machine-checkable part. use_sec bounds are (min, max) for B-roll shots.
+FORMATS = {
+    "ugc_dialogue": {"keep_native": True, "captions": True, "fx": "none", "text": "pill",
+                     "use": (2.0, 4.0), "shots": (5, 7), "dialogue_clips": 1},
+    "hype_montage": {"keep_native": False, "captions": False, "fx": "hype", "text": "bold",
+                     "use": (1.2, 2.5), "shots": (8, 8), "dialogue_clips": 0},
+    "calm_lofi": {"keep_native": True, "captions": False, "fx": "none", "text": "pill",
+                  "use": (2.5, 4.0), "shots": (4, 6), "dialogue_clips": 0},
+    "demo_steps": {"keep_native": None, "captions": False, "fx": "hype", "text": "bold",
+                   "use": (1.2, 2.5), "shots": (8, 8), "dialogue_clips": 0},
+}
+MAX_OVERLAY_WORDS = 4
+
+
+def check_format(prod: dict, fails: list[str], warns: list[str]) -> None:
+    fmt = prod.get("format")
+    if not fmt:
+        warns.append("Thiếu 'format' (ugc_dialogue | hype_montage | calm_lofi | demo_steps): không kiểm tra được preset")
+        return
+    f = FORMATS[fmt]
+    audio, caps = prod.get("audio", {}), prod.get("captions", {})
+    fx = (prod.get("fx") or {}).get("preset", "none")
+    text = (prod.get("text_style") or {}).get("preset", "pill")
+    if f["keep_native"] is not None and audio.get("keep_native", True) != f["keep_native"]:
+        fails.append(f"format {fmt}: audio.keep_native phải là {str(f['keep_native']).lower()}")
+    if caps.get("enabled", True) != f["captions"]:
+        fails.append(f"format {fmt}: captions.enabled phải là {str(f['captions']).lower()}")
+    if fx != f["fx"]:
+        fails.append(f"format {fmt}: fx.preset phải là '{f['fx']}' (đang '{fx}')")
+    if text != f["text"]:
+        warns.append(f"format {fmt}: text_style.preset nên là '{f['text']}' (đang '{text}')")
+    n = len(prod["shots"])
+    if not f["shots"][0] <= n <= f["shots"][1]:
+        warns.append(f"format {fmt}: nên có {f['shots'][0]}–{f['shots'][1]} shot (đang {n})")
+    # dialogue shots only matter when the voice is kept; muted formats may still use
+    # a talking clip as footage (the transcript then just locates the moment)
+    dlg = {s["file_pattern"] for s in prod["shots"] if s["audio_type"] == "dialogue"}
+    if fmt == "ugc_dialogue" and len(dlg) != 1:
+        fails.append(f"format {fmt}: cần đúng 1 clip thoại (đang {len(dlg)})")
+    lo, hi = f["use"]
+    for s in prod["shots"]:
+        if s["audio_type"] == "dialogue":
+            continue
+        if not lo <= s["use_sec"] <= hi:
+            warns.append(f"{s['id']}: use_sec {s['use_sec']}s ngoài khoảng {lo}–{hi}s của format {fmt}")
+        if fmt in ("hype_montage", "demo_steps") and not s.get("moment") and not (s.get("override") or {}).get("src_in"):
+            warns.append(f"{s['id']}: format {fmt} cần 'moment' (a/b/peak/calm) để Editor lấy đúng nửa clip")
+    if fmt != "ugc_dialogue" and not (prod.get("music") or {}).get("drop_on"):
+        warns.append(f"format {fmt}: nên đặt music.drop_on = shot payoff")
+    if len(prod.get("variants") or []) < 2:
+        warns.append("Thiếu biến thể hook: cần 3 hook khác kiểu (variants có ≥ 2 mục)")
+
+
+def check_overlays(prod: dict, fails: list[str], warns: list[str]) -> None:
+    bold = (prod.get("text_style") or {}).get("preset") == "bold"
+    for s in prod["shots"]:
+        ov = s.get("overlay")
+        if not ov:
+            continue
+        n = len(re.findall(r"[A-Za-z0-9'’]+", ov))
+        if n > MAX_OVERLAY_WORDS + 2:
+            fails.append(f"{s['id']}: overlay {n} từ ('{ov}'), tối đa {MAX_OVERLAY_WORDS}")
+        elif n > MAX_OVERLAY_WORDS:
+            warns.append(f"{s['id']}: overlay {n} từ, nên ≤ {MAX_OVERLAY_WORDS} ('{ov}')")
+        if bold and "*" not in ov and s["role"] != "cta":
+            warns.append(f"{s['id']}: chữ bold nên có một từ nhấn *word* ('{ov}')")
+
+
 def main() -> None:
     project = project_dir(sys.argv[1])
     py = sys.executable
@@ -137,6 +205,9 @@ def main() -> None:
     unused = sorted(set(blocks) - set(used))
     if unused:
         warns.append(f"Clip {unused} có prompt nhưng không shot nào dùng")
+
+    check_format(prod, fails, warns)
+    check_overlays(prod, fails, warns)
 
     print("\n== creative_check ==")
     for f in fails:

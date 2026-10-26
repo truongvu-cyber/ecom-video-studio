@@ -11,7 +11,7 @@ import sys
 
 from jsonschema import Draft202012Validator
 
-from common import ROOT, SCHEMAS, inside, load_json, project_dir
+from common import ROOT, SCHEMAS, inside, load_json, project_dir, save_json
 
 
 def check(schema_name: str, data: dict) -> list[str]:
@@ -63,7 +63,10 @@ def main() -> None:
         for e in errors:
             print(" -", e)
         sys.exit(1)
-    print(f"OK: {len(ids)} shots, schema {prod['schema_version']}")
+    if not args.no_clips and prod.get("stage") in (None, "draft", "concept_approved", "prompts_ready"):
+        prod["stage"] = "clips_ready"
+        save_json(project / "production.json", prod)
+    print(f"OK: {len(ids)} shots, schema {prod['schema_version']}, stage {prod.get('stage', '?')}")
 
 
 if __name__ == "__main__":

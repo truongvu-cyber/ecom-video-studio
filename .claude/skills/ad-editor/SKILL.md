@@ -31,6 +31,7 @@ Trước khi quyết định cắt ở đâu, giữ bao lâu, chữ đặt đâu
 
 1. **validate** — sai schema hoặc thiếu file thì dừng, báo đúng lỗi.
 2. **inspect** — loại take sai tỉ lệ, quá ngắn, mất tiếng; chấm điểm khung đen; chọn take tốt nhất theo kỹ thuật → `edit/media.json`.
+2a. **takes** — `edit/qc/takes.jpg`: mỗi clip một hàng, mỗi giây một frame. Đây là tấm ảnh bắt buộc phải đọc trước khi đặt `moment`/`override`: tìm giây có hành động, giây chữ in bị méo, giây camera đang lia. Clip có tên không theo mẫu `cNN_` (Veo đặt tên theo tiêu đề) thì đổi tên sau khi đọc sheet, đối chiếu nội dung với từng `## Clip N` trong `prompts.md`, và ghi bảng đổi tên vào báo cáo.
 2b. **moments** — đo chuyển động từng clip: lúc đổi hành động (`split`/`settled`), cửa sổ động nhất (`peak`), tĩnh nhất (`calm`) → `edit/moments.json`. Shot dùng `moment: a|b|peak|calm` sẽ tự lấy đúng đoạn; `override.src_in` vẫn ghi đè khi bạn nhìn thấy điểm tốt hơn trên sheet.
 3. **Tự xem take bằng mắt (bắt buộc với cảnh `print_fidelity: strict` và mọi clip thoại).** Dùng skill `/watch` ở chế độ **local** (không dùng Gemini cho sản phẩm chưa ra mắt) hoặc trích frame bằng ffmpeg rồi đọc ảnh. Tìm: sản phẩm méo so với ảnh khung đầu, chữ/số/logo in sai, tay biến dạng, phụ đề Veo tự in vào hình, giọng lệch hẳn so với clip khác. Take lỗi thì đặt `chosen_take` sang take khác trong production.json; không còn take tốt thì báo người dùng gen lại cảnh đó (ghi rõ shot và lỗi).
 4. **transcribe** — mlx-whisper chép lời từng chữ (lần đầu tải model ~1.6GB).
@@ -69,7 +70,20 @@ Chỉ sửa đúng phần được nhắc, rồi chạy lại từ bước thấ
 | "Dùng nhạc trong link này" | `fetch_music.py --url <link>` rồi `music: {"source": "file", "file": "music-library/<file>"}`; nhạc ngắn thì video tự cắt cho vừa; `drop_on: "none"` để phát từ đầu bài | beats |
 | "Nhạc mạnh/khác kiểu" | đổi `music.mood` sang từ khoá mới (tránh trùng từ với bài cũ để nó tìm bài mới) | beats |
 
-Trước khi render lại, chép file cũ trong `out/` sang `out/v<n>/` để người dùng so sánh.
+`render.py` tự chuyển bản cũ trong `out/` sang `out/v<n>/` trước mỗi lần render và tự xuất `out/preview_<id>.mp4` (bản nén để gửi qua chat/điện thoại; file `final_*` mới là bản giao). Không copy tay, không tự nén tay.
+
+## Trạng thái project (stage) — do script đặt, không sửa tay
+
+| stage | ai đặt | khi nào |
+|---|---|---|
+| `prompts_ready` | Agent 1 | prompt + production.json qua `creative_check` |
+| `clips_ready` | `validate.py` | lần đầu thấy đủ clip trong `clips/` |
+| `rendered` | `qc.py` | QC xong, không REJECT |
+| `approved` | `scripts/approve.py <id>` | **chỉ khi người dùng nói duyệt**; script từ chối nếu QC REJECT |
+
+## Các hằng số dựng (đổi trong code, không đổi theo cảm tính từng video)
+
+Bỏ 0,25 s đầu mỗi clip Veo · cảnh ngắn nhất 0,8 s · điểm cắt được dời tối đa nửa nhịp để trúng beat, coi là trúng khi lệch ≤ 45 ms · nhạc vào muộn tối đa 3 s để drop trùng cảnh · nhạc nền −6 dB so với chuẩn, hạ thêm −12 dB khi có thoại · chuẩn −14 LUFS, đỉnh −1 dBTP · chữ hiện 0,1 s sau nhát cắt, tắt 0,05 s trước nhát sau · `overlay_pos: auto` chọn dải ít chi tiết nhất, hoà thì ưu tiên top → bottom → lower → center · nhạc hoà điểm thì chọn bài có BPM gần giữa khoảng, rồi theo tên file.
 
 ## Không được làm
 

@@ -3,7 +3,7 @@
   "project_id": "demo-hoodie",
   "product_ref": "product.json",
   "platform": "tiktok_reels",
-  "stage": "clips_ready",
+  "stage": "approved",
   "gen_model": {
     "image": "nano-banana",
     "video": "veo-3"
@@ -78,6 +78,15 @@
       "audio_type": "dialogue",
       "dialogue": "The link is right below.",
       "overlay": "Personalize yours ↓"
+    }
+  ],
+  "format": "ugc_dialogue",
+  "variants": [
+    {
+      "id": "hookB",
+      "overlay_overrides": {
+        "s01": "POV: he'll *wear* it"
+      }
     }
   ]
 }

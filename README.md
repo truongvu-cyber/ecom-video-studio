@@ -47,7 +47,9 @@ ALLOW_TEST_MUSIC=1 .venv/bin/python scripts/edit_pipeline.py <id>       # cho ph
 
 Kết quả: `out/final_<id>.mp4`, `out/final_<id>_no-music.mp4`, `out/final_<id>_<variant>.mp4` (biến thể hook), `out/edit-report.md`, ảnh kiểm tra `edit/qc/sheet.jpg`.
 
-Các bước: validate → inspect (chọn take) → moments (đo chuyển động, tìm lúc đổi hành động) → transcribe → beats → timeline → render → qc.
+Các bước: validate → inspect (chọn take) → takes (ảnh từng giây của mọi clip) → moments (đo chuyển động, tìm lúc đổi hành động) → transcribe → beats → timeline → render (tự lưu bản cũ vào `out/vN/`, tự xuất `preview_*`) → qc. Duyệt: `.venv/bin/python scripts/approve.py <project-id>`.
+
+Mỗi project thuộc một `format` cố định (`ugc_dialogue`, `hype_montage`, `calm_lofi`, `demo_steps`, xem `.claude/skills/ad-creative/references/formats.md`); `creative_check.py` kiểm tra các trường dựng khớp preset.
 
 Trường điều khiển dựng trong `production.json` (xem `schemas/production.schema.json`): `shots[].moment` (`a`/`b`/`peak`/`calm`), `shots[].speed` (slow-mo 0.6–0.8), `shots[].overlay_pos` (`auto` tự tránh mặt/sản phẩm), `fx` (`hype` + `sfx`), `music.drop_on`, `variants` (3 hook để A/B).
 

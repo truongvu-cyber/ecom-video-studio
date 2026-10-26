@@ -48,7 +48,8 @@
       "audio_type": "sfx",
       "overlay": "*NEW* YORK",
       "overlay_pos": "bottom",
-      "print_fidelity": "strict"
+      "print_fidelity": "strict",
+      "moment": "a"
     },
     {
       "id": "s02",
@@ -59,7 +60,8 @@
       "audio_type": "sfx",
       "overlay": "GOLD *EDITION*",
       "overlay_pos": "bottom",
-      "print_fidelity": "strict"
+      "print_fidelity": "strict",
+      "moment": "a"
     },
     {
       "id": "s03",
@@ -70,7 +72,8 @@
       "audio_type": "sfx",
       "overlay": "BRUNSON *11*",
       "overlay_pos": "bottom",
-      "print_fidelity": "strict"
+      "print_fidelity": "strict",
+      "moment": "a"
     },
     {
       "id": "s04",
@@ -78,7 +81,8 @@
       "file_pattern": "c04*.mp4",
       "gen_sec": 8,
       "use_sec": 1.8,
-      "audio_type": "sfx"
+      "audio_type": "sfx",
+      "moment": "a"
     },
     {
       "id": "s05",
@@ -134,5 +138,6 @@
   "fx": {
     "preset": "hype",
     "intensity": 1
-  }
+  },
+  "format": "hype_montage"
 }
