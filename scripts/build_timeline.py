@@ -45,6 +45,24 @@ def find_dialogue(words: list[dict], target: str, cursor: int) -> tuple[int, int
     return best
 
 
+def script_spelling(heard: list[dict], line: str) -> list[dict]:
+    """Captions show the script's spelling where whisper misheard a word.
+
+    Whisper writes names it does not know phonetically ("UEKR" for "Uecker"); the
+    timing is right, the text is not. Swap in script words wherever the two word
+    lists line up one-to-one.
+    """
+    script = line.split()
+    a = [" ".join(norm(w["w"])) for w in heard]
+    b = [" ".join(norm(w)) for w in script]
+    out = [dict(w) for w in heard]
+    for op, i1, i2, j1, j2 in SequenceMatcher(None, a, b).get_opcodes():
+        if op == "replace" and i2 - i1 == j2 - j1:
+            for k in range(i2 - i1):
+                out[i1 + k]["w"] = script[j1 + k]
+    return out
+
+
 def dialogue_segment(shot: dict, words: list[dict], dur: float, cursor: int, issues: list[str]):
     i, j, score = find_dialogue(words, shot["dialogue"], cursor)
     if score < 0.6:
@@ -66,7 +84,7 @@ def dialogue_segment(shot: dict, words: list[dict], dur: float, cursor: int, iss
     seg = {
         "src_in": src_in, "src_out": src_out, "speed": 1.0,
         "out_min": wn["end"] + 0.08, "out_max": hi,
-        "words": [w for w in words[i:j + 1]],
+        "words": script_spelling(words[i:j + 1], shot["dialogue"]),
         "match": round(score, 3),
     }
     return seg, j + 1
@@ -148,6 +166,7 @@ def main() -> None:
     music = load_json(project / "edit" / "music.json")
     issues: list[str] = []
 
+    keep_native = prod["audio"].get("keep_native", True)
     cursors: dict[str, int] = {}
     segments = []
     for shot in prod["shots"]:
@@ -160,6 +179,11 @@ def main() -> None:
             words = load_json(tr_path)["words"]
             seg, cursors[take_name] = dialogue_segment(shot, words, take["duration"],
                                                        cursors.get(take_name, 0), issues)
+            if not keep_native:
+                # voice is muted: the transcript still picks the right moment of the
+                # clip, but the end is free to move to the beat
+                seg["out_min"] = seg["src_in"] + MIN_SHOT
+                seg["out_max"] = take["duration"]
         else:
             seg = broll_segment(shot, take, issues)
         ov = shot.get("override") or {}
@@ -198,7 +222,10 @@ def main() -> None:
     if music.get("file"):
         beats = music["beats"]
         interval = 60.0 / music["bpm"]
-        cta = next((s for s in segments if s["role"] == "cta"), None)
+        # the drop lands on the CTA by default, or on the shot named in music.drop_on
+        drop_on = prod["music"].get("drop_on")
+        cta = next((s for s in segments if s["shot"] == drop_on), None) if drop_on else None
+        cta = cta or next((s for s in segments if s["role"] == "cta"), None)
         offset, delay = align(cta["tl_start"] if cta else 0.0)
         # the moment the music comes in is itself a cut point worth landing on
         entry = [delay] if delay > 0 else []
@@ -207,10 +234,10 @@ def main() -> None:
         total = segments[-1]["tl_end"]
         if cta and music.get("drop_sec") is not None and offset == 0 and delay == 0 \
                 and abs(music["drop_sec"] - cta["tl_start"]) > SNAP_TOL:
-            issues.append("Không đặt được CTA trùng đoạn drop của nhạc")
+            issues.append(f"Không đặt được drop nhạc trùng cảnh {cta['shot']}")
         if offset + total - delay > music["duration"]:
             offset = max(0.0, music["duration"] - total + delay)
-            issues.append("Nhạc ngắn hơn video tính từ đoạn drop: CTA không trùng drop")
+            issues.append("Nhạc ngắn hơn video tính từ đoạn drop: drop không trùng cảnh đã chọn")
         beats_tl = ([delay] if delay > 0 else []) + [b - offset + delay for b in beats]
         for s in segments[:-1]:
             if s["tl_end"] < delay - SNAP_TOL:
@@ -241,7 +268,7 @@ def main() -> None:
                              "start": round(start, 3),
                              "end": round(max(start + 0.6, s["tl_end"] - 0.05), 3)})
     duck = []
-    for s in segments:
+    for s in segments if keep_native else []:
         if s["audio_type"] == "dialogue" and s["words"]:
             a = s["tl_start"] + (s["words"][0]["start"] - s["src_in"]) / s["speed"]
             b = s["tl_start"] + (s["words"][-1]["end"] - s["src_in"]) / s["speed"]
@@ -266,6 +293,7 @@ def main() -> None:
         "segments": [{k: (round(v, 3) if isinstance(v, float) else v) for k, v in s.items()
                       if k not in ("out_min", "out_max")} for s in segments],
         "cuts": cuts, "captions": captions, "overlays": overlays, "issues": issues,
+        "text_style": prod.get("text_style", {"preset": "pill"}),
     }
     save_json(project / "edit" / "edit-plan.json", plan)
 

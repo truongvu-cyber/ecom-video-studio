@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -62,7 +63,7 @@ def native_audio(project: Path, plan: dict, work: Path) -> Path:
     for i, s in enumerate(plan["segments"]):
         dur = (s["src_out"] - s["src_in"]) / s["speed"]
         inputs += ["-i", str(project / "clips" / s["take"])]
-        if s["audio_type"] == "music_only":
+        if s["audio_type"] == "music_only" or not plan["audio"].get("keep_native", True):
             chains.append(f"anullsrc=r={SR}:cl=stereo,atrim=duration={dur}[a{i}]")
             continue
         g = gains[s["take"] + s["audio_type"]]
@@ -128,7 +129,12 @@ def master(inputs: list[Path], plan: dict, out: Path) -> Path:
         ln += (f":measured_I={meas['input_i']}:measured_TP={meas['input_tp']}"
                f":measured_LRA={meas['input_lra']}:measured_thresh={meas['input_thresh']}"
                f":offset={meas['target_offset']}:linear=true")
-    run(["ffmpeg", "-y", "-v", "error", "-i", str(pre), "-af", ln, "-ar", str(SR), str(out)])
+    # loudnorm alone lets peaks through on punchy tracks, and AAC adds ~0.5 dB on top
+    # limit at 4x sample rate so inter-sample (true) peaks are caught too
+    limit = 10 ** ((tp - 1.0) / 20)
+    run(["ffmpeg", "-y", "-v", "error", "-i", str(pre), "-af",
+         f"{ln},aresample={SR * 4},alimiter=limit={limit:.3f}:level=false:attack=1:release=50,"
+         f"aresample={SR}", "-ar", str(SR), str(out)])
     pre.unlink()
     return out
 
@@ -138,6 +144,19 @@ def brand() -> dict:
     return load_json(p) if p.exists() else {}
 
 
+BOLD_CSS = """
+.headline span {{ background:none; padding:0 10px; display:inline-block; transform:rotate(-3deg);
+  font-family:Impact,"Arial Black",sans-serif; font-weight:400; font-size:100px; line-height:1.0;
+  letter-spacing:1px; text-transform:uppercase; color:{accent};
+  -webkit-text-stroke:16px {stroke}; paint-order:stroke fill;
+  text-shadow:0 12px 0 rgba(0,0,0,0.55), 0 0 40px rgba(0,0,0,0.45); }}
+.headline span em, .cta span em {{ font-style:normal; color:{ink}; }}
+.cta span {{ font-family:Impact,"Arial Black",sans-serif; font-weight:400; font-size:76px; letter-spacing:1px;
+  text-transform:uppercase; background:{accent}; color:{stroke}; border:7px solid {stroke};
+  box-shadow:0 12px 0 {stroke}; padding:18px 46px; display:inline-block; transform:rotate(-2deg); }}
+"""
+
+
 def composition(plan: dict, hf: Path) -> None:
     b = brand()
     colors = b.get("colors", {})
@@ -145,6 +164,9 @@ def composition(plan: dict, hf: Path) -> None:
     ink = colors.get("primary", "#FFFFFF")
     stroke = colors.get("text_stroke", "#000000")
     font = b.get("fonts", {}).get("caption", "Inter")
+    style = plan.get("text_style") or {}
+    bold = style.get("preset") == "bold"
+    accent = style.get("color", accent)
     W, H, T = plan["width"], plan["height"], plan["total_sec"]
     top = int(H * plan["safe_zone"].get("top", 0.15))
     bottom = int(H * plan["safe_zone"].get("bottom", 0.20))
@@ -153,10 +175,17 @@ def composition(plan: dict, hf: Path) -> None:
     for k, o in enumerate(plan["overlays"]):
         cls = "cta" if o["kind"] == "cta" else f"headline pos-{o.get('pos', 'top')}"
         d = round(o["end"] - o["start"], 3)
+        # *word* in an overlay is drawn in the second colour (white) for contrast
+        text = re.sub(r"\*(.+?)\*", r"<em>\1</em>", html.escape(o["text"]))
         els.append(f'<div id="ov{k}" class="clip {cls}" data-start="{o["start"]}" data-duration="{d}">'
-                   f'<span>{html.escape(o["text"])}</span></div>')
-        js.append(f'tl.fromTo("#ov{k} span",{{opacity:0,y:24,scale:0.96}},'
-                  f'{{opacity:1,y:0,scale:1,duration:0.22,ease:"power3.out"}},{o["start"]});')
+                   f'<span>{text}</span></div>')
+        if bold:
+            js.append(f'tl.fromTo("#ov{k} span",{{opacity:0,scale:2.2,rotation:-9}},'
+                      f'{{opacity:1,scale:1,rotation:-3,duration:0.26,ease:"back.out(2.4)"}},{o["start"]});')
+            js.append(f'tl.to("#ov{k} span",{{x:7,duration:0.035,yoyo:true,repeat:5,ease:"none"}},{o["start"] + 0.26});')
+        else:
+            js.append(f'tl.fromTo("#ov{k} span",{{opacity:0,y:24,scale:0.96}},'
+                      f'{{opacity:1,y:0,scale:1,duration:0.22,ease:"power3.out"}},{o["start"]});')
         if o["kind"] == "cta":
             js.append(f'tl.to("#ov{k} span",{{scale:1.06,duration:0.3,yoyo:true,repeat:3,ease:"sine.inOut"}},{o["start"] + 0.3});')
     for k, c in enumerate(plan["captions"]):
@@ -184,10 +213,11 @@ html, body {{ width:{W}px; height:{H}px; overflow:hidden; background:#000; }}
 .headline.pos-top {{ top:{top + 40}px; }}
 .headline.pos-center {{ top:{H // 2 - 60}px; }}
 .headline.pos-lower {{ bottom:{bottom + 380}px; }}
-.headline.pos-bottom {{ bottom:{bottom + 40}px; }}
+.headline.pos-bottom {{ bottom:{bottom + (190 if plan["captions"] else 40)}px; }}
 .headline span {{ background:rgba(0,0,0,0.55); color:{ink}; font-size:54px; font-weight:800; line-height:1.15; padding:16px 28px; border-radius:22px; }}
 .cta {{ bottom:{bottom + 220}px; }}
 .cta span {{ background:{accent}; color:#111; font-size:58px; font-weight:900; padding:22px 44px; white-space:nowrap; border-radius:999px; }}
+{BOLD_CSS.format(accent=accent, stroke=stroke, ink=ink) if bold else ""}
 .caption {{ bottom:{bottom + 40}px; flex-wrap:wrap; gap:0 18px; color:{ink}; font-size:84px; font-weight:900; line-height:1.1;
   -webkit-text-stroke:10px {stroke}; paint-order:stroke fill; text-transform:uppercase; }}
 </style>
@@ -256,7 +286,7 @@ def main() -> None:
     mixes = {}
     if music:
         mixes["final"] = master([native, music], plan, work / "mix_music.wav")
-    if plan["audio"].get("export_no_music", True) or not music:
+    if (plan["audio"].get("export_no_music", True) and plan["audio"].get("keep_native", True)) or not music:
         mixes["no-music"] = master([native], plan, work / "mix_nomusic.wav")
 
     print("3/4 vẽ phụ đề và chữ (HyperFrames)...")

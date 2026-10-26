@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0",
+  "project_id": "milwaukee-uecker-9-jersey",
+  "product_ref": "product.json",
+  "platform": "tiktok_reels",
+  "stage": "approved",
+  "gen_model": {
+    "image": "nano-banana-pro",
+    "video": "veo-3"
+  },
+  "spec": {
+    "ratio": "9:16",
+    "resolution": "1080x1920",
+    "fps": 24,
+    "target_sec": 16,
+    "safe_zone": {
+      "top": 0.15,
+      "bottom": 0.2
+    }
+  },
+  "audio": {
+    "source": "native",
+    "music_duck_db": -12,
+    "target_lufs": -14,
+    "true_peak_db": -1,
+    "export_no_music": false,
+    "keep_native": false
+  },
+  "music": {
+    "source": "auto",
+    "mood": "hard trap drill gang bass instrumental",
+    "bpm_range": [
+      60,
+      160
+    ],
+    "drop_on": "s05"
+  },
+  "captions": {
+    "enabled": false,
+    "style": "none"
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "role": "hook",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.6,
+      "audio_type": "dialogue",
+      "dialogue": "Milwaukee fans, look at this.",
+      "overlay": "MILWAUKEE FANS *LOOK*",
+      "overlay_pos": "bottom",
+      "print_fidelity": "strict"
+    },
+    {
+      "id": "s02",
+      "role": "proof",
+      "file_pattern": "c02*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.5,
+      "audio_type": "sfx",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 3.5
+      },
+      "overlay": "*UECKER* #9",
+      "overlay_pos": "bottom"
+    },
+    {
+      "id": "s03",
+      "role": "proof",
+      "file_pattern": "c03*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.5,
+      "audio_type": "sfx",
+      "overlay": "2026 *WORLD SERIES* PATCH",
+      "overlay_pos": "top",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 2.0
+      }
+    },
+    {
+      "id": "s04",
+      "role": "demo",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 3.6,
+      "audio_type": "dialogue",
+      "dialogue": "World Series and NL Champions patches. Uecker nine.",
+      "overlay": "NL CHAMPIONS *PATCH*",
+      "overlay_pos": "bottom"
+    },
+    {
+      "id": "s05",
+      "role": "lifestyle",
+      "file_pattern": "c04*.mp4",
+      "gen_sec": 8,
+      "use_sec": 3,
+      "audio_type": "music_only",
+      "overlay": "WORLD SERIES *WEEK*",
+      "overlay_pos": "bottom"
+    },
+    {
+      "id": "s06",
+      "role": "cta",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.4,
+      "audio_type": "dialogue",
+      "dialogue": "Link's below, grab yours.",
+      "overlay": "GET YOURS — *LINK BELOW* ↓"
+    }
+  ],
+  "text_style": {
+    "preset": "bold",
+    "color": "#FFC52F"
+  }
+}

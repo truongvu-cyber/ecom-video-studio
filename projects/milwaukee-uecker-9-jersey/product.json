@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "product_id": "milwaukee-uecker-9-jersey",
+  "name": "Milwaukee Uecker #9 Navy Jersey — 2026 World Series / NL Champions patches",
+  "model": "pod",
+  "reference_images": ["frames/product.png"],
+  "design_files": [],
+  "invariants": [
+    "Navy button-front baseball jersey with gold piping along the placket, collar and sleeve ends",
+    "Front: script word Milwaukee in gold across the chest, gold number 9 below it on the wearer's left side, small gold swoosh on the wearer's right chest",
+    "Wearer's left chest: round World Series 2026 patch; wearer's left sleeve: NATIONAL LEAGUE CHAMPIONS 2026 patch; wearer's right sleeve: gold monogram patch",
+    "Back: UECKER in gold block letters above a large gold number 9, small league logo at the collar",
+    "The two large patches at the bottom of the product photo are display callouts, not sewn on the jersey in those places"
+  ],
+  "facts": [
+    {"key": "jersey", "value": "Navy baseball jersey with gold lettering and piping", "source": "image"},
+    {"key": "name_number", "value": "UECKER and number 9 on the back, number 9 on the front", "source": "image"},
+    {"key": "patches", "value": "World Series 2026 patch and National League Champions 2026 patch", "source": "image"},
+    {"key": "team_script", "value": "Milwaukee script across the chest", "source": "image"}
+  ],
+  "inferred": [
+    {"key": "self_buyer", "value": "Milwaukee baseball fans 20-55 who want to wear the 2026 postseason moment"},
+    {"key": "gift_buyer", "value": "Partner or family buying for a lifelong Milwaukee fan; Christmas gift after the season"},
+    {"key": "tribute", "value": "UECKER #9 reads as a tribute to the team's legendary broadcaster; fans buy it for nostalgia"},
+    {"key": "season", "value": "Late October 2026: World Series window, urgency is highest now and falls after the Series"},
+    {"key": "desire", "value": "Be part of the moment at the watch party, at the bar, at the parade"}
+  ],
+  "unknown": [
+    "fabric and weight", "sizes", "price", "shipping time",
+    "stitched or printed lettering and patches",
+    "official licensing or authenticity",
+    "whether the team is playing in the 2026 World Series right now"
+  ],
+  "claims": [
+    {"text": "World Series and NL Champions patches", "evidence": "patches"},
+    {"text": "Uecker nine", "evidence": "name_number"}
+  ]
+}

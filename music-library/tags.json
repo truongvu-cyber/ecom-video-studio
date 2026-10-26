@@ -89,6 +89,123 @@
         "internal"
       ],
       "expires": null
+    },
+    {
+      "file": "sports-anthem-hype-energy-orchestral-hip-hop-instr-XX1ZG4kMqYA.mp3",
+      "title": "Sports Anthem | Hype Energy | Orchestral Hip Hop Instrumental",
+      "source_url": "https://www.youtube.com/watch?v=XX1ZG4kMqYA",
+      "mood": [
+        "hype",
+        "energetic",
+        "sports",
+        "anthem"
+      ],
+      "bpm": 89.2,
+      "drop_sec": 46.44,
+      "duration": 77.346,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=XX1ZG4kMqYA, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "sports-anthem-hype-energy-orchestral-hip-hop-instr-lqPva8HUQfs.mp3",
+      "title": "Sports Anthem | Hype Energy | Orchestral Hip Hop Instrumental",
+      "source_url": "https://www.youtube.com/watch?v=lqPva8HUQfs",
+      "mood": [
+        "hype",
+        "energetic",
+        "sports",
+        "anthem"
+      ],
+      "bpm": 88.2,
+      "drop_sec": 63.576,
+      "duration": 108.205,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=lqPva8HUQfs, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "sports-anthem-hype-energy-orchestral-hip-hop-instr-CD7nMHTZf3s.mp3",
+      "title": "Sports Anthem | Hype Energy | Orchestral Hip Hop Instrumental",
+      "source_url": "https://www.youtube.com/watch?v=CD7nMHTZf3s",
+      "mood": [
+        "hype",
+        "energetic",
+        "sports",
+        "anthem"
+      ],
+      "bpm": 95.3,
+      "drop_sec": 53.94,
+      "duration": 86.518,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=CD7nMHTZf3s, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "free-for-profit-hard-bouncy-freestyle-trap-type-be-pH6KVynLRVQ.mp3",
+      "title": "[FREE FOR PROFIT] HARD BOUNCY FREESTYLE TRAP TYPE BEAT \"CHASIN\" | HARD BOUNCY RAP TRAP BEAT",
+      "source_url": "https://www.youtube.com/watch?v=pH6KVynLRVQ",
+      "mood": [
+        "hard",
+        "trap",
+        "drill",
+        "gang",
+        "bass"
+      ],
+      "bpm": 100.0,
+      "drop_sec": 10.194,
+      "duration": 172.13,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=pH6KVynLRVQ, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "free-for-profit-hard-bouncy-freestyle-trap-type-be-ZO86W5Px1lw.mp3",
+      "title": "[FREE FOR PROFIT] HARD BOUNCY FREESTYLE TRAP TYPE BEAT \"COBRA\" | HARD BOUNCY RAP TRAP BEAT",
+      "source_url": "https://www.youtube.com/watch?v=ZO86W5Px1lw",
+      "mood": [
+        "hard",
+        "trap",
+        "drill",
+        "gang",
+        "bass"
+      ],
+      "bpm": 160.0,
+      "drop_sec": 75.047,
+      "duration": 124.505,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=ZO86W5Px1lw, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "free-for-profit-hard-bouncy-freestyle-trap-type-be-OlS_33bq81M.mp3",
+      "title": "[FREE FOR PROFIT] HARD BOUNCY FREESTYLE TRAP TYPE BEAT \"CITY\" | HARD BOUNCY RAP TRAP BEAT",
+      "source_url": "https://www.youtube.com/watch?v=OlS_33bq81M",
+      "mood": [
+        "hard",
+        "trap",
+        "drill",
+        "gang",
+        "bass"
+      ],
+      "bpm": 123.8,
+      "drop_sec": 97.013,
+      "duration": 135.837,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=OlS_33bq81M, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
     }
   ]
 }

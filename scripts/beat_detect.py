@@ -30,13 +30,14 @@ def pick_auto(music: dict) -> tuple[Path | None, str, int]:
         # the synthetic test beat must never end up in a real ad
         if lic.startswith("TEST ONLY") and os.environ.get("ALLOW_TEST_MUSIC") != "1":
             continue
-        score = len(moods & set(t.get("mood", [])))
-        if t.get("bpm") and lo <= t["bpm"] <= hi:
-            score += 1
+        overlap = len(moods & set(t.get("mood", [])))
+        if overlap == 0:
+            continue  # right tempo but wrong mood (e.g. a rap track for a lo-fi ad) is not a match
+        score = overlap * 2 + (1 if t.get("bpm") and lo <= t["bpm"] <= hi else 0)
         if score > best_score:
             best, best_score = (f, lic), score
     if not best:
-        return None, "không có bài nào trong music-library có license hợp lệ", -1
+        return None, "không có bài nào trong music-library khớp mood", -1
     return best[0], best[1], int(best_score)
 
 

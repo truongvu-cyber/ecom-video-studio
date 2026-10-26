@@ -54,6 +54,10 @@ Chỉ sửa đúng phần được nhắc, rồi chạy lại từ bước thấ
 | "Đổi nhạc" | `music.file` hoặc `music.mood` + `source: auto` | beats |
 | "Đổi màu/font" | `brand/brand.json` | render |
 | "Tắt phụ đề" | `captions.enabled: false` | timeline |
+| "Bỏ hết tiếng gốc / chỉ để nhạc" | `audio.keep_native: false` (+ `export_no_music: false`); chữ overlay phải gánh thông điệp của lời thoại | timeline |
+| "Chữ nổi bật hơn" | `text_style: {"preset": "bold", "color": "#…"}`; `*từ*` trong overlay = tô màu thứ hai | timeline |
+| "Drop nhạc vào cảnh X" | `music.drop_on: "<shot id>"` (mặc định là cảnh CTA) | timeline |
+| "Nhạc mạnh/khác kiểu" | đổi `music.mood` sang từ khoá mới (tránh trùng từ với bài cũ để nó tìm bài mới) | beats |
 
 Trước khi render lại, chép file cũ trong `out/` sang `out/v<n>/` để người dùng so sánh.
 
