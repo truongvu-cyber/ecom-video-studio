@@ -145,6 +145,7 @@ def brand() -> dict:
 
 
 BOLD_CSS = """
+@font-face {{ font-family: Impact; src: local('Impact'); }}
 .headline span {{ background:none; padding:0 10px; display:inline-block; transform:rotate(-3deg);
   font-family:Impact,"Arial Black",sans-serif; font-weight:400; font-size:100px; line-height:1.0;
   letter-spacing:1px; text-transform:uppercase; color:{accent};
@@ -155,6 +156,34 @@ BOLD_CSS = """
   text-transform:uppercase; background:{accent}; color:{stroke}; border:7px solid {stroke};
   box-shadow:0 12px 0 {stroke}; padding:18px 46px; display:inline-block; transform:rotate(-2deg); }}
 """
+
+
+def hype_fx(plan: dict, k: float) -> tuple[list[str], str]:
+    """Cut and beat effects drawn on the base video (HyperFrames/GSAP).
+
+    Every cut: white flash, zoom punch from a motion blur, short decaying shake.
+    Every other beat inside a shot: a small zoom pulse. The base video stays
+    slightly overscaled (BASE) so shake never shows the frame edge.
+    """
+    BASE = 1.06
+    cuts = [s["tl_start"] for s in plan["segments"][1:]]
+    js = [f'gsap.set("#base",{{scale:{BASE},transformOrigin:"50% 45%"}});']
+    for t in cuts:
+        js.append(f'tl.fromTo("#flash",{{opacity:{min(0.85, 0.7 * k):.2f}}},'
+                  f'{{opacity:0,duration:0.14,ease:"power2.out",immediateRender:false}},{t:.3f});')
+        js.append(f'tl.fromTo("#base",{{scale:{BASE + 0.16 * k:.3f},filter:"blur({8 * k:.1f}px)"}},'
+                  f'{{scale:{BASE},filter:"blur(0px)",duration:0.3,ease:"power3.out",immediateRender:false}},{t:.3f});')
+        # deterministic shake: alternating offsets that decay over ~0.2 s
+        for j, (dx, dy) in enumerate([(14, -10), (-12, 8), (9, -6), (-7, 5), (4, -3), (0, 0)]):
+            js.append(f'tl.set("#base",{{x:{dx * k:.1f},y:{dy * k:.1f}}},{t + 0.035 * j:.3f});')
+    for b in plan.get("beats_tl", []):
+        if b < 0.2 or any(abs(b - t) < 0.15 for t in cuts):
+            continue
+        js.append(f'tl.fromTo("#base",{{scale:{BASE + 0.045 * k:.3f}}},'
+                  f'{{scale:{BASE},duration:0.18,ease:"power2.out",immediateRender:false}},{b:.3f});')
+    flash = (f'<div id="flash" class="clip" data-start="0" data-duration="{plan["total_sec"]}" '
+             f'style="position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;"></div>')
+    return js, flash
 
 
 def composition(plan: dict, hf: Path) -> None:
@@ -198,6 +227,11 @@ def composition(plan: dict, hf: Path) -> None:
             js.append(f'tl.set("#cw{k}_{j}",{{color:"{accent}"}},{w["start"]});')
             js.append(f'tl.set("#cw{k}_{j}",{{color:"{ink}"}},{w["end"]});')
 
+    fx = plan.get("fx") or {}
+    if fx.get("preset") == "hype":
+        js_fx, flash_el = hype_fx(plan, float(fx.get("intensity", 1)))
+        els.insert(0, flash_el)
+        js = js_fx + js  # effects first so text tweens stay on top
     page = f"""<!doctype html>
 <html lang="en" data-resolution="portrait">
 <head>

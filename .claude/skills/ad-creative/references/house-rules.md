@@ -66,3 +66,8 @@ written anyway (it helps a regenerate stay close) but it is not trusted.
 - A second talking clip with a different speaker or voice, unless the user asks
   (then warn: voices will not match).
 - Music in any Veo clip (the Editor adds licensed music).
+- A person who could pass for the real player whose name or number is on the
+  product (same sex, build, look, doing pro moves like dunks). Veo refuses these
+  as "famous person" content, and it would imply an endorsement. Cast the wearer
+  as an obvious fan who looks nothing like the player (different sex, age or
+  build, everyday clothes around the jersey) and keep the action fan-level.

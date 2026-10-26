@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0",
+  "project_id": "nyk-brunson-11-champions-jersey",
+  "product_ref": "product.json",
+  "platform": "tiktok_reels",
+  "stage": "approved",
+  "gen_model": {
+    "image": "nano-banana-pro",
+    "video": "veo-3"
+  },
+  "spec": {
+    "ratio": "9:16",
+    "resolution": "1080x1920",
+    "fps": 24,
+    "target_sec": 15,
+    "safe_zone": {
+      "top": 0.15,
+      "bottom": 0.2
+    }
+  },
+  "audio": {
+    "source": "native",
+    "keep_native": false,
+    "export_no_music": false,
+    "target_lufs": -14,
+    "true_peak_db": -1
+  },
+  "music": {
+    "source": "file",
+    "file": "music-library/turquoise-hits-different-in-lobo-country-the-new-m.mp3",
+    "drop_on": "none"
+  },
+  "captions": {
+    "enabled": false,
+    "style": "none"
+  },
+  "text_style": {
+    "preset": "bold",
+    "color": "#FFC72C"
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "role": "hook",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2,
+      "audio_type": "sfx",
+      "overlay": "*NEW* YORK",
+      "overlay_pos": "bottom",
+      "print_fidelity": "strict"
+    },
+    {
+      "id": "s02",
+      "role": "proof",
+      "file_pattern": "c03*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2,
+      "audio_type": "sfx",
+      "overlay": "GOLD *EDITION*",
+      "overlay_pos": "bottom",
+      "print_fidelity": "strict"
+    },
+    {
+      "id": "s03",
+      "role": "proof",
+      "file_pattern": "c02*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2,
+      "audio_type": "sfx",
+      "overlay": "BRUNSON *11*",
+      "overlay_pos": "bottom",
+      "print_fidelity": "strict"
+    },
+    {
+      "id": "s04",
+      "role": "lifestyle",
+      "file_pattern": "c04*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.8,
+      "audio_type": "sfx"
+    },
+    {
+      "id": "s05",
+      "role": "proof",
+      "file_pattern": "c03*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2,
+      "audio_type": "sfx",
+      "overlay": "2025-26 *CHAMPIONS*",
+      "overlay_pos": "top",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 5.0
+      }
+    },
+    {
+      "id": "s06",
+      "role": "lifestyle",
+      "file_pattern": "c04*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.4,
+      "audio_type": "sfx",
+      "override": {
+        "src_in": 6.6
+      }
+    },
+    {
+      "id": "s07",
+      "role": "demo",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.2,
+      "audio_type": "sfx",
+      "override": {
+        "src_in": 4.4
+      },
+      "print_fidelity": "strict"
+    },
+    {
+      "id": "s08",
+      "role": "cta",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.0,
+      "audio_type": "sfx",
+      "overlay": "GET YOURS — *LINK BELOW* ↓",
+      "override": {
+        "src_in": 5.9
+      },
+      "print_fidelity": "strict"
+    }
+  ],
+  "fx": {
+    "preset": "hype",
+    "intensity": 1
+  }
+}

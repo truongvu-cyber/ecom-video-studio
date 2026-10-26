@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "product_id": "nyk-brunson-11-champions-jersey",
+  "name": "New York Brunson #11 White Champions Jersey (gold lettering)",
+  "model": "pod",
+  "reference_images": ["frames/product.png"],
+  "design_files": [],
+  "invariants": [
+    "White sleeveless basketball jersey, blue and orange striped trim at the neck and armholes",
+    "Front: NEW YORK in gold block letters with a thin blue outline, large gold number 11 below, small blue check-shaped logo on the wearer's right chest, small gold trophy patch on the wearer's left chest",
+    "Back: BRUNSON in gold letters arched above a large gold number 11, small round 2025-26 Champions patch below the back collar",
+    "Jock tag at the lower front with the line ONCE A KNICK, ALWAYS A KNICK",
+    "The large trophy and 2025-26 Champions badges at the bottom of the product photo are display callouts, not sewn on the jersey in those places"
+  ],
+  "facts": [
+    {"key": "jersey", "value": "White basketball jersey with gold lettering and blue/orange trim", "source": "image"},
+    {"key": "name_number", "value": "BRUNSON and number 11 on the back, NEW YORK and 11 on the front", "source": "image"},
+    {"key": "champions_patch", "value": "2025-26 Champions patch and gold trophy patch", "source": "image"},
+    {"key": "gold_lettering", "value": "Gold lettering and numbers", "source": "image"}
+  ],
+  "inferred": [
+    {"key": "self_buyer", "value": "New York basketball fans 16-40, streetwear and hype culture, want the champions-season look"},
+    {"key": "gift_buyer", "value": "Partner or parent buying for a die-hard New York fan (birthday, Christmas)"},
+    {"key": "vibe", "value": "Gold edition reads as a victory lap: flex, swagger, NYC street energy"},
+    {"key": "desire", "value": "Stand out at the game, the bar, on the block"}
+  ],
+  "unknown": [
+    "fabric and weight", "sizes", "price", "shipping time",
+    "stitched or printed lettering and patches",
+    "official licensing or authenticity",
+    "whether the team actually won the 2025-26 title"
+  ],
+  "claims": [
+    {"text": "Brunson 11", "evidence": "name_number"},
+    {"text": "2025-26 Champions patch", "evidence": "champions_patch"},
+    {"text": "Gold edition lettering", "evidence": "gold_lettering"}
+  ]
+}

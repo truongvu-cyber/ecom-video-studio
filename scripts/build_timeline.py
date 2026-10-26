@@ -207,11 +207,11 @@ def main() -> None:
 
     total = layout(segments)
     # music time m plays at timeline time  m - offset + delay  (delay = music enters late)
-    offset, delay, cuts = 0.0, 0.0, []
+    offset, delay, cuts, beats_tl = 0.0, 0.0, [], []
 
     def align(cta_start: float) -> tuple[float, float]:
         drop = music.get("drop_sec")
-        if drop is None or cta is None:
+        if drop is None or cta is None or prod["music"].get("drop_on") == "none":
             return 0.0, 0.0
         if drop >= cta_start:
             return drop - cta_start, 0.0
@@ -227,12 +227,30 @@ def main() -> None:
         cta = next((s for s in segments if s["shot"] == drop_on), None) if drop_on else None
         cta = cta or next((s for s in segments if s["role"] == "cta"), None)
         offset, delay = align(cta["tl_start"] if cta else 0.0)
-        # the moment the music comes in is itself a cut point worth landing on
-        entry = [delay] if delay > 0 else []
-        snap_cuts(segments, entry + [b - offset + delay for b in beats if b - offset + delay > 0.2], interval)
-        offset, delay = align(cta["tl_start"] if cta else 0.0)
+        # snapping moves the drop shot, which moves the music, which moves every beat:
+        # repeat until the grid stops shifting (once the drop shot sits on a beat the
+        # realignment is a whole number of beats and earlier cuts stay on the beat)
+        for _ in range(4):
+            entry = [delay] if delay > 0 else []  # the music's entry is a cut point too
+            snap_cuts(segments, entry + [b - offset + delay for b in beats if b - offset + delay > 0.2], interval)
+            new_offset, new_delay = align(cta["tl_start"] if cta else 0.0)
+            moved = abs(new_offset - offset) + abs(new_delay - delay)
+            offset, delay = new_offset, new_delay
+            if moved < 0.005:
+                break
         total = segments[-1]["tl_end"]
-        if cta and music.get("drop_sec") is not None and offset == 0 and delay == 0 \
+        # a short track (e.g. a TikTok sound) must not end before the video does
+        room = music["duration"] - offset + delay
+        if total > room + 0.02:
+            last = segments[-1]
+            cut = min(total - room, (last["tl_end"] - last["tl_start"]) - MIN_SHOT)
+            last["src_out"] -= cut * last["speed"]
+            total = layout(segments)
+            if total > room + 0.02:
+                issues.append(f"Nhạc chỉ dài {room:.1f}s nhưng video dài {total:.1f}s")
+        if prod["music"].get("drop_on") == "none":
+            pass
+        elif cta and music.get("drop_sec") is not None and offset == 0 and delay == 0 \
                 and abs(music["drop_sec"] - cta["tl_start"]) > SNAP_TOL:
             issues.append(f"Không đặt được drop nhạc trùng cảnh {cta['shot']}")
         if offset + total - delay > music["duration"]:
@@ -294,6 +312,8 @@ def main() -> None:
                       if k not in ("out_min", "out_max")} for s in segments],
         "cuts": cuts, "captions": captions, "overlays": overlays, "issues": issues,
         "text_style": prod.get("text_style", {"preset": "pill"}),
+        "fx": prod.get("fx", {"preset": "none"}),
+        "beats_tl": [round(b, 3) for b in beats_tl if 0 <= b <= total],
     }
     save_json(project / "edit" / "edit-plan.json", plan)
 

@@ -57,6 +57,8 @@ Chỉ sửa đúng phần được nhắc, rồi chạy lại từ bước thấ
 | "Bỏ hết tiếng gốc / chỉ để nhạc" | `audio.keep_native: false` (+ `export_no_music: false`); chữ overlay phải gánh thông điệp của lời thoại | timeline |
 | "Chữ nổi bật hơn" | `text_style: {"preset": "bold", "color": "#…"}`; `*từ*` trong overlay = tô màu thứ hai | timeline |
 | "Drop nhạc vào cảnh X" | `music.drop_on: "<shot id>"` (mặc định là cảnh CTA) | timeline |
+| "Chuyển cảnh mượt / cuốn hơn / gang gang" | `fx: {"preset": "hype", "intensity": 1}` (flash + zoom đập + mờ chuyển động + rung ở mỗi nhát, zoom nhẹ theo beat) | timeline |
+| "Dùng nhạc trong link này" | `fetch_music.py --url <link>` rồi `music: {"source": "file", "file": "music-library/<file>"}`; nhạc ngắn thì video tự cắt cho vừa; `drop_on: "none"` để phát từ đầu bài | beats |
 | "Nhạc mạnh/khác kiểu" | đổi `music.mood` sang từ khoá mới (tránh trùng từ với bài cũ để nó tìm bài mới) | beats |
 
 Trước khi render lại, chép file cũ trong `out/` sang `out/v<n>/` để người dùng so sánh.

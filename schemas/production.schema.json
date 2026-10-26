@@ -58,7 +58,7 @@
         "source": { "enum": ["auto", "file", "none"], "description": "auto = chọn từ music-library có license" },
         "file": { "type": ["string", "null"] },
         "mood": { "type": "string", "description": "Từ khoá mood, cũng dùng làm từ khoá tìm nhạc" },
-        "drop_on": { "type": "string", "description": "id shot mà đoạn drop của nhạc rơi vào; mặc định là shot CTA" },
+        "drop_on": { "type": "string", "description": "id shot mà đoạn drop của nhạc rơi vào; mặc định là shot CTA; \"none\" = phát nhạc từ đầu bài, không căn drop" },
         "allow_fetch": { "type": "boolean", "default": true, "description": "auto: thư viện không có bài hợp thì tự tìm và tải (nội bộ)" },
         "bpm_range": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
       }
@@ -70,6 +70,14 @@
         "preset": { "enum": ["pill", "bold"], "default": "pill", "description": "pill = chữ trắng trên nền mờ; bold = chữ to, đậm, viền đen, màu nhấn, hiệu ứng bật" },
         "color": { "type": "string", "description": "Màu nhấn, vd #FFC52F" },
         "font": { "type": "string" }
+      }
+    },
+    "fx": {
+      "type": "object",
+      "description": "Hiệu ứng hình khi dựng",
+      "properties": {
+        "preset": { "enum": ["none", "hype"], "default": "none", "description": "hype = mỗi nhát cắt có flash + zoom đập + rung + mờ chuyển động, mỗi beat có nhịp zoom nhẹ" },
+        "intensity": { "type": "number", "minimum": 0.3, "maximum": 2, "default": 1 }
       }
     },
     "captions": {
