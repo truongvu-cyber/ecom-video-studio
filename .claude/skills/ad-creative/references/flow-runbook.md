@@ -108,6 +108,14 @@ executes what the queue says.
   on that text without retrying, and the next run starts no sooner than 10 minutes later; if it
   comes back, the user generates that job by hand in the same window before the script resumes.
 
+- **Keyframe geometry decides the clip.** cubs-door-light-rap c02 (a foot stepping out beside the
+  logo) failed three times in a row — the shoe landed on the logo every time — because
+  keyframe_c2 put the logo a shoe-length from the sill. Rewriting the clip's blocking did not
+  help; the fix is in the keyframe: leave at least a stride of dark ground between the sill and
+  the print before any foot, hand or object has to move next to it. After two failed takes of
+  the same clip, stop regenerating the clip and fix the keyframe (or use the usable part of a
+  take via `override.src_in/src_out`, marked `pass` with that note in `gen_review.jsonl`).
+
 ## 4. Stop conditions
 
 Stop and report (never retry blindly): a sign-in or captcha page; a refusal

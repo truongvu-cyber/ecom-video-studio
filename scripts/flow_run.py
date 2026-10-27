@@ -30,6 +30,7 @@ LABEL = {  # queue value -> Flow label
     "veo-3.1-fast": "Veo 3.1 - Fast", "veo-3.1-quality": "Veo 3.1 - Quality",
 }
 WAIT = {"image": 180, "video": 480}
+PAUSE_BETWEEN_JOBS = 25  # seconds of idle between jobs (runbook §3c)
 REFUSAL = re.compile(r"Không thành công|vi phạm chính sách|không thể tạo|policy", re.I)
 # Google flagged the automation itself ("hoạt động bất thường"): stop at once, no retry, and the
 # runner is not started again for at least 10 minutes (runbook §4).
@@ -481,7 +482,9 @@ def main() -> None:
 
     flow = Flow(project, args.dry_run)
     budget = int(queue.get("retry_budget", 2))
-    for job in jobs:
+    for k, job in enumerate(jobs):
+        if k:  # runbook §3c: no bursts — Flow flagged a rapid run as "hoạt động bất thường"
+            time.sleep(PAUSE_BETWEEN_JOBS)
         print(f"== {job['kind']} {job['id']} -> {job['save_as']}")
         attempt = 0
         while True:

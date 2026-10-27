@@ -1,0 +1,166 @@
+{
+  "schema_version": "1.0",
+  "project_id": "cubs-door-light-rap",
+  "product_ref": "product.json",
+  "platform": "tiktok_reels",
+  "format": "hype_montage",
+  "stage": "rendered",
+  "gen_model": {
+    "image": "nano-banana-2.1",
+    "video": "omni-1.1-flash"
+  },
+  "spec": {
+    "ratio": "9:16",
+    "resolution": "1080x1920",
+    "fps": 24,
+    "target_sec": 14,
+    "safe_zone": {
+      "top": 0.15,
+      "bottom": 0.2
+    }
+  },
+  "audio": {
+    "source": "native",
+    "keep_native": false,
+    "export_no_music": false,
+    "target_lufs": -14,
+    "true_peak_db": -1
+  },
+  "music": {
+    "source": "auto",
+    "mood": "hard drill rap night",
+    "bpm_range": [
+      85,
+      160
+    ],
+    "drop_on": "s02"
+  },
+  "captions": {
+    "enabled": false,
+    "style": "none"
+  },
+  "text_style": {
+    "preset": "bold",
+    "color": "#FF3B3B"
+  },
+  "fx": {
+    "preset": "hype",
+    "intensity": 0.9,
+    "sfx": true
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "role": "hook",
+      "file_pattern": "c01_b*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.6,
+      "audio_type": "music_only",
+      "overlay": "*DOOR* OPENS…",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "moment": "a"
+    },
+    {
+      "id": "s02",
+      "role": "proof",
+      "file_pattern": "c01_b*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.4,
+      "audio_type": "music_only",
+      "overlay": "*LOGO* DROPS",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "speed": 0.7,
+      "override": {
+        "src_in": 4.0,
+        "src_out": 5.7
+      }
+    },
+    {
+      "id": "s03",
+      "role": "lifestyle",
+      "file_pattern": "c02_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.6,
+      "audio_type": "music_only",
+      "overlay": "*EVERY* NIGHT",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 2.6,
+        "src_out": 4.2
+      }
+    },
+    {
+      "id": "s04",
+      "role": "lifestyle",
+      "file_pattern": "c02_c*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.6,
+      "audio_type": "music_only",
+      "overlay": "*NO* WIRES",
+      "overlay_pos": "auto",
+      "moment": "b"
+    },
+    {
+      "id": "s05",
+      "role": "demo",
+      "file_pattern": "c03_b*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.4,
+      "audio_type": "music_only",
+      "overlay": "*PEEL*",
+      "overlay_pos": "auto",
+      "moment": "a"
+    },
+    {
+      "id": "s06",
+      "role": "demo",
+      "file_pattern": "c03_b*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.6,
+      "audio_type": "music_only",
+      "overlay": "*STICK* — 60 SEC",
+      "overlay_pos": "auto",
+      "moment": "b"
+    },
+    {
+      "id": "s07",
+      "role": "proof",
+      "file_pattern": "c04_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2,
+      "audio_type": "music_only",
+      "overlay": "*THEY* ALL ASK",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "moment": "a"
+    },
+    {
+      "id": "s08",
+      "role": "cta",
+      "file_pattern": "c04_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.2,
+      "audio_type": "music_only",
+      "overlay": "GET YOURS — *LINK* ↓",
+      "overlay_pos": "auto",
+      "moment": "b"
+    }
+  ],
+  "variants": [
+    {
+      "id": "hookB",
+      "overlay_overrides": {
+        "s01": "POV: *GAME NIGHT*"
+      }
+    },
+    {
+      "id": "hookC",
+      "overlay_overrides": {
+        "s01": "*WAIT* FOR IT"
+      }
+    }
+  ]
+}

@@ -62,7 +62,8 @@ def main() -> None:
                 if line.strip():
                     j = json.loads(line)
                     marks[j["job"]] = j["result"]
-        for c in sorted((project / "clips").glob("c*.mp4")):
+        used = {c for s in prod.get("shots", []) for c in (project / "clips").glob(s.get("file_pattern", "__none__"))}
+        for c in sorted(used):  # only the takes the shots actually use need a pass mark
             if marks.get(c.stem) != "pass":
                 errors.append(f"{c.name}: chưa được soát 'pass' (gen_review.py --mark {c.stem} pass \"...\")")
 
