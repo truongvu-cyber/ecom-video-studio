@@ -17,7 +17,19 @@ import numpy as np
 from common import MUSIC_LIBRARY, ROOT, load_json, project_dir, run, save_json
 
 
-def pick_auto(music: dict) -> tuple[Path | None, str, int]:
+def used_elsewhere(project: Path) -> set[str]:
+    """Track files other projects already used (user rule 2026-10-27: every ad gets a new track)."""
+    used = set()
+    for m in (ROOT / "projects").glob("*/edit/music.json"):
+        if m.parent.parent == project:
+            continue
+        f = (load_json(m) or {}).get("file")
+        if f:
+            used.add(Path(f).name)
+    return used
+
+
+def pick_auto(music: dict, exclude: set[str] = frozenset()) -> tuple[Path | None, str, int]:
     tags = load_json(MUSIC_LIBRARY / "tags.json").get("tracks", [])
     moods = set((music.get("mood") or "").lower().replace(",", " ").split())
     lo, hi = (music.get("bpm_range") or [0, 999])
@@ -25,7 +37,7 @@ def pick_auto(music: dict) -> tuple[Path | None, str, int]:
     for t in tags:
         f = MUSIC_LIBRARY / t["file"]
         lic = t.get("license") or ""
-        if not f.exists() or not lic or lic.startswith("TODO"):
+        if not f.exists() or not lic or lic.startswith("TODO") or t["file"] in exclude:
             continue
         # the synthetic test beat must never end up in a real ad
         if lic.startswith("TEST ONLY") and os.environ.get("ALLOW_TEST_MUSIC") != "1":
@@ -90,16 +102,18 @@ def main() -> None:
         f = ROOT / music["file"] if (ROOT / music["file"]).exists() else project / music["file"]
         license_note = "nhạc do người dùng cung cấp"
     else:
-        f, license_note, score = pick_auto(music)
-        # nothing in the library fits the mood: fetch a few tracks (user allowed any
-        # source for internal use) and pick again
+        exclude = used_elsewhere(project)
+        f, license_note, score = pick_auto(music, exclude)
+        # nothing unused in the library fits the mood: fetch new tracks (user allowed any
+        # source for internal use; search leans on what is current) and pick again
         if (f is None or score < 1) and music.get("allow_fetch", True) and music.get("mood"):
-            print(f"Thư viện chưa có bài hợp '{music['mood']}', đang tìm và tải nhạc...")
-            cmd = [sys.executable, str(Path(__file__).parent / "fetch_music.py"), music["mood"], "--count", "3"]
+            print(f"Thư viện không còn bài mới hợp '{music['mood']}' (đã loại {len(exclude)} bài project khác dùng), đang tìm nhạc mới...")
+            cmd = [sys.executable, str(Path(__file__).parent / "fetch_music.py"), f"{music['mood']} 2026",
+                   "--mood", music["mood"], "--count", "3"]
             if music.get("bpm_range"):
                 cmd += ["--bpm", *map(str, music["bpm_range"])]
             subprocess.run(cmd)
-            f, license_note, score = pick_auto(music)
+            f, license_note, score = pick_auto(music, exclude)
         if f is None:
             sys.exit(f"LỖI: {license_note}")
     data = {"file": str(f.resolve()), "license": license_note, **analyze(f)}

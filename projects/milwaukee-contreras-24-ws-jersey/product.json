@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "product_id": "milwaukee-contreras-24-ws-jersey",
+  "name": "Brew Crew Contreras #24 Powder Blue Jersey — 2026 World Series / NL Champions patches",
+  "model": "pod",
+  "reference_images": [
+    "frames/product.png"
+  ],
+  "design_files": [],
+  "invariants": [
+    "Powder-blue button-front baseball jersey with gold-and-white trim on the V collar, placket edge and sleeve ends",
+    "Front: script words Brew Crew in gold with a navy outline across the chest, navy number 24 with gold outline below it on the wearer's left side, small navy swoosh on the wearer's right chest",
+    "Wearer's left chest: round World Series 2026 patch (navy diamond, white script, gold 2026); wearer's left sleeve: NATIONAL LEAGUE CHAMPIONS 2026 patch (gold, with a ball-in-glove monogram)",
+    "Back: CONTRERAS in navy block letters arched above a large navy number 24 with gold outline, small league logo at the collar, a World Series patch on the back of the wearer's right sleeve",
+    "The two large patches at the bottom of the product photo are display callouts, not sewn on the jersey in those places"
+  ],
+  "facts": [
+    {
+      "key": "jersey",
+      "value": "Powder-blue baseball jersey with navy and gold lettering and gold trim",
+      "source": "image"
+    },
+    {
+      "key": "name_number",
+      "value": "CONTRERAS and number 24 on the back, number 24 on the front",
+      "source": "image"
+    },
+    {
+      "key": "patches",
+      "value": "World Series 2026 patch and National League Champions 2026 patch",
+      "source": "image"
+    },
+    {
+      "key": "team_script",
+      "value": "Brew Crew script across the chest",
+      "source": "image"
+    }
+  ],
+  "inferred": [
+    {
+      "key": "self_buyer",
+      "value": "Milwaukee baseball fans 18-40, many women, who want a statement game-day fit for the 2026 postseason"
+    },
+    {
+      "key": "gift_buyer",
+      "value": "Partner or family buying for a Contreras fan; Christmas gift after the season"
+    },
+    {
+      "key": "season",
+      "value": "Late October 2026: World Series window, urgency is highest now"
+    },
+    {
+      "key": "desire",
+      "value": "Look good and loud at the watch party; show the patches that mark this season"
+    }
+  ],
+  "unknown": [
+    "fabric and weight",
+    "sizes",
+    "price",
+    "shipping time",
+    "stitched or printed lettering and patches",
+    "official licensing or authenticity",
+    "whether the team is playing in the 2026 World Series right now"
+  ],
+  "claims": [
+    {
+      "text": "World Series and NL Champions patches",
+      "evidence": "patches"
+    },
+    {
+      "text": "Contreras twenty-four",
+      "evidence": "name_number"
+    }
+  ],
+  "world": {
+    "name": "Milwaukee Brewers (Brew Crew)",
+    "cues": [
+      "navy baseball cap with a small gold glove-shaped emblem, no lettering",
+      "a powder-blue and gold pennant pinned on the bedroom wall",
+      "a navy-and-gold foam finger leaning on the shelf",
+      "fairy lights and a powder-blue throw pillow on the bed"
+    ]
+  },
+  "placement_checks": [
+    "Brew Crew script is centred across the chest, gold with a navy outline, reads left to right, never mirrored or misspelled",
+    "front number 24 sits below the script on the wearer's left side; back reads CONTRERAS arched over a large 24",
+    "the round World Series 2026 patch is on the wearer's left chest, the NATIONAL LEAGUE CHAMPIONS 2026 patch on the wearer's left sleeve — never on the stomach or the back",
+    "jersey is powder blue with gold-and-white trim at collar, placket and sleeves; worn open or buttoned, never tucked in — an open jersey splitting the Brew Crew script across the placket is natural, not a fault",
+    "unboxing: the jersey comes out of the box folded with the back (CONTRERAS 24) on top or the front script on top — the print is never inside-out or upside down"
+  ]
+}

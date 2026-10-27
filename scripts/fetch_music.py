@@ -83,7 +83,8 @@ def main() -> None:
         path = download(args.url, slug(info.get("title", "track")), SECTION if long_mix else None)
         added.append(register(path, info.get("title", ""), args.url, moods))
     else:
-        found = search(f"{args.query} instrumental", 15)
+        have = {tr.get("source_url", "").split("v=")[-1] for tr in load_json(MUSIC_LIBRARY / "tags.json").get("tracks", [])}
+        found = [e for e in search(f"{args.query} instrumental", 20) if e["id"] not in have]
         short = [e for e in found if MIN_SEC <= (e.get("duration") or 0) <= MAX_SEC]
         picks = (short or found)[: args.count * 2]
         for e in picks:

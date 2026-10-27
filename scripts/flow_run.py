@@ -55,6 +55,11 @@ class Flow:
             self.state["url"] in p["url"] for p in pages()) else pick("flow.google.com/project"))
         self.c.call("Page.enable")
         self.c.downloads(str(self.dl))
+        self.pending_dl: list[dict] = []
+        log_path = project / "edit" / "gen_log.jsonl"
+        # assets generated in this Flow project (renamed to their file stem): usable as inputs at once
+        self.made: set[str] = {json.loads(l).get("flow_name") for l in log_path.read_text().splitlines()
+                               if l.strip()} - {None} if log_path.exists() else set()
 
     # ---------- primitives ----------
     def js(self, expr: str):
@@ -180,9 +185,14 @@ class Flow:
         if not box:
             return None
         self.click(box)
-        for t in ("keyDown", "keyUp"):
-            self.c.call("Input.dispatchKeyEvent", type=t, key="a", code="KeyA", modifiers=4)  # cmd+A
+        # cmd+A only selects with the editing command attached; without it the new name was
+        # appended to the previous search ("keyframe_c1keyframe_c2") and uploads looked missing
+        self.c.call("Input.dispatchKeyEvent", type="keyDown", key="a", code="KeyA", modifiers=4, commands=["selectAll"])
+        self.c.call("Input.dispatchKeyEvent", type="keyUp", key="a", code="KeyA", modifiers=4)
         self.c.call("Input.insertText", text=Path(name).stem)
+        if self.js("document.querySelector('input[placeholder*=\"Tìm kiếm thành phần\"]').value") != Path(name).stem:
+            self.js("(()=>{const i=document.querySelector('input[placeholder*=\"Tìm kiếm thành phần\"]');"
+                    "i.value=%s;i.dispatchEvent(new Event('input',{bubbles:true}));})()" % json.dumps(Path(name).stem))
         for _ in range(8):
             time.sleep(0.6)
             hit = self.rect("[...document.querySelectorAll('.cdk-overlay-container *')].find(e=>e.children.length<=3"
@@ -221,7 +231,7 @@ class Flow:
     def attach(self, rel: str) -> None:
         name = Path(rel).name
         self.panel_open()
-        tile = self.panel_find(name)
+        tile = self.panel_find(name) or self.panel_find(Path(name).stem)
         if not tile:
             raise Stop(f"Không tìm thấy {name} trong thư viện để gắn vào prompt")
         self.click(tile)
@@ -415,7 +425,7 @@ class Flow:
                 print(f"   (cảnh báo: tile chưa hiện tên {name}: {got[:60]!r})")
 
     # ---------- download ----------
-    def download(self, url: str | None, kind: str, size: str, rect: dict | None = None) -> Path:
+    def download(self, url: str | None, kind: str, size: str, rect: dict | None = None, wait: bool = True) -> Path | None:
         mid = re.search(r"/(?:image|video)/([0-9a-f-]+)", url).group(1) if url else None
         self.tile_menu(mid, "Tải xuống", rect)
         sub = self.menu_items()
@@ -425,6 +435,9 @@ class Flow:
             raise Stop(f"Không có lựa chọn tải {size} miễn phí: {sub}")
         before = set(os.listdir(self.dl))
         self.click(self.menu_item("^" + re.escape(choice.split(" ")[0])))
+        if not wait:  # batch mode: the file is collected later (collect_downloads), work goes on
+            self.esc()
+            return None
         for _ in range(90):
             time.sleep(2)
             new = [f for f in os.listdir(self.dl) if f not in before and not f.endswith(".crdownload")]
@@ -468,7 +481,7 @@ class Flow:
     def upload_all(self, names: list[str]) -> None:
         """One drop for every reference file not yet in the library, then verify each."""
         missing = [n for n in dict.fromkeys(names) if n not in self.state["uploaded"]
-                   and (self.project / "frames" / n).exists()]
+                   and Path(n).stem not in self.made and (self.project / "frames" / n).exists()]
         if not missing:
             return
         self.panel_open()
@@ -537,35 +550,79 @@ class Flow:
         if index >= len(tiles):
             return None, None
         t = tiles[index]
+        if REFUSAL.search(t.get("text") or ""):
+            return "refused", None
         if t["pct"] is not None:
             return t["pct"], None
         ids = [i for i in t["ids"] if i not in taken]
         return None, (ids[0] if ids and t.get("kind") == kind else None)
 
     def finish(self, job: dict, mid: str | None, log, rect: dict | None = None) -> Path:
-        """Download, save under the next free name, rename the Flow asset, log."""
+        """Rename the Flow asset to its file name, start the download without waiting for it
+        (collect_downloads picks the file up later: Flow names it after the asset title), log."""
         kind = job["kind"]
         url = f"https://flow-content.google/{kind}/{mid}" if mid else None
-        f = self.download(url, kind, job.get("download", "2K" if kind == "image" else "1080p"), rect)
         dest = self.project / job["save_as"]
-        while dest.exists():  # never overwrite: next free suffix
+        claimed = {d["dest"] for d in self.pending_dl}
+        while dest.exists() or dest in claimed:  # never overwrite: next free suffix
             stem, suf = dest.stem, dest.suffix
             m = re.match(r"(.*)_([a-z])$", stem)
             dest = dest.with_name(f"{m.group(1)}_{chr(ord(m.group(2)) + 1)}{suf}" if m else f"{stem}_b{suf}")
-        if kind == "image" and f.suffix.lower() != dest.suffix.lower():
-            os.system(f'sips -s format png "{f}" --out "{dest}" >/dev/null')
-        else:
-            shutil.copy(f, dest)
         self.rename(url, dest.stem, rect)
-        print(f"   {job['id']}: -> {dest.relative_to(self.project)} (đổi tên trong Flow: {dest.stem})")
+        self.download(url, kind, job.get("download", "1K" if kind == "image" else "1080p"), rect, wait=False)
+        self.pending_dl.append({"stem": dest.stem, "dest": dest, "kind": kind, "t": time.time()})
+        self.made.add(dest.stem)
+        print(f"   {job['id']}: đổi tên trong Flow -> {dest.stem}, đang tải nền -> {dest.relative_to(self.project)}")
         log({"job": job["id"], "url": url, "file": str(dest.relative_to(self.project)), "flow_name": dest.stem,
              "settings": {"tool": job["tool"], "mode": job.get("mode"), "download": job.get("download")}})
         return dest
 
+    def collect_downloads(self, wait: float = 0) -> None:
+        """Move finished downloads (named '<asset title>_<size>_<time>.<ext>') to their dest."""
+        t_end = time.time() + wait
+        while self.pending_dl:
+            files = [f for f in os.listdir(self.dl) if not f.endswith(".crdownload")]
+            for d in list(self.pending_dl):
+                hit = sorted((f for f in files if f.startswith(d["stem"] + "_") or f.startswith(d["stem"] + ".")),
+                             key=lambda f: os.path.getmtime(self.dl / f))
+                hit = [f for f in hit if os.path.getmtime(self.dl / f) >= d["t"] - 5]
+                if not hit:
+                    if time.time() - d["t"] > 600:
+                        print(f"   (tải {d['stem']} quá 10 phút, bỏ — tải tay trong Flow)")
+                        self.pending_dl.remove(d)
+                    continue
+                src = self.dl / hit[-1]
+                if d["kind"] == "image" and src.suffix.lower() != d["dest"].suffix.lower():
+                    os.system(f'sips -s format png "{src}" --out "{d["dest"]}" >/dev/null')
+                else:
+                    shutil.copy(src, d["dest"])
+                print(f"   tải xong -> {d['dest'].relative_to(self.project)}")
+                self.pending_dl.remove(d)
+            if not self.pending_dl or time.time() >= t_end:
+                return
+            time.sleep(3)
+
+    def retry_tile(self, index: int) -> bool:
+        """Press the failed tile's own retry button (no recomposing). True if it was pressed."""
+        tiles = self.grid_tiles(index + 1)
+        if index >= len(tiles):
+            return False
+        t = tiles[index]
+        self.hover({"x": t["x"], "y": t["y"], "w": t["w"]})
+        b = self.rect("[...document.querySelectorAll('button')].find(b=>{const r=b.getBoundingClientRect();"
+                      "if(!r.width||Math.abs(r.x+r.width/2-%f)>%f||Math.abs(r.y+r.height/2-%f)>%f)return false;"
+                      "const s=(b.getAttribute('aria-label')||'')+' '+b.textContent;return /Thử lại|Tạo lại|retry|refresh/i.test(s);})"
+                      % (t["x"], t["w"] / 2 + 2, t["y"], t["h"] / 2 + 2))
+        if not b:
+            return False
+        self.click(b)
+        return True
+
     def upload_tracked(self, refs: list[str], events: list) -> None:
         """Upload refs during a batch run and account for the grid tiles they add (one per file),
         so later tile positions stay correct."""
-        missing = [n for n in dict.fromkeys(refs) if n not in self.state["uploaded"]]
+        missing = [n for n in dict.fromkeys(refs) if n not in self.state["uploaded"]
+                   and Path(n).stem not in self.made and (self.project / "frames" / n).exists()]
         if not missing:
             return
         before = len(self.grid_tiles(40))
@@ -597,8 +654,8 @@ class Flow:
                 if len(active) >= MAX_ACTIVE:
                     break
                 refs = job.get("refs", [])
-                if not all((self.project / "frames" / r).exists() for r in refs):
-                    continue  # waits for its keyframe
+                if not all((self.project / "frames" / r).exists() or Path(r).stem in self.made for r in refs):
+                    continue  # waits for its keyframe to finish in Flow (not for the download)
                 if time.time() - last_submit < PAUSE_BETWEEN_JOBS:
                     time.sleep(PAUSE_BETWEEN_JOBS - (time.time() - last_submit))
                 self.upload_tracked(refs, events)
@@ -608,8 +665,12 @@ class Flow:
                 except Stop as e:
                     log({"job": job["id"], "attempt": attempts[job["id"]], "error": str(e)})
                     print(f"   {job['id']}: DỪNG: {e}")
-                    if "bất thường" in str(e) or "đăng nhập" in str(e) or "captcha" in str(e).lower() or budget <= 0:
+                    if "bất thường" in str(e) or "đăng nhập" in str(e) or "captcha" in str(e).lower():
                         sys.exit(1)
+                    if budget <= 0:  # give this job up, keep collecting the ones already running
+                        pending.remove(job)
+                        print(f"   {job['id']}: bỏ qua (hết hạn mức gen lại)")
+                        continue
                     budget -= 1
                     continue
                 last_submit = time.time()
@@ -625,6 +686,7 @@ class Flow:
                     continue
                 break
             time.sleep(POLL)
+            self.collect_downloads()
             txt = self.js("document.body.innerText.slice(0,4000)") or ""
             if ABNORMAL.search(txt):
                 sys.exit("Flow báo hoạt động bất thường — dừng hẳn, chờ ít nhất 10 phút rồi mới chạy lại")
@@ -645,8 +707,20 @@ class Flow:
                             budget -= 1
                             pending.insert(0, job)
                     active.pop(jid)
-                elif pct is None and mid is None and REFUSAL.search(txt) and elapsed > 20:
+                elif pct == "refused":  # this job's own tile says it failed (page-wide text is not evidence)
                     log({"job": jid, "attempt": attempts[jid], "error": "Flow từ chối prompt này (chính sách)"})
+                    idx = len(events) - 1 - a["event"]
+                    n_before = len(self.grid_tiles(60))
+                    if budget > 0 and attempts[jid] < 3 and self.retry_tile(idx):
+                        budget -= 1
+                        attempts[jid] += 1
+                        time.sleep(3)
+                        if len(self.grid_tiles(60)) > n_before:  # retry made a new tile at the top
+                            events.append({"type": "job", "id": jid})
+                            a["event"] = len(events) - 1
+                        a["t0"] = time.time()
+                        print(f"   {jid}: Flow từ chối — đã bấm Thử lại trên tile")
+                        continue
                     print(f"   {jid}: Flow từ chối (chính sách)")
                     active.pop(jid)
                     if budget > 0 and attempts[jid] < 3:
@@ -659,6 +733,9 @@ class Flow:
                     if budget > 0 and attempts[jid] < 2:
                         budget -= 1
                         pending.insert(0, job)
+        if self.pending_dl:
+            print(f"   chờ {len(self.pending_dl)} file tải nền...")
+            self.collect_downloads(wait=300)
         print("Hàng đợi xong.")
 
 

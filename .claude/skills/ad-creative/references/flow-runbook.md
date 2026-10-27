@@ -145,6 +145,24 @@ executes what the queue says.
    gate between stages is wanted (`--stage all` chains them for speed; review then runs on
    `gen_review.jpg` at the end and a failed keyframe means its clip is regenerated too).
 
+- **Batch fixes from the jersey run (2026-10-27).** (a) The media-panel search appended each new
+  name to the previous one ("keyframe_c1keyframe_c2") because ⌘A was sent without the
+  `selectAll` editing command, so uploads looked missing; the runner now replaces the text and
+  checks the value. (b) Generated assets are renamed to their file stem, so a keyframe made in
+  this project is attached by that name and never uploaded again (`gen_log.jsonl` flow_name).
+  (c) A refusal is read from the job's **own tile**; page-wide "Không thành công" text from
+  another tile made the runner re-submit a clip that was actually rendering (one extra clip,
+  12 credits). (d) A job that runs out of retry budget is dropped without abandoning jobs
+  already rendering.
+- **Faster finishing (user rule 2026-10-27).** A finished result is first **renamed**, then its
+  download is **fired and not waited for**: Flow names the file after the asset title, so
+  `collect_downloads()` moves `<stem>_<size>_<time>.<ext>` to its dest on every poll while the
+  next jobs are composed. A clip waits for its keyframe to **finish in Flow** (it is attached by
+  name), not for the file. Images download at **1K original size** (no upscale wait): the local
+  copy is only for `gen_review.jpg` and the repo; videos stay 1080p because the editor cuts them.
+- **Retry in place.** A tile that says "Không thành công" is retried with its own retry button
+  (no recomposing, not charged when refused); if the button is missing the job is recomposed.
+
 ## 4. Stop conditions
 
 Stop and report (never retry blindly): a sign-in or captcha page; a refusal

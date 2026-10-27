@@ -149,6 +149,17 @@ is and what state it is in**, written per product, e.g.
   mirrored".
 - mug / bottle: "print faces the camera, handle on the right".
 
+What is **not** a failure (user rule 2026-10-27) — keep it natural, do not regenerate or
+"fix" it in prompts:
+
+- a jersey, shirt or jacket worn **open/unbuttoned** whose chest script splits across the
+  placket ("Brew" on one panel, "Crew" on the other) or folds with the fabric;
+- print partly hidden by an arm, hair, a fold or a hand for a moment;
+- print seen at an angle or in motion blur during a real action (putting it on, a spin).
+
+A failure is the print **itself** being wrong: misspelled or invented letters, wrong number,
+mirrored text, a patch moved to another place, wrong colours.
+
 Rules:
 
 1. Every keyframe's `Soát trước khi làm video` line and every clip's

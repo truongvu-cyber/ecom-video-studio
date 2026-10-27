@@ -19,7 +19,7 @@ MAX_RETRIES_PER_PROJECT = 2  # extra generations allowed beyond one per job
 IMAGE_TOOL = "nano-banana-2.1"
 VIDEO_TOOL = "omni-1.1-flash"
 VIDEO_MODE = "ingredients"
-DOWNLOAD = {"image": "2K", "video": "1080p"}  # free upscales; never an option priced in credits
+DOWNLOAD = {"image": "1K", "video": "1080p"}  # image: original size, no upscale wait (only used for review); never a credit option
 
 
 def fenced(block: str) -> str:
