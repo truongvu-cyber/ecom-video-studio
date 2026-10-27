@@ -162,6 +162,15 @@ What is **not** a failure (user rule 2026-10-27) — keep it natural, do not reg
 A failure is the print **itself** being wrong: misspelled or invented letters, wrong number,
 mirrored text, a patch moved to another place, wrong colours.
 
+**Several units in one frame (user rule 2026-10-27, door-light cruise idea).** One unit
+makes one effect in one place: one door light = one logo, directly below *its own* open
+door. With several cars (or several products), each effect stays tied to its own unit, so
+the effects sit where the units are — a car length apart, at different distances from the
+camera, each one under a different door — never lined up side by side, grouped in a row or
+arranged like a graphic. A shot whose idea needs "many logos together" is written as the
+real geometry ("three separate logos, each on the ground under its own open door") and the
+keyframe check says it; a row of logos that no door explains is a failure.
+
 Rules:
 
 1. Every keyframe's `Soát trước khi làm video` line and every clip's

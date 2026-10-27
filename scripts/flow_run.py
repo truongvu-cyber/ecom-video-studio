@@ -312,7 +312,7 @@ class Flow:
         """{media id: kind} for every tile. A video tile shows a poster under /image/<same id>,
         so ids are compared (signed URLs change) and the kind comes from the play icon."""
         return json.loads(self.js("""JSON.stringify(Object.fromEntries([...document.querySelectorAll('img,video,source')]
-            .map(e=>[(e.src||e.currentSrc||'').match(/flow-content\\.google\\/(?:image|video)\\/([0-9a-f-]{36})/)||[], e])
+            .map(e=>[(e.src||e.currentSrc||'').match(/(?:flow-content\\.google|storage\\.googleapis\\.com\\/ai-sandbox-videofx)\\/(?:image|video)\\/([0-9a-f-]{36})/)||[], e])
             .filter(([m])=>m.length).map(([m,e])=>{const t=e.closest('[class*=tile], [class*=virtual-item]')||e.parentElement;
             const isVideo=e.tagName==='VIDEO'||/play_circle/.test(t.innerText||'')||/\\/video\\//.test(e.src||'');
             return [m[1], isVideo?'video':'image'];})))"""))
@@ -539,7 +539,7 @@ class Flow:
             return JSON.stringify(tiles.map(({t})=>{const txt=norm(t.innerText);
               const pct=(txt.match(/\\b(\\d{1,3})%%/)||[])[1]||null;
               const kind=t.querySelector('flow-video-tile')?'video':(t.querySelector('flow-image-tile')?'image':null);
-              const ids=[...t.querySelectorAll('img,video,source')].map(e=>((e.src||e.currentSrc||'').match(/flow-content\\.google\\/(?:image|video)\\/([0-9a-f-]{36})/)||[])[1]).filter(Boolean);
+              const ids=[...t.querySelectorAll('img,video,source')].map(e=>((e.src||e.currentSrc||'').match(/(?:flow-content\\.google|storage\\.googleapis\\.com\\/ai-sandbox-videofx)\\/(?:image|video)\\/([0-9a-f-]{36})/)||[])[1]).filter(Boolean);
               const r=t.getBoundingClientRect();
               return {kind, pct, ids:[...new Set(ids)], text:txt.slice(0,60), x:r.x+r.width/2, y:r.y+r.height/2, w:r.width, h:r.height};}));})()""" % n)
         return json.loads(v or "[]")
@@ -733,7 +733,9 @@ class Flow:
                         pending.insert(0, job)
                 elif elapsed > WAIT[job["kind"]]:
                     log({"job": jid, "attempt": attempts[jid], "error": f"Hết {WAIT[job['kind']]} s mà chưa thấy kết quả"})
-                    print(f"   {jid}: hết giờ chờ (tile {len(events) - 1 - a['event']}: {self.grid_tiles()[:1]})")
+                    idx = len(events) - 1 - a['event']
+                    tiles = self.grid_tiles()
+                    print(f"   {jid}: hết giờ chờ (tile {idx}: {tiles[idx] if idx < len(tiles) else 'không có'})")
                     active.pop(jid)
                     if budget > 0 and attempts[jid] < 2:
                         budget -= 1

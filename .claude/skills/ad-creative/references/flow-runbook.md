@@ -170,6 +170,11 @@ executes what the queue says.
   menu button sits in the tile's top strip, so the hit-test uses the tile's real height from
   `rect()` — a hard-coded 260 px missed every button on a 340 px tile (Uecker run: 4 clips
   rendered, 0 downloaded by the runner, recovered by grid position; no credits lost).
+- **Two media hosts (dodgers trend run, 2026-10-27).** A finished video tile can carry its poster under
+  `storage.googleapis.com/ai-sandbox-videofx/image/<id>` instead of `flow-content.google/…`; the id regex only knew
+  the second host, so c01 rendered but was never seen, timed out after 480 s and was submitted again (12 credits
+  lost). The regex in `grid_tiles` / `new_media` now accepts both hosts, and the timeout line prints the job's own
+  tile, not tile 0.
 - **Retry in place.** A tile that says "Không thành công" is retried with its own retry button
   (no recomposing, not charged when refused); if the button is missing the job is recomposed.
 
