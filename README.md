@@ -38,7 +38,8 @@ Ví dụ đầy đủ một lần chạy: `projects/cubs-car-door-light/` (brief
 ```bash
 scripts/flow_chrome.sh                                                   # Chrome riêng, đăng nhập Google một lần
 .venv/bin/python scripts/gen_queue.py <project-id>                       # hàng đợi gen từ prompts.md
-.venv/bin/python scripts/flow_run.py <project-id> --stage images         # ảnh nhân vật + keyframe, tự đổi tên trong Flow theo file
+.venv/bin/python scripts/flow_run.py <project-id>                        # cả hàng đợi: upload 1 lượt, gen song song (4), clip chạy ngay khi keyframe về
+.venv/bin/python scripts/flow_run.py <project-id> --stage images         # chỉ ảnh (soát xong mới --stage clips); --serial = từng job một
 .venv/bin/python scripts/gen_review.py <project-id>                      # edit/qc/gen_review.jpg + danh sách soát vị trí sản phẩm
 .venv/bin/python scripts/gen_review.py <project-id> --mark c03 fail "…"  # ghi kết quả soát; clip chưa 'pass' thì validate chặn
 .venv/bin/python scripts/flow_run.py <project-id> --stage clips          # clip Omni 1.1 Flash, tải 1080p vào clips/

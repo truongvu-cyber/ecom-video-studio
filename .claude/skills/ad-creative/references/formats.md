@@ -73,6 +73,16 @@ Never pick a colour that is not already on screen.
   Hands-only shots need no character lock.
 - Name the character in the lock (`CHARACTER - Maya`) so prompts refer to
   "the woman", never to the name.
+- **A new person every project (user rule 2026-10-27).** Each project invents
+  its own character — new name, new face, age, build, hair, outfit drawn from
+  the buyer persona and the world cues — and generates its own
+  `frames/<name>_sheet.png` (`Bước 0` fenced block, free). Never copy a sheet
+  or a character lock from an earlier project, never re-upload an old sheet,
+  even for the same product; the same goes for other generated people
+  (friends, hands). `creative_check.py` FAILs a project whose CHARACTER lock
+  has no sheet block, and a sheet file identical to another project's.
+  Reference photos of the real product are the only files that travel
+  between projects.
 
 ## 4b. World rule — the person and the place belong to the product (user rule 2026-10-27)
 
@@ -80,20 +90,25 @@ A product that carries a team, a brand or a fandom (a Dodgers door light, a
 Cubs jersey, a Swiftie tote) is sold to a fan. The fan and their surroundings
 must look like it, or the product floats in a generic world.
 
-- `product.json` gets `world`: `{"name": "Dodgers", "cues": ["Dodger blue cap",
-  "white jersey with blue script", "blue-and-white pennant on the wall",
-  "stadium parking lot at dusk"]}` — at least two visual cues, written as
-  things a camera can see (colours, garments, objects, places), never the
-  team name inside a model prompt when the name itself would be refused
-  (then describe the colours and shapes only).
-- The **CHARACTER lock** uses at least one cue on the person (cap, jersey,
-  hoodie, scarf, wristband, colours).
-- Every **STYLE lock** (one per setting) uses at least one cue in the setting
-  (a pennant, a poster, a flag on the garage wall, a car in the team colour,
-  a game-day crowd far behind) — a small, out-of-focus one is enough.
-- `creative_check.py` FAILs a project with `world` whose CHARACTER or STYLE
-  locks contain none of the cues. Hands-only shots keep the sleeve or
-  wristband cue.
+- `product.json` gets `world`: `{"name": "Dodgers", "cues": [...]}`. **`cues[0]` is the
+  item the person wears** (a cap or jersey with the team mark described by colour and
+  shape: "royal-blue cap with a red letter C", "white jersey with blue pinstripes and a
+  round red-and-blue crest"), **`cues[1:]` are objects for the settings** ("a white flag
+  with a big blue letter W on the garage wall", "a red-and-blue pennant on the mirror").
+  Describe marks by colour and letter shape, never with the team name inside a model
+  prompt; add "no other lettering" so the model does not invent text.
+- The **CHARACTER lock contains `cues[0]` verbatim**; **every STYLE lock contains one of
+  `cues[1:]` verbatim**, in focus enough to be read as fan gear. Subtle is not enough: a
+  plain navy cap and a blurred pennant read as "generic man, generic lot" (user feedback
+  on the Cubs runs, 2026-10-27). Hands-only shots keep the sleeve plus the jersey or cap
+  edge in frame.
+- `creative_check.py` FAILs a project with `world` whose CHARACTER lock lacks `cues[0]`
+  or whose STYLE locks lack a setting cue.
+- **The character sheet must match the lock.** Omni follows the attached sheet over the
+  prompt: with an old sheet (henley, plain cap) every clip came back without the jersey
+  even though the lock and the keyframe had it (cubs-door-light-rap, 2026-10-27). When the
+  CHARACTER lock changes, the sheet is regenerated first (`Bước 0` fenced block in
+  prompts.md → `gen_queue.py` adds the `_sheet` job, free) and reviewed before any clip.
 - The product's own print is still the only legible text/logo in frame; cues
   are colours and shapes, never a second readable logo next to the product.
 

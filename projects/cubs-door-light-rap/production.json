@@ -52,7 +52,7 @@
     {
       "id": "s01",
       "role": "hook",
-      "file_pattern": "c01_b*.mp4",
+      "file_pattern": "c01_c*.mp4",
       "gen_sec": 8,
       "use_sec": 1.6,
       "audio_type": "music_only",
@@ -64,7 +64,7 @@
     {
       "id": "s02",
       "role": "proof",
-      "file_pattern": "c01_b*.mp4",
+      "file_pattern": "c01_c*.mp4",
       "gen_sec": 8,
       "use_sec": 2.4,
       "audio_type": "music_only",
@@ -80,7 +80,7 @@
     {
       "id": "s03",
       "role": "lifestyle",
-      "file_pattern": "c02_a*.mp4",
+      "file_pattern": "c02_e*.mp4",
       "gen_sec": 8,
       "use_sec": 1.6,
       "audio_type": "music_only",
@@ -88,25 +88,28 @@
       "overlay_pos": "auto",
       "print_fidelity": "strict",
       "override": {
-        "src_in": 2.6,
-        "src_out": 4.2
+        "src_in": 0.2,
+        "src_out": 1.8
       }
     },
     {
       "id": "s04",
       "role": "lifestyle",
-      "file_pattern": "c02_c*.mp4",
+      "file_pattern": "c02_e*.mp4",
       "gen_sec": 8,
       "use_sec": 1.6,
       "audio_type": "music_only",
       "overlay": "*NO* WIRES",
       "overlay_pos": "auto",
-      "moment": "b"
+      "override": {
+        "src_in": 6.0,
+        "src_out": 7.6
+      }
     },
     {
       "id": "s05",
       "role": "demo",
-      "file_pattern": "c03_b*.mp4",
+      "file_pattern": "c03_c*.mp4",
       "gen_sec": 8,
       "use_sec": 1.4,
       "audio_type": "music_only",
@@ -117,7 +120,7 @@
     {
       "id": "s06",
       "role": "demo",
-      "file_pattern": "c03_b*.mp4",
+      "file_pattern": "c03_c*.mp4",
       "gen_sec": 8,
       "use_sec": 1.6,
       "audio_type": "music_only",
@@ -128,25 +131,31 @@
     {
       "id": "s07",
       "role": "proof",
-      "file_pattern": "c04_a*.mp4",
+      "file_pattern": "c04_d*.mp4",
       "gen_sec": 8,
       "use_sec": 2,
       "audio_type": "music_only",
       "overlay": "*THEY* ALL ASK",
       "overlay_pos": "auto",
       "print_fidelity": "strict",
-      "moment": "a"
+      "override": {
+        "src_in": 2.5,
+        "src_out": 4.5
+      }
     },
     {
       "id": "s08",
       "role": "cta",
-      "file_pattern": "c04_a*.mp4",
+      "file_pattern": "c04_d*.mp4",
       "gen_sec": 8,
       "use_sec": 2.2,
       "audio_type": "music_only",
       "overlay": "GET YOURS — *LINK* ↓",
       "overlay_pos": "auto",
-      "moment": "b"
+      "override": {
+        "src_in": 5.6,
+        "src_out": 7.8
+      }
     }
   ],
   "variants": [

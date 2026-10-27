@@ -78,6 +78,31 @@ def lock(md: str, name: str) -> list[str]:
     return [m.group(1) for m in re.finditer(r"\*\*%s[^*]*\*\*:?\s*\n(.+)" % name, md)]
 
 
+def check_character(md: str, project: Path, fails: list[str], warns: list[str]) -> None:
+    """formats.md §4 (user rule 2026-10-27): every project invents its own person and generates
+    its own sheet — a CHARACTER lock needs a Bước 0 sheet block, and the sheet file must not be
+    a copy of another project's."""
+    if not lock(md, "CHARACTER"):
+        return
+    sheets = re.findall(r"```[a-z]*\n.*?```\s*\n\s*\*\*(?:Lưu thành|Save as)[^*]*\*\*:?\s*`?([^`\n]+_sheet\.png)`?", md, re.S)
+    if not sheets:
+        fails.append("Có khoá CHARACTER nhưng Bước 0 không có block gen ảnh nhân vật (`Lưu thành: <name>_sheet.png`) — "
+                     "mỗi project một người mới, không dùng lại sheet cũ (formats.md §4)")
+        return
+    import hashlib
+    for name in sheets:
+        f = project / "frames" / name
+        if not f.exists():
+            continue
+        h = hashlib.md5(f.read_bytes()).hexdigest()
+        for other in (ROOT / "projects").iterdir():
+            if other == project or not other.is_dir():
+                continue
+            for g in (other / "frames").glob("*_sheet.png"):
+                if hashlib.md5(g.read_bytes()).hexdigest() == h:
+                    fails.append(f"frames/{name} trùng với {other.name}/frames/{g.name}: sheet phải gen mới cho project này")
+
+
 def check_world(md: str, product: dict, fails: list[str], warns: list[str]) -> None:
     """formats.md §4b: with product.json.world, CHARACTER and every STYLE lock carry a cue."""
     world = product.get("world")
@@ -86,15 +111,15 @@ def check_world(md: str, product: dict, fails: list[str], warns: list[str]) -> N
             warns.append("product.json không có 'world' dù sản phẩm thuộc đội/brand — thêm world.cues (formats.md §4b)")
         return
     cues = [c.lower() for c in world.get("cues", [])]
-    keys = {w for c in cues for w in words(c) if len(w) > 3}  # cue words: "dodger", "pennant", "navy"
-    for name in ("CHARACTER", "STYLE"):
-        locks = lock(md, name)
-        if not locks:
-            continue
-        for text in locks:
-            hit = any(c in text.lower() for c in cues) or len(keys & set(words(text))) >= 2
-            if not hit:
-                fails.append(f"Khoá {name} không mang dấu hiệu nào của world '{world['name']}' ({', '.join(world['cues'][:3])}…) — formats.md §4b")
+    if len(cues) < 2:
+        fails.append("product.json world.cues cần ≥2 mục: [0] đồ fan trên người, [1:] vật trong bối cảnh (formats.md §4b)")
+        return
+    for text in lock(md, "CHARACTER"):
+        if cues[0] not in text.lower():
+            fails.append(f"Khoá CHARACTER thiếu nguyên văn đồ fan world.cues[0]: '{world['cues'][0][:50]}…' (formats.md §4b)")
+    for text in lock(md, "STYLE"):
+        if not any(c in text.lower() for c in cues[1:]):
+            fails.append(f"Một khoá STYLE không có vật bối cảnh nào trong world.cues[1:] nguyên văn (formats.md §4b): '{text[:50]}…'")
 
 
 def check_placement(md: str, product: dict, blocks: dict[int, str], keyframes: set[int],
@@ -282,6 +307,7 @@ def main() -> None:
     check_format(prod, fails, warns)
     check_overlays(prod, fails, warns)
     check_world(md, product, fails, warns)
+    check_character(md, project, fails, warns)
     check_placement(md, product, blocks, keyframes, fails, warns)
 
     print("\n== creative_check ==")

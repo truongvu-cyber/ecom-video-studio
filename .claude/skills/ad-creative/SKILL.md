@@ -93,7 +93,9 @@ user approves. "Đổi sang hướng 2" → redo the draft, stop again.
 
 ## Stage 3 — Locks
 
-PRODUCT, CHARACTER (if a person), **REALISM** (if a person, a hand or a face
+PRODUCT, CHARACTER (if a person — a **new, random person for this project**,
+never one from an earlier project, with its own `_sheet.png` job in Bước 0;
+`formats.md` §4), **REALISM** (if a person, a hand or a face
 appears — `references/realism.md` §1, and every such clip states the blocking
 per §2), STYLE, **VOICE** (for c01), AUDIO, NEGATIVE.
 Written once, pasted word for word into every prompt (`SKILL` rules of

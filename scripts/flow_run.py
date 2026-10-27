@@ -30,7 +30,9 @@ LABEL = {  # queue value -> Flow label
     "veo-3.1-fast": "Veo 3.1 - Fast", "veo-3.1-quality": "Veo 3.1 - Quality",
 }
 WAIT = {"image": 180, "video": 480}
-PAUSE_BETWEEN_JOBS = 25  # seconds of idle between jobs (runbook §3c)
+PAUSE_BETWEEN_JOBS = 5   # seconds between two submits (user rule 2026-10-27)
+MAX_ACTIVE = 4           # generations running in Flow at the same time
+POLL = 8                 # seconds between polls of the grid
 REFUSAL = re.compile(r"Không thành công|vi phạm chính sách|không thể tạo|policy", re.I)
 # Google flagged the automation itself ("hoạt động bất thường"): stop at once, no retry, and the
 # runner is not started again for at least 10 minutes (runbook §4).
@@ -340,19 +342,23 @@ class Flow:
         return False
 
     # ---------- tile menu ----------
-    def tile_menu(self, mid: str, item: str) -> list[str]:
+    def tile_menu(self, mid: str | None, item: str, rect: dict | None = None) -> list[str]:
         """Hover the tile with media id `mid` (newest tile if not found), open 'Tuỳ chọn khác',
         click the menu item matching `item`; returns the menu as it was before the click."""
         self.leave_detail()
-        tile = None
-        for _ in range(12):
-            tile = self.rect("[...document.querySelectorAll('img,video')].find(e=>(e.src||e.currentSrc||'').includes(%s)&&e.getBoundingClientRect().width>100)" % json.dumps(mid))
+        tile = rect
+        for _ in range(0 if rect else 12):
+            tile = self.rect("(()=>{const e=[...document.querySelectorAll('img,video,source')].find(e=>(e.src||e.currentSrc||'').includes(%s));"
+                             "return e&&(e.closest('flow-grid-tile-container')||e)})()" % json.dumps(mid))
             if tile:
                 break
             time.sleep(5)
         if not tile:  # newest tile is top-left
-            tile = self.rect("[...document.querySelectorAll('img,video')].filter(e=>e.getBoundingClientRect().width>100)"
-                             ".sort((a,b)=>(a.getBoundingClientRect().y-b.getBoundingClientRect().y)||(a.getBoundingClientRect().x-b.getBoundingClientRect().x))[0]")
+            t = self.grid_tiles(1)
+            if not t:
+                raise Stop("Không có tile nào trong lưới")
+            tile = {"x": t[0]["x"], "y": t[0]["y"], "w": t[0]["w"], "h": t[0].get("h", 260)}
+        h = tile.get("h", 260)
         items: list[str] = []
         self.close_overlays()
         for _ in range(3):
@@ -361,7 +367,10 @@ class Flow:
                 time.sleep(2)
                 self.close_overlays()
             self.hover(tile)
-            more = self.rect("[...document.querySelectorAll('button')].find(b=>/Tuỳ chọn khác/.test(b.getAttribute('aria-label')||'')&&b.getBoundingClientRect().width>0)")
+            # every tile has its own 'Tuỳ chọn khác' (top-right corner of the tile): take the one inside this tile
+            more = self.rect("[...document.querySelectorAll('button')].find(b=>{if(!/Tuỳ chọn khác/.test(b.getAttribute('aria-label')||''))return false;"
+                             "const r=b.getBoundingClientRect();return r.width>0&&Math.abs(r.x+r.width/2-%f)<%f&&Math.abs(r.y+r.height/2-%f)<%f})"
+                             % (tile["x"], tile["w"] / 2 + 2, tile["y"], h / 2 + 2))
             if more:
                 self.click(more)
                 time.sleep(1.2)
@@ -376,13 +385,13 @@ class Flow:
         time.sleep(1.2)
         return items
 
-    def rename(self, url: str, name: str) -> None:
+    def rename(self, url: str | None, name: str, rect: dict | None = None) -> None:
         """Flow names a result after its prompt ("Man stepping out of car"); the user's rule
         (2026-10-27) is that every generated asset carries the name it is saved under
         (keyframe_c3, c04_a) so the library and the project files match. Menu 'Đổi tên' opens a
         dialog with one input (aria-label "Văn bản có thể chỉnh sửa") and buttons Xong / Huỷ."""
-        mid = re.search(r"/(?:image|video)/([0-9a-f-]+)", url).group(1)
-        self.tile_menu(mid, "Đổi tên")
+        mid = re.search(r"/(?:image|video)/([0-9a-f-]+)", url).group(1) if url else None
+        self.tile_menu(mid, "Đổi tên", rect)
         box = self.rect("document.querySelector('.cdk-overlay-container input[aria-label=\"Văn bản có thể chỉnh sửa\"]')")
         if not box:
             self.esc()
@@ -399,15 +408,16 @@ class Flow:
             raise Stop("Không thấy nút Xong trong hộp thoại Đổi tên")
         self.click(ok)
         time.sleep(1.0)
-        got = self.js("(()=>{const e=[...document.querySelectorAll('img,video')].find(e=>(e.src||e.currentSrc||'').includes(%s));"
-                      "const t=e&&(e.closest('[class*=tile],[class*=virtual-item]')||e.parentElement.parentElement);return t?t.innerText:''})()" % json.dumps(mid)) or ""
-        if name not in got:
-            print(f"   (cảnh báo: tile chưa hiện tên {name}: {got[:60]!r})")
+        if mid:
+            got = self.js("(()=>{const e=[...document.querySelectorAll('img,video')].find(e=>(e.src||e.currentSrc||'').includes(%s));"
+                          "const t=e&&e.closest('flow-grid-tile-container');return t?t.innerText:''})()" % json.dumps(mid)) or ""
+            if name not in got:
+                print(f"   (cảnh báo: tile chưa hiện tên {name}: {got[:60]!r})")
 
     # ---------- download ----------
-    def download(self, url: str, kind: str, size: str) -> Path:
-        mid = re.search(r"/(?:image|video)/([0-9a-f-]+)", url).group(1)
-        self.tile_menu(mid, "Tải xuống")
+    def download(self, url: str | None, kind: str, size: str, rect: dict | None = None) -> Path:
+        mid = re.search(r"/(?:image|video)/([0-9a-f-]+)", url).group(1) if url else None
+        self.tile_menu(mid, "Tải xuống", rect)
         sub = self.menu_items()
         choice = next((s for s in sub if s.startswith(size) and "tín dụng" not in s), None)
         if not choice:
@@ -454,6 +464,203 @@ class Flow:
             "tool": job["tool"], "mode": job.get("mode"), "download": job.get("download")}})
         return dest
 
+    # ---------- batch mode: upload once, submit independent jobs together ----------
+    def upload_all(self, names: list[str]) -> None:
+        """One drop for every reference file not yet in the library, then verify each."""
+        missing = [n for n in dict.fromkeys(names) if n not in self.state["uploaded"]
+                   and (self.project / "frames" / n).exists()]
+        if not missing:
+            return
+        self.panel_open()
+        for n in list(missing):
+            if self.panel_find(n):
+                self.state["uploaded"].append(n)
+                missing.remove(n)
+        self.esc()
+        save_json(self.state_path, self.state)
+        if not missing:
+            return
+        print(f"   upload 1 lượt: {', '.join(missing)}")
+        self.c.drop([str(self.project / "frames" / n) for n in missing])
+        for _ in range(40):
+            time.sleep(2)
+            self.panel_open()
+            for n in list(missing):
+                if self.panel_find(n):
+                    self.state["uploaded"].append(n)
+                    missing.remove(n)
+            self.esc()
+            save_json(self.state_path, self.state)
+            if not missing:
+                return
+        raise Stop(f"Upload không thấy trong thư viện sau 80 s: {missing}")
+
+    def submit(self, job: dict) -> str:
+        """Compose and press 'Bắt đầu tạo' without waiting. Returns the prompt key used to
+        find this job's tile later (a rendering tile shows the prompt text and a percentage)."""
+        self.clear_composer()
+        for ref in job.get("refs", []):
+            self.attach(ref)
+        self.settings(job["kind"], job)
+        self.prompt(job["prompt"])
+        key = job["id"]
+        if self.dry:
+            print("   (dry-run: không bấm tạo)")
+            return key
+        gen = self.rect("[...document.querySelectorAll('button')].find(b=>/Bắt đầu tạo/.test(b.getAttribute('aria-label')||'')&&b.getBoundingClientRect().width>0)")
+        if not gen:
+            raise Stop("Không thấy nút 'Bắt đầu tạo'")
+        self.click(gen)
+        return key
+
+    def grid_tiles(self, n: int = 16) -> list[dict]:
+        """The newest n tiles of the project grid, newest first. Flow renders one
+        <flow-grid-tile-container> per asset in creation order (row by row); a rendering one
+        shows a percentage, a finished one holds an <img>/<video> under flow-content.google
+        with the media id (video tiles carry a poster under /image/<same id>).
+        Each: {kind, pct, ids, text}."""
+        v = self.js("""(()=>{const norm=t=>(t||'').replace(/\\s+/g,' ').trim();
+            const tiles=[...document.querySelectorAll('flow-grid-tile-container')]
+              .map(t=>({t,r:t.getBoundingClientRect()})).filter(({r})=>r.width>80)
+              .sort((a,b)=>(a.r.y-b.r.y)||(a.r.x-b.r.x)).slice(0,%d);
+            return JSON.stringify(tiles.map(({t})=>{const txt=norm(t.innerText);
+              const pct=(txt.match(/\\b(\\d{1,3})%%/)||[])[1]||null;
+              const kind=t.querySelector('flow-video-tile')?'video':(t.querySelector('flow-image-tile')?'image':null);
+              const ids=[...t.querySelectorAll('img,video,source')].map(e=>((e.src||e.currentSrc||'').match(/flow-content\\.google\\/(?:image|video)\\/([0-9a-f-]{36})/)||[])[1]).filter(Boolean);
+              const r=t.getBoundingClientRect();
+              return {kind, pct, ids:[...new Set(ids)], text:txt.slice(0,60), x:r.x+r.width/2, y:r.y+r.height/2, w:r.width, h:r.height};}));})()""" % n)
+        return json.loads(v or "[]")
+
+    def tile_status(self, index: int, kind: str, taken: set[str]) -> tuple[str | None, str | None]:
+        """(percent, media id) of the tile at position `index` from the newest."""
+        tiles = self.grid_tiles()
+        if index >= len(tiles):
+            return None, None
+        t = tiles[index]
+        if t["pct"] is not None:
+            return t["pct"], None
+        ids = [i for i in t["ids"] if i not in taken]
+        return None, (ids[0] if ids and t.get("kind") == kind else None)
+
+    def finish(self, job: dict, mid: str | None, log, rect: dict | None = None) -> Path:
+        """Download, save under the next free name, rename the Flow asset, log."""
+        kind = job["kind"]
+        url = f"https://flow-content.google/{kind}/{mid}" if mid else None
+        f = self.download(url, kind, job.get("download", "2K" if kind == "image" else "1080p"), rect)
+        dest = self.project / job["save_as"]
+        while dest.exists():  # never overwrite: next free suffix
+            stem, suf = dest.stem, dest.suffix
+            m = re.match(r"(.*)_([a-z])$", stem)
+            dest = dest.with_name(f"{m.group(1)}_{chr(ord(m.group(2)) + 1)}{suf}" if m else f"{stem}_b{suf}")
+        if kind == "image" and f.suffix.lower() != dest.suffix.lower():
+            os.system(f'sips -s format png "{f}" --out "{dest}" >/dev/null')
+        else:
+            shutil.copy(f, dest)
+        self.rename(url, dest.stem, rect)
+        print(f"   {job['id']}: -> {dest.relative_to(self.project)} (đổi tên trong Flow: {dest.stem})")
+        log({"job": job["id"], "url": url, "file": str(dest.relative_to(self.project)), "flow_name": dest.stem,
+             "settings": {"tool": job["tool"], "mode": job.get("mode"), "download": job.get("download")}})
+        return dest
+
+    def upload_tracked(self, refs: list[str], events: list) -> None:
+        """Upload refs during a batch run and account for the grid tiles they add (one per file),
+        so later tile positions stay correct."""
+        missing = [n for n in dict.fromkeys(refs) if n not in self.state["uploaded"]]
+        if not missing:
+            return
+        before = len(self.grid_tiles(40))
+        self.upload_all(missing)
+        for _ in range(30):  # the new tiles mount late
+            if len(self.grid_tiles(40)) >= before + len(missing):
+                break
+            time.sleep(2)
+        for n in missing:
+            events.append({"type": "upload", "name": n})
+
+    def run_queue(self, jobs: list[dict], budget: int, log) -> None:
+        """Submit every job whose inputs exist (up to MAX_ACTIVE at once), poll the grid, and
+        finish each result the moment it lands; a finished keyframe unlocks its clip.
+        Tiles are matched by position: Flow keeps tiles in creation order, newest first, so the
+        k-th event of this run (a submit or an upload) owns tile index len(events)-1-k."""
+        self.ensure_project()
+        taken = {(json.loads(l).get("url") or "").split("/")[-1] for l in
+                 (self.project / "edit" / "gen_log.jsonl").read_text().splitlines() if l.strip()} \
+            if (self.project / "edit" / "gen_log.jsonl").exists() else set()
+        pending = list(jobs)
+        active: dict[str, dict] = {}   # job id -> {job, event, t0}
+        attempts: dict[str, int] = {}
+        events: list = []
+        self.upload_all([r for j in jobs for r in j.get("refs", [])])  # before any submit: no tracking needed
+        last_submit = 0.0
+        while pending or active:
+            for job in list(pending):
+                if len(active) >= MAX_ACTIVE:
+                    break
+                refs = job.get("refs", [])
+                if not all((self.project / "frames" / r).exists() for r in refs):
+                    continue  # waits for its keyframe
+                if time.time() - last_submit < PAUSE_BETWEEN_JOBS:
+                    time.sleep(PAUSE_BETWEEN_JOBS - (time.time() - last_submit))
+                self.upload_tracked(refs, events)
+                attempts[job["id"]] = attempts.get(job["id"], 0) + 1
+                try:
+                    self.submit(job)
+                except Stop as e:
+                    log({"job": job["id"], "attempt": attempts[job["id"]], "error": str(e)})
+                    print(f"   {job['id']}: DỪNG: {e}")
+                    if "bất thường" in str(e) or "đăng nhập" in str(e) or "captcha" in str(e).lower() or budget <= 0:
+                        sys.exit(1)
+                    budget -= 1
+                    continue
+                last_submit = time.time()
+                pending.remove(job)
+                events.append({"type": "job", "id": job["id"]})
+                active[job["id"]] = {"job": job, "event": len(events) - 1, "t0": time.time()}
+                print(f"== {job['kind']} {job['id']} đã gửi ({len(active)} đang chạy)")
+                if self.dry:
+                    active.pop(job["id"])
+            if not active:
+                if pending and not self.dry:
+                    time.sleep(POLL)
+                    continue
+                break
+            time.sleep(POLL)
+            txt = self.js("document.body.innerText.slice(0,4000)") or ""
+            if ABNORMAL.search(txt):
+                sys.exit("Flow báo hoạt động bất thường — dừng hẳn, chờ ít nhất 10 phút rồi mới chạy lại")
+            self.guard()
+            for jid, a in list(active.items()):
+                job = a["job"]
+                pct, mid = self.tile_status(len(events) - 1 - a["event"], job["kind"], taken)
+                elapsed = time.time() - a["t0"]
+                if mid and elapsed >= (15 if job["kind"] == "image" else 40):
+                    taken.add(mid)
+                    print(f"   {jid}: xong sau {int(elapsed)} s")
+                    try:
+                        self.finish(job, mid, log)
+                    except Stop as e:
+                        log({"job": jid, "attempt": attempts[jid], "error": str(e), "media": mid})
+                        print(f"   {jid}: DỪNG khi tải/đổi tên: {e}")
+                        if budget > 0:
+                            budget -= 1
+                            pending.insert(0, job)
+                    active.pop(jid)
+                elif pct is None and mid is None and REFUSAL.search(txt) and elapsed > 20:
+                    log({"job": jid, "attempt": attempts[jid], "error": "Flow từ chối prompt này (chính sách)"})
+                    print(f"   {jid}: Flow từ chối (chính sách)")
+                    active.pop(jid)
+                    if budget > 0 and attempts[jid] < 3:
+                        budget -= 1
+                        pending.insert(0, job)
+                elif elapsed > WAIT[job["kind"]]:
+                    log({"job": jid, "attempt": attempts[jid], "error": f"Hết {WAIT[job['kind']]} s mà chưa thấy kết quả"})
+                    print(f"   {jid}: hết giờ chờ (tile {len(events) - 1 - a['event']}: {self.grid_tiles()[:1]})")
+                    active.pop(jid)
+                    if budget > 0 and attempts[jid] < 2:
+                        budget -= 1
+                        pending.insert(0, job)
+        print("Hàng đợi xong.")
+
 
 def main() -> None:
     ap = argparse.ArgumentParser()
@@ -461,6 +668,7 @@ def main() -> None:
     ap.add_argument("--stage", default="all", choices=["images", "clips", "all"])
     ap.add_argument("--only", default="", help="job ids, comma separated")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--serial", action="store_true", help="một job một lúc (chế độ cũ)")
     args = ap.parse_args()
 
     project = project_dir(args.project)
@@ -482,8 +690,11 @@ def main() -> None:
 
     flow = Flow(project, args.dry_run)
     budget = int(queue.get("retry_budget", 2))
+    if not args.serial:
+        flow.run_queue(jobs, budget, log)
+        return
     for k, job in enumerate(jobs):
-        if k:  # runbook §3c: no bursts — Flow flagged a rapid run as "hoạt động bất thường"
+        if k:
             time.sleep(PAUSE_BETWEEN_JOBS)
         print(f"== {job['kind']} {job['id']} -> {job['save_as']}")
         attempt = 0

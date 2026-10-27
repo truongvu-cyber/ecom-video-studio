@@ -116,6 +116,35 @@ executes what the queue says.
   the same clip, stop regenerating the clip and fix the keyframe (or use the usable part of a
   take via `override.src_in/src_out`, marked `pass` with that note in `gen_review.jsonl`).
 
+## 3d. Batch mode (default since 2026-10-27, user rule: speed)
+
+`flow_run.py <id>` (no `--serial`) runs the queue as a scheduler:
+
+1. **Upload once**: every reference file of every job that exists on disk goes up in one
+   drop, verified in the panel.
+2. **Submit what is ready**: a job whose refs all exist (keyframes need only their uploads;
+   a clip waits for its `keyframe_cN.png` to be downloaded) is composed and sent at once, up
+   to `MAX_ACTIVE` (4) running in Flow together, `PAUSE_BETWEEN_JOBS` (5 s) between submits.
+3. **Track by tile position**: the grid is one `<flow-grid-tile-container>` per asset in
+   creation order (newest top-left, row by row); a rendering tile shows the prompt text and a
+   percentage, a finished one holds `<flow-image-tile>` / `<flow-video-tile>` with an `<img>`
+   under `flow-content.google/<kind>/<id>` (video tiles: poster under `/image/<same id>`).
+   The k-th event of the run (a submit or an upload, each adds one tile) owns tile index
+   `len(events)-1-k`; the job is done when that tile has no percentage and an id of the right
+   kind not yet in `gen_log.jsonl`. After a page reload the thumbnails switch to
+   `flow.google.com/asb/…` and ids are gone, so a reload mid-run loses tracking: the runner
+   never navigates during a batch. Every tile has its own `Tuỳ chọn khác` button in its top
+   right corner (visible without hover); the menu is opened with the button *inside* the
+   target tile's rect, never the first one in the document (that is tile 0's).
+   Finished tiles carry a Flow-made title ("Man stepping out of car") until renamed.
+4. **Finish on landing**: download (2K / 1080p), save under the next free name, rename in
+   Flow, log — while the other jobs keep rendering. A finished keyframe is uploaded and its
+   clip is submitted in the next loop.
+5. Stop conditions are unchanged; refusals and timeouts re-queue the job while the retry
+   budget lasts. `--stage images` / `--stage clips` still limit the queue when the review
+   gate between stages is wanted (`--stage all` chains them for speed; review then runs on
+   `gen_review.jpg` at the end and a failed keyframe means its clip is regenerated too).
+
 ## 4. Stop conditions
 
 Stop and report (never retry blindly): a sign-in or captcha page; a refusal
