@@ -39,7 +39,7 @@ clean phone footage, vertical 9:16, a home driveway in soft afternoon daylight, 
 2. `frames/install_steps_row.png` — hộp đèn và tay thao tác thật.
 3. **Ảnh nhân vật Mike — gen lại theo khoá CHARACTER mới** (sheet cũ mặc henley, mũ trơn nên Omni bỏ jersey):
    ```
-   Character reference sheet, one image, 16:9: three full-body views (front, side, back) on the left, one chest-up close-up on the right, plain light-grey background, even soft light. Man in his early 40s, medium build, light skin, short dark-blond hair, light stubble, royal-blue baseball cap with a red letter C on the front, white baseball jersey with thin blue pinstripes and a round red-and-blue crest with a letter C on the chest, no other lettering, worn open over a navy long-sleeve henley, dark jeans. No text, no watermark.
+   Photograph, character reference sheet, one image, 16:9: a real person photographed in a studio, three full-body views (front, side, back) on the left, one chest-up close-up on the right, plain light-grey background, even soft light, real skin and fabric texture, no illustration, not a cartoon, no 3D render, no CGI. Man in his early 40s, medium build, light skin, short dark-blond hair, light stubble, royal-blue baseball cap with a red letter C on the front, white baseball jersey with thin blue pinstripes and a round red-and-blue crest with a letter C on the chest, no other lettering, worn open over a navy long-sleeve henley, dark jeans. No text, no watermark.
    ```
    **Lưu thành:** `mike_sheet.png`
 4. `frames/car_night.png` — xe và ánh sáng đêm của các bản trước (giữ xe giống nhau).

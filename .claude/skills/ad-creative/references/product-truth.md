@@ -18,6 +18,15 @@ of statement apart, in `projects/<id>/product.json` (schema:
 Personalization claims ("any name", "any color") need the user to confirm the
 shop really offers them — ask once if the listing does not show it.
 
+## The key selling trigger comes first (user rule 2026-10-27)
+
+Before the analysis, answer `hooks.md` §2: **what is the one visible thing that
+makes this product worth money?** (jersey → the season patches and the
+name/number; door light → the logo appearing when the door opens; name hoodie →
+the name.) Write it as `product.json.key_trigger` (`what`, `proof_in_3s`,
+three `hook_types`). The hook, frame 1 and the payoff shot are built on it;
+`creative_check.py` fails a project without it.
+
 ## The analysis (in brief.md, user's language)
 
 1. **Product card** — what it is, visible details, print/text on it (exact),

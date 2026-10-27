@@ -124,7 +124,9 @@ everything else`.
 ## 5. Check every keyframe before animating it
 
 1. **Product:** side by side with the real photo: shape, proportions, colour,
-   buttons, markings. Any drift, regenerate now; video will not fix it.
+   buttons, markings — **for every face that is visible** (front, back, sleeve,
+   underside). A face the photo does not show is described from the listing,
+   never invented. Any drift, regenerate now; video will not fix it.
 2. **Hands and body:** five fingers, a grip that could hold the product's
    weight, no merged limbs.
 3. **Frame:** 9:16 at 1080x1920 or more, the product where the planned move needs

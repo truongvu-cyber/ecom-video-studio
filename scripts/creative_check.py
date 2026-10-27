@@ -53,14 +53,14 @@ def clip_blocks(md: str) -> dict[int, str]:
 
 # formats.md §2, the machine-checkable part. use_sec bounds are (min, max) for B-roll shots.
 FORMATS = {
-    "ugc_dialogue": {"keep_native": True, "captions": True, "fx": "none", "text": "pill",
-                     "use": (2.0, 4.0), "shots": (5, 7), "dialogue_clips": 1},
-    "hype_montage": {"keep_native": False, "captions": False, "fx": "hype", "text": "bold",
-                     "use": (1.2, 2.5), "shots": (8, 8), "dialogue_clips": 0},
-    "calm_lofi": {"keep_native": True, "captions": False, "fx": "none", "text": "pill",
-                  "use": (2.5, 4.0), "shots": (4, 6), "dialogue_clips": 0},
-    "demo_steps": {"keep_native": None, "captions": False, "fx": "hype", "text": "bold",
-                   "use": (1.2, 2.5), "shots": (8, 8), "dialogue_clips": 0},
+    "ugc_dialogue": {"keep_native": True, "captions": True, "fx": ("none", "clean"), "text": ("pill", "marker", "box"),
+                     "use": (2.0, 4.0), "shots": (5, 9), "dialogue_clips": 1},
+    "hype_montage": {"keep_native": False, "captions": False, "fx": ("hype", "clean"), "text": ("bold", "condensed"),
+                     "use": (1.5, 3.0), "shots": (8, 12), "dialogue_clips": 0},
+    "calm_lofi": {"keep_native": True, "captions": False, "fx": ("none", "clean"), "text": ("serif", "pill"),
+                  "use": (2.5, 4.0), "shots": (4, 8), "dialogue_clips": 0},
+    "demo_steps": {"keep_native": None, "captions": False, "fx": ("hype", "clean"), "text": ("box", "bold", "condensed"),
+                   "use": (1.2, 3.0), "shots": (8, 12), "dialogue_clips": 0},
 }
 MAX_OVERLAY_WORDS = 4
 
@@ -76,6 +76,39 @@ PHYSICS_NEG = ["passing through", "clipping", "extra fingers", "floating"]
 def lock(md: str, name: str) -> list[str]:
     """Text of every lock whose heading starts with `name` (CHARACTER, STYLE, STYLE - day...)."""
     return [m.group(1) for m in re.finditer(r"\*\*%s[^*]*\*\*:?\s*\n(.+)" % name, md)]
+
+
+def check_trigger(product: dict, prod: dict, fails: list[str], warns: list[str]) -> None:
+    """hooks.md §2: the key selling trigger is written before the story, and the hook variants
+    are three different types."""
+    kt = product.get("key_trigger")
+    if not kt or not kt.get("what") or not kt.get("proof_in_3s"):
+        fails.append("product.json thiếu key_trigger (what, proof_in_3s, hook_types) — xác định điểm bán then chốt trước khi lên ý tưởng (hooks.md §2)")
+        return
+    shots = prod.get("shots") or []
+    hook_shot = kt.get("hook_shot", "s01")
+    first = shots[0] if shots else {}
+    if first.get("id") != hook_shot:
+        fails.append(f"shot đầu là {first.get('id')} nhưng key_trigger.hook_shot = {hook_shot}: video phải mở bằng trigger (hooks.md §2b)")
+    if not first.get("trigger"):
+        fails.append(f"{first.get('id')}: shot mở video phải có trigger: true — hình đầu là cái khách muốn nhất (patch, tên, logo), không phải nhân vật xuất hiện (hooks.md §2b)")
+    types = kt.get("hook_types") or []
+    if len(set(types)) < 3:
+        fails.append("key_trigger.hook_types cần 3 kiểu hook khác nhau (hooks.md §3)")
+    n_var = len(prod.get("variants") or []) + 1
+    if n_var < 3:
+        warns.append(f"chỉ có {n_var} hook (bản chính + variants); quy tắc là 3 kiểu khác nhau")
+
+
+def check_sheet_realism(md: str, fails: list[str], warns: list[str]) -> None:
+    """formats.md §4 (user rule 2026-10-27): character/mascot sheets are photographs of a real
+    person or a real costume, never an illustration or 3D render."""
+    for m in re.finditer(r"```[a-z]*\n(.*?)```\s*\n\s*\*\*(?:Lưu thành|Save as)[^*]*\*\*:?\s*`?([^`\n]+_sheet\.png)`?", md, re.S):
+        body, name = m.group(1).lower(), m.group(2)
+        if not re.search(r"\bphotograph|\bphoto\b|photoreal|real costume|real person", body):
+            fails.append(f"{name}: prompt sheet phải là ảnh chụp thật (photograph / real costume), không phải minh hoạ 3D (formats.md §4)")
+        if not re.search(r"no illustration|not a cartoon|no 3d render|no cgi", body):
+            fails.append(f"{name}: prompt sheet thiếu phủ định 'no illustration, no cartoon, no 3D render'")
 
 
 def check_character(md: str, project: Path, fails: list[str], warns: list[str]) -> None:
@@ -174,10 +207,12 @@ def check_format(prod: dict, fails: list[str], warns: list[str]) -> None:
         fails.append(f"format {fmt}: audio.keep_native phải là {str(f['keep_native']).lower()}")
     if caps.get("enabled", True) != f["captions"]:
         fails.append(f"format {fmt}: captions.enabled phải là {str(f['captions']).lower()}")
-    if fx != f["fx"]:
-        fails.append(f"format {fmt}: fx.preset phải là '{f['fx']}' (đang '{fx}')")
-    if text != f["text"]:
-        warns.append(f"format {fmt}: text_style.preset nên là '{f['text']}' (đang '{text}')")
+    if fx not in f["fx"]:
+        fails.append(f"format {fmt}: fx.preset phải là một trong {f['fx']} (đang '{fx}')")
+    if text not in f["text"]:
+        warns.append(f"format {fmt}: text_style.preset nên là một trong {f['text']} (đang '{text}') — editing-playbook §5b")
+    if not (prod.get("spec") or {}).get("structure"):
+        warns.append("spec.structure chưa ghi (result_first | problem_solution | unbox_reveal | us_vs_them | three_reasons) — ecom-ad-anatomy.md §2")
     n = len(prod["shots"])
     if not f["shots"][0] <= n <= f["shots"][1]:
         warns.append(f"format {fmt}: nên có {f['shots'][0]}–{f['shots'][1]} shot (đang {n})")
@@ -308,6 +343,8 @@ def main() -> None:
     check_overlays(prod, fails, warns)
     check_world(md, product, fails, warns)
     check_character(md, project, fails, warns)
+    check_trigger(product, prod, fails, warns)
+    check_sheet_realism(md, fails, warns)
     check_placement(md, product, blocks, keyframes, fails, warns)
 
     print("\n== creative_check ==")

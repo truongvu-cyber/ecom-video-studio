@@ -59,7 +59,8 @@
       "overlay_pos": "auto",
       "print_fidelity": "strict",
       "moment": "a",
-      "status": "pending"
+      "status": "pending",
+      "trigger": true
     },
     {
       "id": "s02",

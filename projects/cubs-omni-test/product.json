@@ -3,7 +3,11 @@
   "product_id": "cubs-car-door-light",
   "name": "Team Logo Car Door Projector Light (Cubs)",
   "model": "dropship",
-  "reference_images": ["frames/product_projection.png", "frames/install_steps_grid.png", "frames/install_steps_row.png"],
+  "reference_images": [
+    "frames/product_projection.png",
+    "frames/install_steps_grid.png",
+    "frames/install_steps_row.png"
+  ],
   "design_files": [],
   "invariants": [
     "Projected logo: round blue ring with a white inner ring, red letter C wrapping the word UBS in red block letters on a white field",
@@ -11,26 +15,95 @@
     "Unit holds batteries in an internal tray; red film covers the adhesive pad on its back"
   ],
   "facts": [
-    {"key": "projection", "value": "Projects the team logo onto the ground below the open car door", "source": "user"},
-    {"key": "battery", "value": "Battery powered, batteries go into a tray inside the unit", "source": "image"},
-    {"key": "adhesive", "value": "Sticks to the door panel with an adhesive pad (peel the backing, press on)", "source": "image"},
-    {"key": "install_steps", "value": "Install in 4 steps: insert batteries, prep the surface, remove backing, stick and close", "source": "image"},
-    {"key": "install_time", "value": "Listing says: Install in 60 Seconds", "source": "user"},
-    {"key": "no_tools", "value": "Listing says: No tools required", "source": "user"}
+    {
+      "key": "projection",
+      "value": "Projects the team logo onto the ground below the open car door",
+      "source": "user"
+    },
+    {
+      "key": "battery",
+      "value": "Battery powered, batteries go into a tray inside the unit",
+      "source": "image"
+    },
+    {
+      "key": "adhesive",
+      "value": "Sticks to the door panel with an adhesive pad (peel the backing, press on)",
+      "source": "image"
+    },
+    {
+      "key": "install_steps",
+      "value": "Install in 4 steps: insert batteries, prep the surface, remove backing, stick and close",
+      "source": "image"
+    },
+    {
+      "key": "install_time",
+      "value": "Listing says: Install in 60 Seconds",
+      "source": "user"
+    },
+    {
+      "key": "no_tools",
+      "value": "Listing says: No tools required",
+      "source": "user"
+    }
   ],
   "inferred": [
-    {"key": "self_buyer", "value": "Chicago baseball fans 20-55 who customize their car and love game-day pride"},
-    {"key": "gift_buyer", "value": "Partner or family buying a small, surprising gift for a fan (Christmas stocking, birthday)"},
-    {"key": "pain", "value": "Car mods seem to need wiring or a shop visit"},
-    {"key": "desire", "value": "A 'wow' moment every time the door opens, show team pride at night"},
-    {"key": "season", "value": "Late October: off-season for the team; gift season (BFCM, Christmas) is the strongest angle"}
+    {
+      "key": "self_buyer",
+      "value": "Chicago baseball fans 20-55 who customize their car and love game-day pride"
+    },
+    {
+      "key": "gift_buyer",
+      "value": "Partner or family buying a small, surprising gift for a fan (Christmas stocking, birthday)"
+    },
+    {
+      "key": "pain",
+      "value": "Car mods seem to need wiring or a shop visit"
+    },
+    {
+      "key": "desire",
+      "value": "A 'wow' moment every time the door opens, show team pride at night"
+    },
+    {
+      "key": "season",
+      "value": "Late October: off-season for the team; gift season (BFCM, Christmas) is the strongest angle"
+    }
   ],
-  "unknown": ["brightness", "battery life", "how it turns on (door sensor type)", "price", "shipping time",
-              "car compatibility", "waterproof rating", "official licensing or authenticity", "which batteries and how many"],
+  "unknown": [
+    "brightness",
+    "battery life",
+    "how it turns on (door sensor type)",
+    "price",
+    "shipping time",
+    "car compatibility",
+    "waterproof rating",
+    "official licensing or authenticity",
+    "which batteries and how many"
+  ],
   "claims": [
-    {"text": "No tools", "evidence": "no_tools"},
-    {"text": "Install in 60 seconds", "evidence": "install_time"},
-    {"text": "Peel and stick", "evidence": "adhesive"},
-    {"text": "Logo on the ground when you open the door", "evidence": "projection"}
-  ]
+    {
+      "text": "No tools",
+      "evidence": "no_tools"
+    },
+    {
+      "text": "Install in 60 seconds",
+      "evidence": "install_time"
+    },
+    {
+      "text": "Peel and stick",
+      "evidence": "adhesive"
+    },
+    {
+      "text": "Logo on the ground when you open the door",
+      "evidence": "projection"
+    }
+  ],
+  "key_trigger": {
+    "what": "the team logo appearing on the ground the moment the car door opens",
+    "proof_in_3s": "dark asphalt, the door swings open, the logo blooms sharp under the door edge",
+    "hook_types": [
+      "result_first",
+      "pov",
+      "curiosity"
+    ]
+  }
 }

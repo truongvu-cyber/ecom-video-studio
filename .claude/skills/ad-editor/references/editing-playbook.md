@@ -51,6 +51,28 @@ Text competes with the product for the eye. Rules in order:
 5. The CTA button sits where the product is *not*; on a shot where the product
    fills the bottom, send it to the top.
 
+## 5b. Fonts — one voice per video, chosen by format (user rule 2026-10-27)
+
+Research (TikTok Sans / Montserrat / Bebas guides, Verizon motion team): bold sans-serifs
+survive compression and small screens; a condensed face fits a long hook in a tall
+column; a serif only large and sparing; contrast (box, stroke, shadow) matters as much
+as the face; type is *cut in* or moved slightly, never flown around while someone reads.
+Our presets (`text_style.preset`, rendered by `render.py`):
+
+| preset | face (macOS local) | entrance | use for | never for |
+| --- | --- | --- | --- | --- |
+| `bold` | Impact, 16 px stroke, tilted | slam + jitter | hype_montage slams, sports/streetwear | calm, luxury, long lines |
+| `condensed` | Futura Condensed ExtraBold, tall column | drop from above | hype/demo hooks of 3–4 words, numbers ("60 SEC") | more than 2 lines |
+| `box` | Arial Black on a solid accent box | push from left | demo_steps step labels, lists, "3 reasons" | emotional lines |
+| `pill` | Inter on a dark pill | fade-up | ugc_dialogue hook + CTA under captions | hype |
+| `marker` | Chalkboard SE (hand-written) | scribble pop | UGC "notes", gifts, kids, relatable | product specs, numbers |
+| `serif` | Didot Bold, large, airy | slow fade with tracking | calm_lofi, gifts, premium/luxury | fast cuts, slams |
+
+Rules: one preset per video (the CTA may differ only in colour); the `*word*` is the one
+the viewer must read; ≤ 4 words per slam; a 4-word slam stays ≥ 1.7 s; keep every line
+inside the safe zone and off the face/print (§5). `creative_check` warns when the preset
+is outside the format's set.
+
 ## 6. Cut effects and sound effects
 
 `fx: hype` adds flash, punch, shake and beat pulses; `fx.sfx` adds a whoosh
@@ -59,6 +81,27 @@ hype/montage formats. Do **not** use them on calm formats (lo-fi, ASMR,
 gift reveals): there the cut itself is the effect and the best transition is
 a plain cut on the beat. `intensity` 0.6 is a good middle ground for
 "energetic but not aggressive".
+
+## 6b. Transitions — the right one for the cut (user rule 2026-10-27)
+
+Every cut has a transition INTO the next shot (`shots[].transition`, else the Editor
+assigns one from `build_timeline.TRANSITION_CYCLE`). Two neighbouring cuts never use the
+same effect; the first frame has none (the hook needs nothing in front of it).
+
+| transition | what it does | use when | avoid when |
+| --- | --- | --- | --- |
+| `cut` | nothing — the cut on the beat is the effect | UGC, calm, any shot where the picture itself changes enough | — |
+| `flash` | white hit + small punch | montage cuts on the downbeat, sports/hype | print close-ups (it bleaches the lettering for 3 frames) |
+| `whip` | fast horizontal rush with blur | change of place (tunnel → field, bedroom → street) | two shots of the same place |
+| `zoom` | punch-in from blur | into the payoff / drop, into a detail (patch, name) | twice in a row |
+| `slide` | vertical push | into the CTA, into a step in a list | emotional beats |
+| `glitch` | jittered offsets + inverted flicker | hype/streetwear once or twice per video, on a slam | kids, gifts, calm, print shots |
+| `dip` | dip to black | calm/luxury scene change, end of an act | fast formats |
+
+`fx.preset`: `hype` = transitions + decaying shake after flash/whip/zoom/glitch + beat
+pulses; `clean` = transitions only; `none` = plain cuts. Speed ramps (`speed` 0.6–0.8)
+only on the payoff; a ramp everywhere reads as cheap. J-cuts: in UGC, let the next line
+start ~0.2 s before the cut when the words run across two shots.
 
 ## 7. Printed products: protect the lettering
 

@@ -156,6 +156,46 @@
       },
       "minItems": 1,
       "description": "Điều phải đúng về VỊ TRÍ/TRẠNG THÁI sản phẩm trong mọi ảnh và clip (vd 'hộp đèn nằm dưới tấm ốp cửa, không ở ngưỡng cửa hay ghế'); soát sau mỗi lần gen (keyframes.md §5b)"
+    },
+    "key_trigger": {
+      "type": "object",
+      "description": "Điểm bán then chốt: một thứ camera thấy được trong ≤3 s khiến người ta mua (hooks.md §2); hook dựng trên nó",
+      "required": [
+        "what",
+        "proof_in_3s",
+        "hook_types"
+      ],
+      "properties": {
+        "what": {
+          "type": "string"
+        },
+        "proof_in_3s": {
+          "type": "string",
+          "description": "cảnh ≤3 s chứng minh điểm đó"
+        },
+        "hook_types": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "enum": [
+              "result_first",
+              "contrast",
+              "pov",
+              "callout",
+              "curiosity",
+              "bold_claim",
+              "confession",
+              "urgency",
+              "social_proof"
+            ]
+          }
+        },
+        "hook_shot": {
+          "type": "string",
+          "default": "s01",
+          "description": "shot mở video, phải là shot cho thấy trigger"
+        }
+      }
     }
   }
 }

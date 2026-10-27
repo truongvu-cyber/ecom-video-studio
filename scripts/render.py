@@ -230,7 +230,7 @@ def brand() -> dict:
     return load_json(p) if p.exists() else {}
 
 
-BOLD_CSS = """
+_OLD_BOLD_CSS = """
 @font-face {{ font-family: Impact; src: local('Impact'); }}
 .headline span {{ background:none; padding:0 10px; display:inline-block; transform:rotate(-3deg);
   font-family:Impact,"Arial Black",sans-serif; font-weight:400; font-size:100px; line-height:1.0;
@@ -244,32 +244,121 @@ BOLD_CSS = """
 """
 
 
-def hype_fx(plan: dict, k: float) -> tuple[list[str], str]:
-    """Cut and beat effects drawn on the base video (HyperFrames/GSAP).
+FONT_CSS = {
+    # preset -> CSS for .headline span / .cta span (editing-playbook §5b)
+    "bold": """
+@font-face {{ font-family: Impact; src: local('Impact'); }}
+.headline span {{ background:none; padding:0 10px; display:inline-block; transform:rotate(-3deg);
+  font-family:Impact,"Arial Black",sans-serif; font-weight:400; font-size:100px; line-height:1.0;
+  letter-spacing:1px; text-transform:uppercase; color:{accent};
+  -webkit-text-stroke:16px {stroke}; paint-order:stroke fill;
+  text-shadow:0 12px 0 rgba(0,0,0,0.55), 0 0 40px rgba(0,0,0,0.45); }}
+.headline span em, .cta span em {{ font-style:normal; color:{ink}; }}
+.cta span {{ font-family:Impact,"Arial Black",sans-serif; font-weight:400; font-size:76px; letter-spacing:1px;
+  text-transform:uppercase; background:{accent}; color:{stroke}; border:7px solid {stroke};
+  box-shadow:0 12px 0 {stroke}; padding:18px 46px; display:inline-block; transform:rotate(-2deg); }}
+""",
+    "condensed": """
+@font-face {{ font-family: FuturaCond; src: local('Futura-CondensedExtraBold'), local('Futura Condensed ExtraBold'); }}
+.headline span {{ background:none; padding:0 6px; display:inline-block;
+  font-family:FuturaCond,"Arial Narrow","Arial Black",sans-serif; font-weight:800; font-size:132px; line-height:0.92;
+  letter-spacing:2px; text-transform:uppercase; color:{ink};
+  -webkit-text-stroke:12px {stroke}; paint-order:stroke fill; text-shadow:0 10px 0 rgba(0,0,0,0.5); }}
+.headline span em, .cta span em {{ font-style:normal; color:{accent}; }}
+.cta span {{ font-family:FuturaCond,"Arial Narrow",sans-serif; font-weight:800; font-size:84px; letter-spacing:2px;
+  text-transform:uppercase; background:{accent}; color:{stroke}; padding:16px 44px; display:inline-block; }}
+""",
+    "serif": """
+@font-face {{ font-family: DidotB; src: local('Didot-Bold'), local('Didot Bold'), local('Georgia-Bold'); }}
+.headline span {{ background:none; padding:0 8px; display:inline-block;
+  font-family:DidotB,Didot,Georgia,serif; font-weight:700; font-size:96px; line-height:1.05;
+  letter-spacing:-1px; color:{ink}; text-shadow:0 4px 24px rgba(0,0,0,0.6); }}
+.headline span em, .cta span em {{ font-style:italic; color:{accent}; }}
+.cta span {{ font-family:DidotB,Didot,Georgia,serif; font-weight:700; font-size:60px; letter-spacing:1px;
+  background:rgba(255,255,255,0.92); color:#111; padding:20px 46px; display:inline-block; border-radius:4px; }}
+""",
+    "marker": """
+@font-face {{ font-family: Marker; src: local('ChalkboardSE-Bold'), local('Chalkboard SE Bold'), local('Marker Felt'); }}
+.headline span {{ background:none; padding:0 8px; display:inline-block; transform:rotate(-2deg);
+  font-family:Marker,"Chalkboard SE","Marker Felt",cursive; font-weight:700; font-size:92px; line-height:1.05;
+  color:{ink}; -webkit-text-stroke:9px {stroke}; paint-order:stroke fill; text-shadow:0 6px 0 rgba(0,0,0,0.45); }}
+.headline span em, .cta span em {{ font-style:normal; color:{accent}; }}
+.cta span {{ font-family:Marker,"Chalkboard SE",cursive; font-weight:700; font-size:66px;
+  background:{accent}; color:#111; padding:18px 42px; display:inline-block; border-radius:18px; transform:rotate(-1deg); }}
+""",
+    "box": """
+.headline span {{ background:{accent}; color:{stroke}; padding:14px 30px; display:inline-block;
+  font-family:"Arial Black",Arial,sans-serif; font-weight:900; font-size:78px; line-height:1.05;
+  text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 10px 0 {stroke}; }}
+.headline span em, .cta span em {{ font-style:normal; background:{stroke}; color:{accent}; padding:0 10px; }}
+.cta span {{ font-family:"Arial Black",Arial,sans-serif; font-weight:900; font-size:64px; text-transform:uppercase;
+  background:{stroke}; color:{accent}; padding:20px 44px; display:inline-block; border:6px solid {accent}; }}
+""",
+}
+BOLD_CSS = FONT_CSS["bold"]
 
-    Every cut: white flash, zoom punch from a motion blur, short decaying shake.
-    Every other beat inside a shot: a small zoom pulse. The base video stays
-    slightly overscaled (BASE) so shake never shows the frame edge.
-    """
+
+def text_in(preset: str, sel: str, t0: float, is_cta: bool) -> list[str]:
+    """Entrance animation per font preset (editing-playbook §5b): slam, drop, fade-up, scribble, snap."""
+    if preset == "bold":
+        return [f'tl.fromTo("{sel}",{{opacity:0,scale:2.2,rotation:-9}},{{opacity:1,scale:1,rotation:-3,duration:0.26,ease:"back.out(2.4)"}},{t0});',
+                f'tl.to("{sel}",{{x:7,duration:0.035,yoyo:true,repeat:5,ease:"none"}},{t0 + 0.26});']
+    if preset == "condensed":
+        return [f'tl.fromTo("{sel}",{{opacity:0,y:-140,scaleY:1.6}},{{opacity:1,y:0,scaleY:1,duration:0.22,ease:"power4.out"}},{t0});']
+    if preset == "serif":
+        return [f'tl.fromTo("{sel}",{{opacity:0,y:18,letterSpacing:"6px"}},{{opacity:1,y:0,letterSpacing:"-1px",duration:0.6,ease:"power2.out"}},{t0});']
+    if preset == "marker":
+        return [f'tl.fromTo("{sel}",{{opacity:0,rotation:-8,scale:0.8}},{{opacity:1,rotation:-2,scale:1,duration:0.18,ease:"back.out(3)"}},{t0});']
+    if preset == "box":
+        return [f'tl.fromTo("{sel}",{{opacity:0,x:-80}},{{opacity:1,x:0,duration:0.16,ease:"power3.out"}},{t0});']
+    return [f'tl.fromTo("{sel}",{{opacity:0,y:24,scale:0.96}},{{opacity:1,y:0,scale:1,duration:0.22,ease:"power3.out"}},{t0});']
+
+
+def cut_fx(plan: dict, k: float, preset: str) -> tuple[list[str], str]:
+    """Cut effects drawn on the base video (HyperFrames/GSAP), one per segment transition
+    (editing-playbook §6b): flash (white hit + punch), whip (horizontal rush with blur), zoom
+    (punch-in from a blur), slide (vertical push), glitch (jittered offsets + inverted flicker),
+    dip (dip to black), cut (nothing). preset 'hype' adds the shake and beat pulses on top.
+    The base video stays slightly overscaled (BASE) so shake and whips never show the edge."""
     BASE = 1.06
-    cuts = [s["tl_start"] for s in plan["segments"][1:]]
     js = [f'gsap.set("#base",{{scale:{BASE},transformOrigin:"50% 45%"}});']
-    for t in cuts:
-        js.append(f'tl.fromTo("#flash",{{opacity:{min(0.85, 0.7 * k):.2f}}},'
-                  f'{{opacity:0,duration:0.14,ease:"power2.out",immediateRender:false}},{t:.3f});')
-        js.append(f'tl.fromTo("#base",{{scale:{BASE + 0.16 * k:.3f},filter:"blur({8 * k:.1f}px)"}},'
-                  f'{{scale:{BASE},filter:"blur(0px)",duration:0.3,ease:"power3.out",immediateRender:false}},{t:.3f});')
-        # deterministic shake: alternating offsets that decay over ~0.2 s
-        for j, (dx, dy) in enumerate([(14, -10), (-12, 8), (9, -6), (-7, 5), (4, -3), (0, 0)]):
-            js.append(f'tl.set("#base",{{x:{dx * k:.1f},y:{dy * k:.1f}}},{t + 0.035 * j:.3f});')
-    for b in plan.get("beats_tl", []):
-        if b < 0.2 or any(abs(b - t) < 0.15 for t in cuts):
-            continue
-        js.append(f'tl.fromTo("#base",{{scale:{BASE + 0.045 * k:.3f}}},'
-                  f'{{scale:{BASE},duration:0.18,ease:"power2.out",immediateRender:false}},{b:.3f});')
-    flash = (f'<div id="flash" class="clip" data-start="0" data-duration="{plan["total_sec"]}" '
-             f'style="position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;"></div>')
-    return js, flash
+    segs = plan["segments"]
+    for seg in segs[1:]:
+        t = seg["tl_start"]
+        tr = seg.get("transition") or "cut"
+        if tr == "flash":
+            js.append(f'tl.fromTo("#flash",{{opacity:{min(0.85, 0.7 * k):.2f}}},{{opacity:0,duration:0.14,ease:"power2.out",immediateRender:false}},{t:.3f});')
+            js.append(f'tl.fromTo("#base",{{scale:{BASE + 0.16 * k:.3f},filter:"blur({8 * k:.1f}px)"}},{{scale:{BASE},filter:"blur(0px)",duration:0.3,ease:"power3.out",immediateRender:false}},{t:.3f});')
+        elif tr == "whip":
+            js.append(f'tl.fromTo("#base",{{x:{-220 * k:.0f},filter:"blur({14 * k:.0f}px)"}},{{x:0,filter:"blur(0px)",duration:0.22,ease:"power4.out",immediateRender:false}},{t:.3f});')
+        elif tr == "zoom":
+            js.append(f'tl.fromTo("#base",{{scale:{BASE + 0.28 * k:.3f},filter:"blur({6 * k:.1f}px)"}},{{scale:{BASE},filter:"blur(0px)",duration:0.38,ease:"expo.out",immediateRender:false}},{t:.3f});')
+        elif tr == "slide":
+            js.append(f'tl.fromTo("#base",{{y:{260 * k:.0f}}},{{y:0,duration:0.24,ease:"power4.out",immediateRender:false}},{t:.3f});')
+        elif tr == "glitch":
+            for j, (dx, inv) in enumerate([(-30, 1), (26, 0), (-16, 1), (10, 0), (0, 0)]):
+                js.append(f'tl.set("#base",{{x:{dx * k:.0f},filter:"invert({inv}) saturate({1 + inv * 2})"}},{t + 0.03 * j:.3f});')
+            js.append(f'tl.set("#base",{{x:0,filter:"none"}},{t + 0.16:.3f});')
+        elif tr == "dip":
+            js.append(f'tl.fromTo("#dip",{{opacity:1}},{{opacity:0,duration:0.35,ease:"power2.inOut",immediateRender:false}},{t:.3f});')
+            js.append(f'tl.to("#dip",{{opacity:1,duration:0.25,ease:"power2.inOut"}},{t - 0.25:.3f});')
+        if preset == "hype" and tr in ("flash", "whip", "zoom", "glitch"):
+            for j, (dx, dy) in enumerate([(14, -10), (-12, 8), (9, -6), (-7, 5), (4, -3), (0, 0)]):
+                js.append(f'tl.set("#base",{{x:{dx * k:.1f},y:{dy * k:.1f}}},{t + 0.2 + 0.035 * j:.3f});')
+    if preset == "hype":
+        cuts = [s["tl_start"] for s in segs[1:]]
+        for b in plan.get("beats_tl", []):
+            if b < 0.2 or any(abs(b - c) < 0.15 for c in cuts):
+                continue
+            js.append(f'tl.fromTo("#base",{{scale:{BASE + 0.045 * k:.3f}}},{{scale:{BASE},duration:0.18,ease:"power2.out",immediateRender:false}},{b:.3f});')
+    T = plan["total_sec"]
+    layers = (f'<div id="flash" class="clip" data-start="0" data-duration="{T}" style="position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;"></div>'
+              f'<div id="dip" class="clip" data-start="0" data-duration="{T}" style="position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;"></div>')
+    return js, layers
+
+
+def hype_fx(plan: dict, k: float) -> tuple[list[str], str]:  # kept for callers
+    return cut_fx(plan, k, "hype")
 
 
 def composition(plan: dict, hf: Path) -> None:
@@ -280,7 +369,8 @@ def composition(plan: dict, hf: Path) -> None:
     stroke = colors.get("text_stroke", "#000000")
     font = b.get("fonts", {}).get("caption", "Inter")
     style = plan.get("text_style") or {}
-    bold = style.get("preset") == "bold"
+    preset = style.get("preset", "pill")
+    bold = preset == "bold"
     accent = style.get("color", accent)
     W, H, T = plan["width"], plan["height"], plan["total_sec"]
     top = int(H * plan["safe_zone"].get("top", 0.15))
@@ -297,13 +387,7 @@ def composition(plan: dict, hf: Path) -> None:
         text = re.sub(r"\*(.+?)\*", r"<em>\1</em>", html.escape(o["text"]))
         els.append(f'<div id="ov{k}" class="clip {cls}" data-start="{o["start"]}" data-duration="{d}">'
                    f'<span>{text}</span></div>')
-        if bold:
-            js.append(f'tl.fromTo("#ov{k} span",{{opacity:0,scale:2.2,rotation:-9}},'
-                      f'{{opacity:1,scale:1,rotation:-3,duration:0.26,ease:"back.out(2.4)"}},{o["start"]});')
-            js.append(f'tl.to("#ov{k} span",{{x:7,duration:0.035,yoyo:true,repeat:5,ease:"none"}},{o["start"] + 0.26});')
-        else:
-            js.append(f'tl.fromTo("#ov{k} span",{{opacity:0,y:24,scale:0.96}},'
-                      f'{{opacity:1,y:0,scale:1,duration:0.22,ease:"power3.out"}},{o["start"]});')
+        js += text_in(preset, f"#ov{k} span", o["start"], o["kind"] == "cta")
         if o["kind"] == "cta":
             js.append(f'tl.to("#ov{k} span",{{scale:1.06,duration:0.3,yoyo:true,repeat:3,ease:"sine.inOut"}},{o["start"] + 0.3});')
     for k, c in enumerate(plan["captions"]):
@@ -317,8 +401,8 @@ def composition(plan: dict, hf: Path) -> None:
             js.append(f'tl.set("#cw{k}_{j}",{{color:"{ink}"}},{w["end"]});')
 
     fx = plan.get("fx") or {}
-    if fx.get("preset") == "hype":
-        js_fx, flash_el = hype_fx(plan, float(fx.get("intensity", 1)))
+    if fx.get("preset") in ("hype", "clean") or any(s.get("transition") not in (None, "cut") for s in plan["segments"]):
+        js_fx, flash_el = cut_fx(plan, float(fx.get("intensity", 1)), fx.get("preset", "clean"))
         els.insert(0, flash_el)
         js = js_fx + js  # effects first so text tweens stay on top
     page = f"""<!doctype html>
@@ -343,7 +427,7 @@ html, body {{ width:{W}px; height:{H}px; overflow:hidden; background:#000; }}
 .cta.pos-center {{ top:{H // 2 - 60}px; bottom:auto; }}
 .cta.pos-bottom {{ bottom:{bottom + 40}px; }}
 .cta span {{ background:{accent}; color:#111; font-size:58px; font-weight:900; padding:22px 44px; white-space:nowrap; border-radius:999px; }}
-{BOLD_CSS.format(accent=accent, stroke=stroke, ink=ink) if bold else ""}
+{FONT_CSS[preset].format(accent=accent, stroke=stroke, ink=ink) if preset in FONT_CSS else ""}
 .caption {{ bottom:{bottom + 40}px; flex-wrap:wrap; gap:0 18px; color:{ink}; font-size:84px; font-weight:900; line-height:1.1;
   -webkit-text-stroke:10px {stroke}; paint-order:stroke fill; text-transform:uppercase; }}
 </style>

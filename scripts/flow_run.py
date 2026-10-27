@@ -701,11 +701,16 @@ class Flow:
                     try:
                         self.finish(job, mid, log)
                     except Stop as e:
+                        # the result exists and is paid for: never regenerate because a menu did not
+                        # open — try finishing the same tile again on the next polls
+                        a["finish_tries"] = a.get("finish_tries", 0) + 1
+                        print(f"   {jid}: chưa đổi tên/tải được ({e}), thử lại ở lượt sau")
+                        self.esc(); self.leave_detail(); self.close_overlays()
+                        if a["finish_tries"] < 4:
+                            taken.discard(mid)
+                            continue
                         log({"job": jid, "attempt": attempts[jid], "error": str(e), "media": mid})
-                        print(f"   {jid}: DỪNG khi tải/đổi tên: {e}")
-                        if budget > 0:
-                            budget -= 1
-                            pending.insert(0, job)
+                        print(f"   {jid}: bỏ — tải tay tile này trong Flow")
                     active.pop(jid)
                 elif pct == "refused":  # this job's own tile says it failed (page-wide text is not evidence)
                     log({"job": jid, "attempt": attempts[jid], "error": "Flow từ chối prompt này (chính sách)"})

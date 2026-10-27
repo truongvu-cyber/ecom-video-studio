@@ -160,6 +160,12 @@ executes what the queue says.
   next jobs are composed. A clip waits for its keyframe to **finish in Flow** (it is attached by
   name), not for the file. Images download at **1K original size** (no upscale wait): the local
   copy is only for `gen_review.jpg` and the repo; videos stay 1080p because the editor cuts them.
+- **A finished result is never regenerated because a menu would not open** (mascot run: c01 and
+  c02 were submitted twice after "Không mở được menu của tile (Đổi tên)", 24 credits). The runner
+  now keeps the job active and retries the rename/download on the same tile on later polls.
+- Omni drifted **night → overcast day** on close-ups and crowd shots (mascot c03, c04) even with a
+  night STYLE lock; the keyframe was night. In a fast montage it reads as fine; for a single-scene
+  ad, name the time of day in the clip prompt's first sentence as well.
 - **Retry in place.** A tile that says "Không thành công" is retried with its own retry button
   (no recomposing, not charged when refused); if the button is missing the job is recomposed.
 

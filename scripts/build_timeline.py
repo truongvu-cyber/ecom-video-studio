@@ -81,6 +81,39 @@ def script_spelling(heard: list[dict], line: str) -> list[dict]:
     return out
 
 
+# editing-playbook §6b: the transition INTO a shot, by format and role, unless the shot names one.
+# Cycles so two neighbouring cuts never use the same effect; the payoff gets zoom, the CTA slide.
+TRANSITION_CYCLE = {
+    "hype_montage": ["flash", "whip", "zoom", "glitch", "flash", "slide"],
+    "demo_steps": ["flash", "slide", "zoom", "flash", "slide", "zoom"],
+    "ugc_dialogue": ["cut", "cut", "zoom", "cut", "cut", "zoom"],
+    "calm_lofi": ["cut", "dip", "cut", "dip"],
+}
+
+
+def assign_transitions(segments: list[dict], fmt: str | None, drop_on: str | None) -> None:
+    cycle = TRANSITION_CYCLE.get(fmt or "", ["cut"])
+    k = 0
+    for i, seg in enumerate(segments):
+        strict = seg.get("print_fidelity") == "strict"
+        if seg.get("transition"):
+            if strict and seg["transition"] in ("flash", "glitch"):
+                seg["transition"] = "zoom"  # §6b: flash bleaches, glitch inverts the lettering
+            continue
+        if i == 0:
+            seg["transition"] = "cut"  # the first frame is the hook: nothing in front of it
+        elif seg["shot"] == drop_on:
+            seg["transition"] = "zoom" if fmt != "calm_lofi" else "dip"
+        elif seg["role"] == "cta":
+            seg["transition"] = "slide" if fmt in ("hype_montage", "demo_steps") else "cut"
+        else:
+            tr = cycle[k % len(cycle)]
+            k += 1
+            if strict and tr in ("flash", "glitch"):
+                tr = "whip" if (i % 2) else "zoom"
+            seg["transition"] = tr
+
+
 def dialogue_segment(shot: dict, words: list[dict], dur: float, cursor: int, issues: list[str]):
     i, j, score = find_dialogue(words, shot["dialogue"], cursor)
     if score < 0.6:
@@ -278,13 +311,14 @@ def main() -> None:
             seg["out_max"] = take["duration"]
             if take["duration"] - ov["src_in"] < shot["use_sec"]:
                 issues.append(f"{shot['id']}: từ giây {ov['src_in']} clip chỉ còn {take['duration'] - ov['src_in']:.1f}s")
-        seg.update({"shot": shot["id"], "role": shot["role"], "take": take_name,
+        seg.update({"shot": shot["id"], "role": shot["role"], "take": take_name, "transition": shot.get("transition"),
                     "audio_type": shot["audio_type"], "overlay": shot.get("overlay"),
                     "overlay_pos": shot.get("overlay_pos", "top"),
                     "cta_pos": shot.get("overlay_pos"),  # CTA keeps its own spot unless set
                     "print_fidelity": shot.get("print_fidelity", "normal")})
         segments.append(seg)
 
+    assign_transitions(segments, prod.get("format"), (prod.get("music") or {}).get("drop_on"))
     total = layout(segments)
     # music time m plays at timeline time  m - offset + delay  (delay = music enters late)
     offset, delay, cuts, beats_tl = 0.0, 0.0, [], []
@@ -395,6 +429,7 @@ def main() -> None:
         "segments": [{k: (round(v, 3) if isinstance(v, float) else v) for k, v in s.items()
                       if k not in ("out_min", "out_max", "cta_pos")} for s in segments],
         "cuts": cuts, "captions": captions, "overlays": overlays, "issues": issues,
+        "format": prod.get("format"),
         "text_style": prod.get("text_style", {"preset": "pill"}),
         "fx": prod.get("fx", {"preset": "none"}),
         "beats_tl": [round(b, 3) for b in beats_tl if 0 <= b <= total],

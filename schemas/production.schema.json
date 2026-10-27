@@ -3,93 +3,271 @@
   "$id": "production.schema.json",
   "title": "production.json — hợp đồng giữa Agent 1 (Creative) và Agent 2 (Editor)",
   "type": "object",
-  "required": ["schema_version", "project_id", "product_ref", "spec", "audio", "music", "shots"],
+  "required": [
+    "schema_version",
+    "project_id",
+    "product_ref",
+    "spec",
+    "audio",
+    "music",
+    "shots"
+  ],
   "additionalProperties": false,
   "properties": {
-    "schema_version": { "const": "1.0" },
-    "project_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
-    "product_ref": { "type": "string", "description": "Đường dẫn tương đối tới product.json" },
-    "platform": { "enum": ["tiktok_reels", "meta_reels", "youtube_shorts"], "default": "tiktok_reels" },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "product_ref": {
+      "type": "string",
+      "description": "Đường dẫn tương đối tới product.json"
+    },
+    "platform": {
+      "enum": [
+        "tiktok_reels",
+        "meta_reels",
+        "youtube_shorts"
+      ],
+      "default": "tiktok_reels"
+    },
     "format": {
-      "enum": ["ugc_dialogue", "hype_montage", "calm_lofi", "demo_steps"],
+      "enum": [
+        "ugc_dialogue",
+        "hype_montage",
+        "calm_lofi",
+        "demo_steps"
+      ],
       "description": "Preset dựng (xem ad-creative/references/formats.md); creative_check kiểm tra các trường còn lại khớp preset"
     },
     "stage": {
-      "enum": ["draft", "concept_approved", "prompts_ready", "clips_ready", "rendered", "approved"],
+      "enum": [
+        "draft",
+        "concept_approved",
+        "prompts_ready",
+        "clips_ready",
+        "rendered",
+        "approved"
+      ],
       "default": "draft"
     },
     "gen_model": {
       "type": "object",
       "properties": {
-        "image": { "type": "string", "default": "nano-banana" },
-        "video": { "type": "string", "default": "veo-3" }
+        "image": {
+          "type": "string",
+          "default": "nano-banana"
+        },
+        "video": {
+          "type": "string",
+          "default": "veo-3"
+        }
       }
     },
     "spec": {
       "type": "object",
-      "required": ["ratio", "fps", "target_sec"],
+      "required": [
+        "ratio",
+        "fps",
+        "target_sec"
+      ],
       "properties": {
-        "ratio": { "enum": ["9:16", "1:1", "4:5"] },
-        "resolution": { "type": "string", "pattern": "^[0-9]+x[0-9]+$", "default": "1080x1920" },
-        "fps": { "type": "integer", "minimum": 24, "maximum": 60 },
-        "target_sec": { "type": "number", "minimum": 5, "maximum": 90 },
+        "ratio": {
+          "enum": [
+            "9:16",
+            "1:1",
+            "4:5"
+          ]
+        },
+        "resolution": {
+          "type": "string",
+          "pattern": "^[0-9]+x[0-9]+$",
+          "default": "1080x1920"
+        },
+        "fps": {
+          "type": "integer",
+          "minimum": 24,
+          "maximum": 60
+        },
+        "target_sec": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 90
+        },
         "safe_zone": {
           "type": "object",
           "description": "Preset, có thể đổi theo placement",
           "properties": {
-            "top": { "type": "number", "minimum": 0, "maximum": 0.4, "default": 0.15 },
-            "bottom": { "type": "number", "minimum": 0, "maximum": 0.4, "default": 0.20 }
+            "top": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.4,
+              "default": 0.15
+            },
+            "bottom": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.4,
+              "default": 0.2
+            }
           }
+        },
+        "structure": {
+          "enum": [
+            "result_first",
+            "problem_solution",
+            "unbox_reveal",
+            "us_vs_them",
+            "three_reasons"
+          ],
+          "description": "Cấu trúc video (ecom-ad-anatomy.md §2)"
         }
       }
     },
     "audio": {
       "type": "object",
-      "required": ["source"],
+      "required": [
+        "source"
+      ],
       "properties": {
-        "source": { "const": "native", "description": "Không lồng tiếng: tiếng có sẵn từ clip Veo" },
-        "music_duck_db": { "type": "number", "maximum": 0, "default": -12 },
-        "target_lufs": { "type": "number", "default": -14 },
-        "true_peak_db": { "type": "number", "default": -1 },
-        "export_no_music": { "type": "boolean", "default": true },
-        "keep_native": { "type": "boolean", "default": true, "description": "false = tắt toàn bộ tiếng gốc của clip (kể cả lời thoại), chỉ còn nhạc" }
+        "source": {
+          "const": "native",
+          "description": "Không lồng tiếng: tiếng có sẵn từ clip Veo"
+        },
+        "music_duck_db": {
+          "type": "number",
+          "maximum": 0,
+          "default": -12
+        },
+        "target_lufs": {
+          "type": "number",
+          "default": -14
+        },
+        "true_peak_db": {
+          "type": "number",
+          "default": -1
+        },
+        "export_no_music": {
+          "type": "boolean",
+          "default": true
+        },
+        "keep_native": {
+          "type": "boolean",
+          "default": true,
+          "description": "false = tắt toàn bộ tiếng gốc của clip (kể cả lời thoại), chỉ còn nhạc"
+        }
       }
     },
     "music": {
       "type": "object",
-      "required": ["source"],
+      "required": [
+        "source"
+      ],
       "properties": {
-        "source": { "enum": ["auto", "file", "none"], "description": "auto = chọn từ music-library có license" },
-        "file": { "type": ["string", "null"] },
-        "mood": { "type": "string", "description": "Từ khoá mood, cũng dùng làm từ khoá tìm nhạc" },
-        "drop_on": { "type": "string", "description": "id shot mà đoạn drop của nhạc rơi vào; mặc định là shot CTA; \"none\" = phát nhạc từ đầu bài, không căn drop" },
-        "allow_fetch": { "type": "boolean", "default": true, "description": "auto: thư viện không có bài hợp thì tự tìm và tải (nội bộ)" },
-        "bpm_range": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+        "source": {
+          "enum": [
+            "auto",
+            "file",
+            "none"
+          ],
+          "description": "auto = chọn từ music-library có license"
+        },
+        "file": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "mood": {
+          "type": "string",
+          "description": "Từ khoá mood, cũng dùng làm từ khoá tìm nhạc"
+        },
+        "drop_on": {
+          "type": "string",
+          "description": "id shot mà đoạn drop của nhạc rơi vào; mặc định là shot CTA; \"none\" = phát nhạc từ đầu bài, không căn drop"
+        },
+        "allow_fetch": {
+          "type": "boolean",
+          "default": true,
+          "description": "auto: thư viện không có bài hợp thì tự tìm và tải (nội bộ)"
+        },
+        "bpm_range": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
       }
     },
     "text_style": {
       "type": "object",
       "description": "Kiểu chữ overlay và CTA",
       "properties": {
-        "preset": { "enum": ["pill", "bold"], "default": "pill", "description": "pill = chữ trắng trên nền mờ; bold = chữ to, đậm, viền đen, màu nhấn, hiệu ứng bật" },
-        "color": { "type": "string", "description": "Màu nhấn, vd #FFC52F" },
-        "font": { "type": "string" }
+        "preset": {
+          "enum": [
+            "pill",
+            "bold",
+            "condensed",
+            "serif",
+            "marker",
+            "box"
+          ],
+          "default": "pill",
+          "description": "pill = Inter trắng trên nền mờ (UGC); bold = Impact slam viền đen (hype); condensed = Futura Condensed ExtraBold cột cao (hook dài, hype/demo); serif = Didot lớn, thưa (calm/luxury); marker = Chalkboard SE như viết tay (UGC note); box = Arial Black trên hộp đặc (demo_steps, bước)"
+        },
+        "color": {
+          "type": "string",
+          "description": "Màu nhấn, vd #FFC52F"
+        },
+        "font": {
+          "type": "string"
+        }
       }
     },
     "fx": {
       "type": "object",
       "description": "Hiệu ứng hình khi dựng",
       "properties": {
-        "preset": { "enum": ["none", "hype"], "default": "none", "description": "hype = mỗi nhát cắt có flash + zoom đập + rung + mờ chuyển động, mỗi beat có nhịp zoom nhẹ" },
-        "intensity": { "type": "number", "minimum": 0.3, "maximum": 2, "default": 1 },
-        "sfx": { "type": "boolean", "description": "Whoosh trước + impact tại mỗi nhát cắt, riser vào drop. Mặc định bật khi preset = hype." }
+        "preset": {
+          "enum": [
+            "none",
+            "hype",
+            "clean"
+          ],
+          "default": "none",
+          "description": "none = cắt thường; clean = chỉ chuyển cảnh theo shots[].transition, không rung/flash/pulse; hype = chuyển cảnh + rung + nhịp zoom theo beat"
+        },
+        "intensity": {
+          "type": "number",
+          "minimum": 0.3,
+          "maximum": 2,
+          "default": 1
+        },
+        "sfx": {
+          "type": "boolean",
+          "description": "Whoosh trước + impact tại mỗi nhát cắt, riser vào drop. Mặc định bật khi preset = hype."
+        }
       }
     },
     "captions": {
       "type": "object",
       "properties": {
-        "enabled": { "type": "boolean", "default": true },
-        "style": { "enum": ["word-highlight", "phrase", "none"], "default": "word-highlight" }
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "style": {
+          "enum": [
+            "word-highlight",
+            "phrase",
+            "none"
+          ],
+          "default": "word-highlight"
+        }
       }
     },
     "variants": {
@@ -97,12 +275,28 @@
       "description": "Biến thể rẻ, render thêm từ cùng footage. Hiện render.py áp dụng overlay_overrides (shot id → chữ mới); music_file và shot_order chưa render.",
       "items": {
         "type": "object",
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "overlay_overrides": { "type": "object", "additionalProperties": { "type": "string" } },
-          "music_file": { "type": "string" },
-          "shot_order": { "type": "array", "items": { "type": "string" } }
+          "id": {
+            "type": "string"
+          },
+          "overlay_overrides": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "music_file": {
+            "type": "string"
+          },
+          "shot_order": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         }
       }
     },
@@ -111,43 +305,145 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "role", "file_pattern", "use_sec", "audio_type"],
+        "required": [
+          "id",
+          "role",
+          "file_pattern",
+          "use_sec",
+          "audio_type"
+        ],
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^s[0-9]{2}$" },
-          "role": { "enum": ["hook", "problem", "demo", "personalize", "proof", "lifestyle", "offer", "cta"] },
+          "id": {
+            "type": "string",
+            "pattern": "^s[0-9]{2}$"
+          },
+          "role": {
+            "enum": [
+              "hook",
+              "problem",
+              "demo",
+              "personalize",
+              "proof",
+              "lifestyle",
+              "offer",
+              "cta"
+            ]
+          },
           "file_pattern": {
             "type": "string",
             "description": "Mẫu tên clip trong clips/, vd c01*.mp4 (nhiều take). Nhiều shot có thể dùng chung một clip thoại."
           },
-          "gen_sec": { "type": "number", "default": 8, "description": "Thời lượng clip Veo gen ra" },
+          "gen_sec": {
+            "type": "number",
+            "default": 8,
+            "description": "Thời lượng clip Veo gen ra"
+          },
           "moment": {
-            "enum": ["a", "b", "peak", "calm"],
+            "enum": [
+              "a",
+              "b",
+              "peak",
+              "calm"
+            ],
             "description": "Đoạn nào của clip: a = đầu clip, b = sau lúc đổi hành động, peak = chuyển động mạnh nhất, calm = tĩnh nhất (cho hình in). Bị override.src_in ghi đè."
           },
-          "speed": { "type": "number", "minimum": 0.5, "maximum": 2, "description": "Tốc độ phát: 0.6–0.8 slow-mo cho cảnh reveal, 1.2 cho bước lắp nhanh. Không áp dụng cho cảnh thoại còn giữ tiếng." },
-          "use_sec": { "type": "number", "exclusiveMinimum": 0, "description": "Thời lượng dùng trong video cuối" },
-          "audio_type": { "enum": ["dialogue", "sfx", "music_only"] },
+          "speed": {
+            "type": "number",
+            "minimum": 0.5,
+            "maximum": 2,
+            "description": "Tốc độ phát: 0.6–0.8 slow-mo cho cảnh reveal, 1.2 cho bước lắp nhanh. Không áp dụng cho cảnh thoại còn giữ tiếng."
+          },
+          "use_sec": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Thời lượng dùng trong video cuối"
+          },
+          "audio_type": {
+            "enum": [
+              "dialogue",
+              "sfx",
+              "music_only"
+            ]
+          },
           "dialogue": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Với clip thoại dùng chung: đoạn lời của shot này, dùng để tìm điểm vào/ra trong transcript"
           },
-          "overlay": { "type": ["string", "null"] },
+          "overlay": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "overlay_pos": {
-            "enum": ["top", "center", "lower", "bottom", "auto"], "default": "top",
+            "enum": [
+              "top",
+              "center",
+              "lower",
+              "bottom",
+              "auto"
+            ],
+            "default": "top",
             "description": "Vị trí chữ overlay; auto = tự chọn dải khung thưa chi tiết nhất; bottom = sát vùng an toàn dưới"
           },
-          "print_fidelity": { "enum": ["strict", "normal"], "default": "normal", "description": "strict = cảnh có chữ/số/logo in, bắt buộc QC so với file thiết kế" },
-          "status": { "enum": ["pending", "pass", "review", "reject"], "default": "pending" },
-          "chosen_take": { "type": ["string", "null"], "description": "Người dùng chỉ định take (vd c01_b.mp4); để trống thì Agent 2 tự chọn" },
+          "print_fidelity": {
+            "enum": [
+              "strict",
+              "normal"
+            ],
+            "default": "normal",
+            "description": "strict = cảnh có chữ/số/logo in, bắt buộc QC so với file thiết kế"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "pass",
+              "review",
+              "reject"
+            ],
+            "default": "pending"
+          },
+          "chosen_take": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Người dùng chỉ định take (vd c01_b.mp4); để trống thì Agent 2 tự chọn"
+          },
           "override": {
             "type": "object",
             "description": "Chỉnh tay điểm cắt trong clip nguồn (giây); dùng trong vòng sửa",
             "additionalProperties": false,
             "properties": {
-              "src_in": { "type": "number", "minimum": 0 },
-              "src_out": { "type": "number", "exclusiveMinimum": 0 }
+              "src_in": {
+                "type": "number",
+                "minimum": 0
+              },
+              "src_out": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
             }
+          },
+          "transition": {
+            "enum": [
+              "cut",
+              "flash",
+              "whip",
+              "zoom",
+              "slide",
+              "glitch",
+              "dip"
+            ],
+            "description": "Chuyển cảnh VÀO shot này (editing-playbook §6b). Bỏ trống = Editor chọn theo format + vai trò shot"
+          },
+          "trigger": {
+            "type": "boolean",
+            "description": "Shot này cho thấy key_trigger ở cỡ lớn (hooks.md §2b); shot đầu phải là shot này"
           }
         }
       }

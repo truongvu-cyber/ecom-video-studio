@@ -34,23 +34,32 @@ click-by-click procedure.
 
 | setting | `ugc_dialogue` | `hype_montage` | `calm_lofi` | `demo_steps` |
 | --- | --- | --- | --- | --- |
-| clips | 1 dialogue clip + 3–4 B-roll | 4 B-roll | 4 B-roll | 4 B-roll |
+| clips | 1 dialogue clip + 3–5 B-roll | 4–6 B-roll | 4–6 B-roll | 4–6 B-roll |
 | clip design | B-roll: one action, one slow move | **two actions per clip** (0–4 s / 4–8 s), camera settles between them | one slow action per clip | two actions per clip (two steps, or step + result) |
-| shots | 5–7 | 8 | 4–6 | 8 |
-| total | 15–20 s | 13–16 s | 14–16 s | 13–16 s |
-| `use_sec` | dialogue: words ÷ 2.5 + 0.5; B-roll 2–4 | 1.2–2.2; payoff 2–2.5 | 3–4 | steps 1.2–1.6; reveal 2–2.5 |
+| shots | 5–9 | 8–12 | 4–8 | 8–12 |
+| total | 15–20 s | 14–24 s | 14–20 s | 14–24 s |
+| `use_sec` | dialogue: words ÷ 2.5 + 0.5; B-roll 2–4 | **2–3 s per cut** by segment (fast setup 1.5–2, payoff 2.5–3) | 3–4 | steps 1.5–2; reveal 2.5–3 |
 | `moment` | B-roll `peak`, print `calm` | `a` / `b` by half; payoff `peak`; print `calm` | `calm` for print, `peak` otherwise | `a` / `b` by half |
 | `speed` | 1.0 | payoff 0.6–0.8 | 1.0 | reveal 0.75, steps 1.0–1.2 |
 | `audio.keep_native` | true | false | true (ambience under the music) | false (true only if the user wants the real sounds) |
 | `captions` | on, `word-highlight` | off | off | off |
-| `text_style` | `pill` | `bold` | `pill` | `bold` |
-| `fx` | none | `hype`, intensity 0.8–1.0, sfx on | none | `hype`, intensity 0.6–0.8, sfx on |
+| `text_style` | `pill` (or `marker` / `box`) | `bold` or `condensed` | `serif` or `pill` | `box` (or `bold` / `condensed`) — editing-playbook §5b |
+| `fx` | none (or `clean`) | `hype`, intensity 0.8–1.0, sfx on | none (or `clean` with `dip`) | `hype` 0.6–0.8 or `clean` |
+| transitions | cut; `zoom` into the payoff | auto cycle flash / whip / zoom / glitch / slide; payoff `zoom`, CTA `slide` | cut / `dip` | flash / slide / zoom per step — editing-playbook §6b |
 | overlays | hook + CTA only | one slam per shot, ≤ 4 words | hook, one mid-video line, CTA | numbered steps + reveal lines |
 | `music.mood` | by vibe: "warm upbeat hip hop" / "chill lofi" | "hard trap drill" or "ny drill rap" or "hype sports anthem" | "chill lofi indie" (+ scene word: surf, cozy) | "upbeat bouncy hip hop" |
-| `music.bpm_range` | 85–120 | 85–160 | 75–95 | 85–110 |
+| `music.bpm_range` | 85–120 | **120–160** (fast cuts need a fast track; the picker weights tempo over mood ties) | 75–95 | 95–130 |
 | `music.drop_on` | payoff shot (or CTA) | payoff shot | `none` or payoff | the reveal shot |
 | `overlay_pos` | `auto` | `auto` | `auto` | `auto` |
 | `variants` | 3 hooks (overlay + first spoken line variants in prompts) | 3 hook slams | 3 hook lines | 3 hook slams |
+
+### 2b. How many clips (user rule 2026-10-27)
+
+Four clips is the floor, not the ceiling. When the idea needs more scenes — a
+mascot moving through a stadium, an unboxing plus try-on plus street — plan 5–6
+clips (10–12 shots) and say so in the brief with the cost. Never pad a thin idea
+to 6 clips; never squeeze a rich one into 4. Every clip must still carry two
+distinct actions and every shot must add new information (playbook §1).
 
 ## 3. Colour rule (text accent)
 
@@ -73,6 +82,18 @@ Never pick a colour that is not already on screen.
   Hands-only shots need no character lock.
 - Name the character in the lock (`CHARACTER - Maya`) so prompts refer to
   "the woman", never to the name.
+- **Sheets are photographs, never illustrations (user rule 2026-10-27).** A
+  character or mascot sheet is generated as a *photo*: "photograph of a real
+  person / of a performer in a real plush costume, studio lighting, true fabric
+  and fur texture" with the negative "no illustration, not a cartoon, no 3D
+  render, no CGI". The Barley sheet came out as a cartoon turnaround and the
+  clips had to re-invent the fur; `creative_check.py` now fails a sheet prompt
+  without the photo wording.
+- **The product matches its photo from every angle.** Whoever wears or uses the
+  product — person or mascot — every visible face of it (front, back, sleeve,
+  side) matches the product photo for that face; a face the photo does not show
+  is described from the listing text, never invented. Keyframe and clip `Soát`
+  lines name the face shown ("back reads…", "left sleeve patch…").
 - **A new person every project (user rule 2026-10-27).** Each project invents
   its own character — new name, new face, age, build, hair, outfit drawn from
   the buyer persona and the world cues — and generates its own

@@ -30,6 +30,8 @@ US audience.
 | `references/product-analysis.md`, `genres.md`, `styles.md`, `vocabulary.md` | choosing angle, beat pattern, look, words |
 | `references/keyframes.md`, `failure-modes.md`, `models.md` (Veo section), `output-template.md` | writing the prompts |
 | `references/realism.md` | any prompt with a person, hand or face: REALISM lock, blocking rule, action-logic checklist, negatives |
+| `references/hooks.md` | Stage 1–2: the key selling trigger (`product.json.key_trigger`), why the first 2 s decide the ad, the hook-type matrix for the 3 variants |
+| `references/ecom-ad-anatomy.md` | Stage 2: the five ad structures (`spec.structure`), proof ladder, CTA rules (one action, last 2 s, platform wording) |
 | `examples/` | a full worked run (Kling) and quick prompts |
 
 Scripts run from the project root with `.venv/bin/python scripts/<name>.py`.
@@ -62,8 +64,10 @@ your analysis.
 
 ## Stage 1 — Product Truth (every mode)
 
-Look at every photo. Fill `product.json` (facts / inferred / unknown / claims /
-invariants) per `product-truth.md`. Ask **one** short question only if the
+Look at every photo. **First name the key selling trigger** (`hooks.md` §2 →
+`product.json.key_trigger`): the one visible thing that sells it. Then fill
+`product.json` (facts / inferred / unknown / claims / invariants) per
+`product-truth.md`. Ask **one** short question only if the
 product cannot be identified, or a personalization claim the ad depends on is
 unconfirmed. Otherwise decide and list assumptions.
 
@@ -73,6 +77,10 @@ unconfirmed. Otherwise decide and list assumptions.
   `hype_montage`, `calm_lofi`, `demo_steps`) and take every edit setting from
   its preset row; the colour, character, music-keyword and file-naming rules
   in the same file are fixed. What stays creative is listed in its §7.
+- The hook is built on `key_trigger` (`hooks.md` §3): frame 1 shows the trigger
+  or hides it on purpose (curiosity), the payoff shot shows it at full size, and
+  the three variants are three different hook *types*. Clip count follows the
+  idea (4–6, `formats.md` §2b); fast formats cut every 2–3 s on a 120–160 BPM track.
 - Read `references/viral-playbook.md` first: frame 1 carries the payoff,
   re-hook every 2–4 s, uneven rhythm (fast setup, held payoff), text = claim
   and picture = proof, drop on the payoff shot, three hook variants. Run its

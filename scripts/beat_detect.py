@@ -45,7 +45,9 @@ def pick_auto(music: dict, exclude: set[str] = frozenset()) -> tuple[Path | None
         overlap = len(moods & set(t.get("mood", [])))
         if overlap == 0:
             continue  # right tempo but wrong mood (e.g. a rap track for a lo-fi ad) is not a match
-        score = overlap * 2 + (1 if t.get("bpm") and lo <= t["bpm"] <= hi else 0)
+        # tempo is not a tie-breaker: a fast-cut video needs a fast track (user rule 2026-10-27)
+        in_range = bool(t.get("bpm")) and lo <= t["bpm"] <= hi
+        score = overlap * 2 + (3 if in_range else 0)
         # ties: closest tempo to the middle of the range, then file name (never insertion order)
         mid = (lo + hi) / 2
         key = (score, -abs((t.get("bpm") or mid) - mid), t["file"])
@@ -106,7 +108,7 @@ def main() -> None:
         f, license_note, score = pick_auto(music, exclude)
         # nothing unused in the library fits the mood: fetch new tracks (user allowed any
         # source for internal use; search leans on what is current) and pick again
-        if (f is None or score < 1) and music.get("allow_fetch", True) and music.get("mood"):
+        if (f is None or score < 4) and music.get("allow_fetch", True) and music.get("mood"):  # < 4 = no in-tempo match
             print(f"Thư viện không còn bài mới hợp '{music['mood']}' (đã loại {len(exclude)} bài project khác dùng), đang tìm nhạc mới...")
             cmd = [sys.executable, str(Path(__file__).parent / "fetch_music.py"), f"{music['mood']} 2026",
                    "--mood", music["mood"], "--count", "3"]

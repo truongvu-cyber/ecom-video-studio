@@ -112,5 +112,14 @@
     "the logo lies on the ground directly below the open door edge, not under the seat or the wheel",
     "logo visible only while the door is open; dark ground once the door is closed",
     "the person stands on the ground outside the car (or sits inside it), never across the sill"
-  ]
+  ],
+  "key_trigger": {
+    "what": "the team logo appearing on the ground the moment the car door opens",
+    "proof_in_3s": "a fan tells the camera to watch his door, opens it, the logo appears",
+    "hook_types": [
+      "callout",
+      "contrast",
+      "pov"
+    ]
+  }
 }

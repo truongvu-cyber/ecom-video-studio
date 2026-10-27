@@ -35,7 +35,7 @@ phone footage, vertical 9:16, a cozy bedroom in the evening, warm fairy lights a
 1. `frames/product.png` — nguồn duy nhất của chữ và patch trên áo.
 2. **Ảnh nhân vật Ava (gen mới cho project này):**
    ```
-   Character reference sheet, one image, 16:9: three full-body views (front, side, back) on the left, one chest-up close-up on the right, plain light-grey background, even soft light. American woman in her mid-20s, naturally beautiful, warm confident smile, long wavy honey-blonde hair, light freckles, slim athletic build, white cropped t-shirt, light-wash high-waist jeans, navy baseball cap with a small gold glove-shaped emblem, no lettering. No text, no watermark.
+   Photograph, character reference sheet, one image, 16:9: a real person photographed in a studio, three full-body views (front, side, back) on the left, one chest-up close-up on the right, plain light-grey background, even soft light, real skin and fabric texture, no illustration, not a cartoon, no 3D render, no CGI. American woman in her mid-20s, naturally beautiful, warm confident smile, long wavy honey-blonde hair, light freckles, slim athletic build, white cropped t-shirt, light-wash high-waist jeans, navy baseball cap with a small gold glove-shaped emblem, no lettering. No text, no watermark.
    ```
    **Lưu thành:** `ava_sheet.png`
 

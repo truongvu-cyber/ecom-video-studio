@@ -59,7 +59,8 @@
       "overlay": "*DOOR* OPENS…",
       "overlay_pos": "auto",
       "print_fidelity": "strict",
-      "moment": "a"
+      "moment": "a",
+      "trigger": true
     },
     {
       "id": "s02",
@@ -111,7 +112,7 @@
       "role": "demo",
       "file_pattern": "c03_c*.mp4",
       "gen_sec": 8,
-      "use_sec": 1.4,
+      "use_sec": 1.5,
       "audio_type": "music_only",
       "overlay": "*PEEL*",
       "overlay_pos": "auto",

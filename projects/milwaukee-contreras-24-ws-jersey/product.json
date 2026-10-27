@@ -88,5 +88,14 @@
     "the round World Series 2026 patch is on the wearer's left chest, the NATIONAL LEAGUE CHAMPIONS 2026 patch on the wearer's left sleeve — never on the stomach or the back",
     "jersey is powder blue with gold-and-white trim at collar, placket and sleeves; worn open or buttoned, never tucked in — an open jersey splitting the Brew Crew script across the placket is natural, not a fault",
     "unboxing: the jersey comes out of the box folded with the back (CONTRERAS 24) on top or the front script on top — the print is never inside-out or upside down"
-  ]
+  ],
+  "key_trigger": {
+    "what": "the 2026 World Series and NL Champions patches and the CONTRERAS 24 lettering",
+    "proof_in_3s": "the jersey lifted out of the box back-first so CONTRERAS 24 fills the frame, then a macro on the patch",
+    "hook_types": [
+      "result_first",
+      "pov",
+      "curiosity"
+    ]
+  }
 }

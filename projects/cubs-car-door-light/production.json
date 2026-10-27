@@ -58,7 +58,8 @@
       "overlay": "OPEN THE *DOOR*…",
       "overlay_pos": "auto",
       "print_fidelity": "strict",
-      "moment": "a"
+      "moment": "a",
+      "trigger": true
     },
     {
       "id": "s02",
