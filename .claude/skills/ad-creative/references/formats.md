@@ -74,6 +74,29 @@ Never pick a colour that is not already on screen.
 - Name the character in the lock (`CHARACTER - Maya`) so prompts refer to
   "the woman", never to the name.
 
+## 4b. World rule — the person and the place belong to the product (user rule 2026-10-27)
+
+A product that carries a team, a brand or a fandom (a Dodgers door light, a
+Cubs jersey, a Swiftie tote) is sold to a fan. The fan and their surroundings
+must look like it, or the product floats in a generic world.
+
+- `product.json` gets `world`: `{"name": "Dodgers", "cues": ["Dodger blue cap",
+  "white jersey with blue script", "blue-and-white pennant on the wall",
+  "stadium parking lot at dusk"]}` — at least two visual cues, written as
+  things a camera can see (colours, garments, objects, places), never the
+  team name inside a model prompt when the name itself would be refused
+  (then describe the colours and shapes only).
+- The **CHARACTER lock** uses at least one cue on the person (cap, jersey,
+  hoodie, scarf, wristband, colours).
+- Every **STYLE lock** (one per setting) uses at least one cue in the setting
+  (a pennant, a poster, a flag on the garage wall, a car in the team colour,
+  a game-day crowd far behind) — a small, out-of-focus one is enough.
+- `creative_check.py` FAILs a project with `world` whose CHARACTER or STYLE
+  locks contain none of the cues. Hands-only shots keep the sleeve or
+  wristband cue.
+- The product's own print is still the only legible text/logo in frame; cues
+  are colours and shapes, never a second readable logo next to the product.
+
 ## 5. Music keyword rule
 
 `music.mood` is a search string as well as a label. Build it as

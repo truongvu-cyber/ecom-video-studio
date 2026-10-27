@@ -16,3 +16,9 @@ tests/fixtures/*.wav
 
 # Project test nhân bản từ cubs-car-door-light (clone_project.py): frames là bản sao, không đưa vào git
 projects/cubs-omni-test/frames/
+
+# cubs-door-light-ugc dùng lại ảnh tham chiếu của cubs-car-door-light (bản sao, không đưa vào git)
+projects/cubs-door-light-ugc/frames/product_projection.png
+projects/cubs-door-light-ugc/frames/install_steps_*.png
+projects/cubs-door-light-ugc/frames/mike_sheet.png
+projects/cubs-door-light-ugc/frames/car_night.png

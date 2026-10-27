@@ -38,11 +38,13 @@ Ví dụ đầy đủ một lần chạy: `projects/cubs-car-door-light/` (brief
 ```bash
 scripts/flow_chrome.sh                                                   # Chrome riêng, đăng nhập Google một lần
 .venv/bin/python scripts/gen_queue.py <project-id>                       # hàng đợi gen từ prompts.md
-.venv/bin/python scripts/flow_run.py <project-id> --stage images         # ảnh nhân vật + keyframe (soát xong mới chạy clip)
+.venv/bin/python scripts/flow_run.py <project-id> --stage images         # ảnh nhân vật + keyframe, tự đổi tên trong Flow theo file
+.venv/bin/python scripts/gen_review.py <project-id>                      # edit/qc/gen_review.jpg + danh sách soát vị trí sản phẩm
+.venv/bin/python scripts/gen_review.py <project-id> --mark c03 fail "…"  # ghi kết quả soát; clip chưa 'pass' thì validate chặn
 .venv/bin/python scripts/flow_run.py <project-id> --stage clips          # clip Omni 1.1 Flash, tải 1080p vào clips/
 ```
 
-Quy trình click-by-click và các điều kiện dừng: `.claude/skills/ad-creative/references/flow-runbook.md`.
+Chrome riêng phải mở suốt lúc chạy (runner điều khiển cửa sổ đó qua DevTools; đóng là dừng). Quy trình click-by-click và các điều kiện dừng: `.claude/skills/ad-creative/references/flow-runbook.md`.
 
 ## Chạy Agent 2 (Editor)
 

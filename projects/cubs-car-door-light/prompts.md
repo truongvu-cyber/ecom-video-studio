@@ -17,16 +17,16 @@ Phần mô tả, hướng dẫn và ghi chú viết bằng tiếng Việt. Phầ
 a palm-sized matte black square projector unit with a small round lens on its underside, stuck under the inside door panel of a car; when the door is open it projects a round logo onto the ground: a blue outer ring, a thin white ring, and a red letter C wrapping the red block letters UBS on a white field, exactly as in the product photo
 
 **CHARACTER - Mike (nhân vật):**
-man in his early 40s, medium build, light skin, short dark-blond hair, light stubble, navy long-sleeve henley, dark jeans, plain navy baseball cap with no logo
+man in his early 40s, medium build, light skin, short dark-blond hair, light stubble, navy henley in the team's blue, long sleeves, dark jeans, plain royal-blue baseball cap with no logo
 
 **REALISM (độ chân thực + vật lý, dán vào mọi prompt có người/tay — quy tắc 2026-10-27):**
 Real human being filmed on a phone: natural skin with pores and slight unevenness, real eyes with reflections, hair with individual strands, clothing that creases and hangs with weight. Every movement obeys physics: feet stay on the ground, weight shifts before a step, hands grip objects with correct finger placement and stay on their surfaces, bodies and clothes keep clear of the car, the door, the ground and each other, objects keep their size and weight. One continuous action at real speed.
 
 **STYLE (phong cách, bối cảnh, ánh sáng — cảnh đêm):**
-UGC phone footage, vertical 9:16, a quiet parking lot at night, dark textured asphalt, soft amber streetlights far in the background, a blue coupe with no visible badges or logos, natural contrast, real textures, no color grading
+UGC phone footage, vertical 9:16, a quiet parking lot at night, dark textured asphalt, soft amber streetlights far in the background, a blue coupe with no visible badges or logos, a small red-and-blue pennant hanging from the rear-view mirror, natural contrast, real textures, no color grading
 
 **STYLE - day (cảnh lắp đặt ban ngày):**
-UGC phone footage, vertical 9:16, a home driveway in soft afternoon daylight, light grey concrete tiles, the same blue coupe with no visible badges or logos, natural colours, real skin and fabric texture, no color grading
+UGC phone footage, vertical 9:16, a home driveway in soft afternoon daylight, light grey concrete tiles, the same blue coupe with no visible badges or logos, a blue-and-red team pennant in the garage window behind, natural colours, real skin and fabric texture, no color grading
 
 **AUDIO (âm thanh):** quiet ambience, no speech, no music
 
@@ -51,10 +51,10 @@ UGC phone footage, vertical 9:16, a home driveway in soft afternoon daylight, li
 ```
 Image 1 is the product photo: an open car door at night with a small black projector under the door panel shining a round logo onto the asphalt. Keep the projected logo exactly as in image 1: a blue outer ring, a thin white ring, a red letter C wrapping the red block letters UBS on a white field; same shapes, letters, colours and sharpness; do not redraw, retype or restyle it. Keep the door, the projector and the light beam as in image 1.
 Extend the scene to a vertical 9:16 frame: more dark textured asphalt below the logo and more of the open door and car body above, the blue interior door light glowing, a faint beam of light from the projector to the logo.
-UGC phone footage, vertical 9:16, a quiet parking lot at night, dark textured asphalt, soft amber streetlights far in the background, a blue coupe with no visible badges or logos, natural contrast, real textures, no color grading
+UGC phone footage, vertical 9:16, a quiet parking lot at night, dark textured asphalt, soft amber streetlights far in the background, a blue coupe with no visible badges or logos, a small red-and-blue pennant hanging from the rear-view mirror, natural contrast, real textures, no color grading
 Top-down three-quarter view, vertical 9:16, the logo in the centre of the lower half filling about half of the frame width, top 15% and bottom 20% kept clear. No people, no other text, no watermark.
 ```
-**Soát trước khi làm video:** logo đúng hệt ảnh gốc (vòng xanh, viền trắng, chữ C đỏ ôm chữ UBS) · không có logo hãng xe
+**Soát trước khi làm video:** logo đúng hệt ảnh gốc (vòng xanh, viền trắng, chữ C đỏ ôm chữ UBS) · không có logo hãng xe · hộp đèn nằm dưới mép dưới tấm ốp cửa, ống kính hướng xuống · logo ngay dưới mép cửa đang mở (door open), đất tối khi cửa đóng
 
 ### Keyframe 2 · cho clip 2 · Nano Banana Pro
 **Ảnh tải lên:** ảnh 1 = `install_steps_row.png` · **Lưu thành:** `keyframe_c2.png`
@@ -63,10 +63,10 @@ Top-down three-quarter view, vertical 9:16, the logo in the centre of the lower 
 ```
 Image 1 shows four real install photos; use the first one as the reference for the product and the hands: a palm-sized matte black square projector unit with its battery tray open, three batteries inside. Keep the unit's shape, colour and tray exactly as in image 1; do not add text or brand marks to the unit or the batteries.
 Close-up of a man's two hands in a navy long sleeve holding the unit at chest height, the right thumb pressing the last battery into the tray, a blue coupe softly out of focus behind.
-UGC phone footage, vertical 9:16, a home driveway in soft afternoon daylight, light grey concrete tiles, the same blue coupe with no visible badges or logos, natural colours, real skin and fabric texture, no color grading
+UGC phone footage, vertical 9:16, a home driveway in soft afternoon daylight, light grey concrete tiles, the same blue coupe with no visible badges or logos, a blue-and-red team pennant in the garage window behind, natural colours, real skin and fabric texture, no color grading
 Close-up, vertical 9:16, the unit in the centre third, top 15% and bottom 20% kept clear. No readable brand names on the batteries, no other text, no watermark, natural hands with five fingers.
 ```
-**Soát trước khi làm video:** tay đủ ngón, cầm tự nhiên · không có chữ thương hiệu đọc được trên pin
+**Soát trước khi làm video:** tay đủ ngón, cầm tự nhiên · không có chữ thương hiệu đọc được trên pin · hộp đèn nằm dưới mép dưới tấm ốp cửa, ống kính hướng xuống · logo ngay dưới mép cửa đang mở (door open), đất tối khi cửa đóng
 
 ### Keyframe 3 · cho clip 3 · Nano Banana Pro
 **Ảnh tải lên:** ảnh 1 = `install_steps_row.png`, ảnh 2 = `keyframe_c2.png` · **Lưu thành:** `keyframe_c3.png`
@@ -75,10 +75,10 @@ Close-up, vertical 9:16, the unit in the centre third, top 15% and bottom 20% ke
 ```
 Image 1 shows four real install photos; use the third one as the reference: two hands peeling a red film off the adhesive pad on the back of the black projector unit. Keep the unit's shape and the red film exactly as in image 1. Image 2 is the hands, sleeve and daylight to match.
 Close-up of the man's two hands holding the unit, the left fingers pinching a corner of the red film just starting to lift, the open driver's door and dark interior door panel softly behind.
-UGC phone footage, vertical 9:16, a home driveway in soft afternoon daylight, light grey concrete tiles, the same blue coupe with no visible badges or logos, natural colours, real skin and fabric texture, no color grading
+UGC phone footage, vertical 9:16, a home driveway in soft afternoon daylight, light grey concrete tiles, the same blue coupe with no visible badges or logos, a blue-and-red team pennant in the garage window behind, natural colours, real skin and fabric texture, no color grading
 Close-up, vertical 9:16, the unit in the centre third, top 15% and bottom 20% kept clear. No other text, no watermark, natural hands with five fingers.
 ```
-**Soát trước khi làm video:** tay đủ ngón · màng đỏ đang bóc ở một góc
+**Soát trước khi làm video:** tay đủ ngón · màng đỏ đang bóc ở một góc · hộp đèn nằm dưới mép dưới tấm ốp cửa, ống kính hướng xuống · logo ngay dưới mép cửa đang mở (door open), đất tối khi cửa đóng
 
 ### Keyframe 4 · cho clip 4 · Nano Banana Pro
 **Ảnh tải lên:** ảnh 1 = `product_projection.png`, ảnh 2 = `mike_sheet.png`, ảnh 3 = `keyframe_c1.png` · **Lưu thành:** `keyframe_c4.png`
@@ -87,10 +87,10 @@ Close-up, vertical 9:16, the unit in the centre third, top 15% and bottom 20% ke
 ```
 Image 1 is the product: keep the projected ground logo exactly as in image 1, a blue outer ring, a thin white ring, a red letter C wrapping the red block letters UBS on a white field; do not redraw or retype it. Image 2 is the man; keep his face and outfit. Image 3 is the car, asphalt and light to match.
 Man in his early 40s, medium build, light skin, short dark-blond hair, light stubble, navy long-sleeve henley, dark jeans, plain navy baseball cap with no logo, standing beside the open driver's door of the blue coupe, one foot just stepped onto the asphalt, looking down at the glowing logo at his feet with a half smile; a friend walks up from behind, soft and out of focus.
-UGC phone footage, vertical 9:16, a quiet parking lot at night, dark textured asphalt, soft amber streetlights far in the background, a blue coupe with no visible badges or logos, natural contrast, real textures, no color grading
+UGC phone footage, vertical 9:16, a quiet parking lot at night, dark textured asphalt, soft amber streetlights far in the background, a blue coupe with no visible badges or logos, a small red-and-blue pennant hanging from the rear-view mirror, natural contrast, real textures, no color grading
 Full shot from a low angle near the ground, vertical 9:16, the logo sharp in the lower third, the man and the open door above it, top 15% and bottom 20% kept clear. One person in focus, no other text, no watermark, natural hands with five fingers.
 ```
-**Soát trước khi làm video:** logo đúng hệt ảnh gốc · không có logo hãng xe · người bạn phía sau mờ
+**Soát trước khi làm video:** logo đúng hệt ảnh gốc · không có logo hãng xe · người bạn phía sau mờ · hộp đèn nằm dưới mép dưới tấm ốp cửa, ống kính hướng xuống · logo ngay dưới mép cửa đang mở (door open), đất tối khi cửa đóng
 
 ## Clip 1 · 8s · Reveal logo
 **Khung đầu:** `keyframe_c1.png` · **Lưu video thành:** `c01_a.mp4` (gen lại thì lưu `c01_b.mp4`)
@@ -101,6 +101,7 @@ Top-down three-quarter view, slow push in. In the first half the open door swing
 Audio: quiet night ambience, no speech, no music. No subtitles, no on-screen text.
 ```
 **Phủ định (Negative):** `subtitles, captions, on-screen text, watermark, misspelled or redrawn logo, flickering logo, extra logos, car brand badges, music`
+**Soát clip:** hộp đèn nằm dưới tấm ốp cửa (under the inner door panel), logo chỉ hiện khi cửa mở và nằm ngay dưới mép cửa · người đứng ngoài xe, không xuyên cửa/ngưỡng (sill) · mặt và áo giống sheet suốt 8 giây · lời đúng 3 câu
 
 ## Clip 2 · 8s · Lắp pin → lau bề mặt
 **Khung đầu:** `keyframe_c2.png` · **Lưu video thành:** `c02_a.mp4`
@@ -112,6 +113,7 @@ Real human being filmed on a phone: natural skin with pores and slight unevennes
 Audio: click of the battery tray, cloth on plastic, quiet driveway ambience, no speech, no music. No subtitles, no on-screen text.
 ```
 **Phủ định (Negative):** `subtitles, captions, readable battery brand, fast motion, music, plastic skin, airbrushed, beauty filter, uncanny face, extra fingers, fused fingers, distorted hands, extra limbs, body passing through the car or door, clipping through objects, floating objects, morphing, duplicated person, teleporting, sliding feet, warped background`
+**Soát clip:** hộp đèn dưới tấm ốp cửa (under the inner door panel), ống kính hướng xuống · logo ngay dưới mép cửa mở (door open), đúng hệt ảnh gốc ở mọi giây · không có người
 
 ## Clip 3 · 8s · Bóc keo → dán và đóng cửa
 **Khung đầu:** `keyframe_c3.png` · **Lưu video thành:** `c03_a.mp4`
@@ -123,6 +125,7 @@ Real human being filmed on a phone: natural skin with pores and slight unevennes
 Audio: soft peel of the film, a firm press, quiet driveway ambience, no speech, no music. No subtitles, no on-screen text.
 ```
 **Phủ định (Negative):** `subtitles, captions, unit falling, fast motion, music, plastic skin, airbrushed, beauty filter, uncanny face, extra fingers, fused fingers, distorted hands, extra limbs, body passing through the car or door, clipping through objects, floating objects, morphing, duplicated person, teleporting, sliding feet, warped background`
+**Soát clip:** hộp đèn được ấn vào dưới mép dưới tấm ốp cửa (under the inner door panel), không dán lên ngưỡng cửa/ghế (sill, seat) · tay đủ ngón, không xuyên tấm ốp · áo và xe đúng màu khoá
 
 ## Clip 4 · 8s · Ngoài đời → đóng cửa
 **Khung đầu:** `keyframe_c4.png` · **Lưu video thành:** `c04_a.mp4`
@@ -134,6 +137,7 @@ Real human being filmed on a phone: natural skin with pores and slight unevennes
 Audio: footsteps on asphalt, a car door closing, quiet night ambience, no dialogue, no music. No subtitles, no on-screen text.
 ```
 **Phủ định (Negative):** `subtitles, captions, misspelled or redrawn logo, extra logos, car brand badges, extra people in focus, music, plastic skin, airbrushed, beauty filter, uncanny face, extra fingers, fused fingers, distorted hands, extra limbs, body passing through the car or door, clipping through objects, floating objects, morphing, duplicated person, teleporting, sliding feet, warped background`
+**Soát clip:** logo ngay dưới mép cửa mở (door open), đúng hệt ảnh gốc · chân đặt ngoài xe cạnh logo, không đè lên, không xuyên ngưỡng cửa (sill) · đất tối khi cửa đóng (door closed)
 
 ## Thiết lập khi gen video
 - Cả 4 clip: Omni 1.1 Flash, chế độ **Thành phần** (ingredients): ảnh sản phẩm/hình in trước, keyframe sau; 8 giây, dọc 9:16, tải **1080p** (không chọn tuỳ chọn tính tín dụng).

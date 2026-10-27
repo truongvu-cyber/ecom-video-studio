@@ -150,12 +150,18 @@ Follow the Veo section of `models.md` and `house-rules.md`:
 When the user wants the assets generated for them (not by hand):
 
 1. `.venv/bin/python scripts/gen_queue.py <id>` — the fixed job list (`edit/gen_queue.json`).
-2. `scripts/flow_chrome.sh` — the dedicated signed-in Chrome must be running.
-3. `.venv/bin/python scripts/flow_run.py <id> --stage images` → look at every file in
-   `frames/` against its checks (letters, badges, hands) → `--stage clips`.
+2. `scripts/flow_chrome.sh` — the dedicated signed-in Chrome must be running and
+   stay open for the whole run (the runner drives that window; closing it stops
+   everything mid-job).
+3. `.venv/bin/python scripts/flow_run.py <id> --stage images` → the runner renames
+   each result in Flow to its file name (`keyframe_c3`) → `gen_review.py <id>` →
+   read `edit/qc/gen_review.jpg` against the placement checks (`keyframes.md`
+   §5b) → fix and `--only <job>` until every keyframe is marked `pass` →
+   `--stage clips` → `gen_review.py <id>` again → every clip `pass`.
 4. Hand over to ad-editor. Everything the runner does is in
    `references/flow-runbook.md`; a step not in the runbook is not done, and any
-   option priced in credits is never chosen by the script.
+   option priced in credits is never chosen by the script. Flow's "hoạt động bất
+   thường" notice stops the run; wait at least 10 minutes before starting again.
 
 ## Changes after delivery
 

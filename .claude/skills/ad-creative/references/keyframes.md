@@ -135,6 +135,35 @@ everything else`.
 Fix the prompt, not the image: name the failure in the next attempt ("the
 projector has one button on the front, not two").
 
+## 5b. Placement checks — strict review after every generation (user rule 2026-10-27)
+
+Looking "roughly right" is not a pass. `product.json` carries
+`placement_checks`: the things that must be true about **where the product
+is and what state it is in**, written per product, e.g.
+
+- door light: "unit stuck under the inner door panel, lens pointing down",
+  "logo on the ground only while the door is open; dark ground when closed",
+  "logo directly below the door edge, not under the seat or the wheel".
+- apparel: "print centred on the chest, top edge two fingers below the
+  collar", "name on the back between the shoulder blades", "logo not
+  mirrored".
+- mug / bottle: "print faces the camera, handle on the right".
+
+Rules:
+
+1. Every keyframe's `Soát trước khi làm video` line and every clip's
+   `**Soát clip:**` line **repeat the placement checks that apply** to that
+   shot, plus the shot's own checks (letters, hands, start state).
+2. After `--stage images`, run `scripts/gen_review.py <id>` and read
+   `edit/qc/gen_review.jpg` (every keyframe with its check list under it).
+   After `--stage clips`, run it again: every clip as a 1-frame-per-second
+   strip with its checks. A failed check is fixed **before the next stage
+   starts**: rewrite the sentence of the prompt that governs that detail,
+   regenerate that one job (`flow_run.py … --only <job>`), review again.
+3. The review is written down: `gen_review.py --mark <job> pass|fail "<why>"`
+   appends to `edit/gen_review.jsonl`; a clip without a `pass` mark is not
+   handed to ad-editor (`validate.py` reports it).
+
 ## 6. Hand-off to the video prompt
 
 The clip header names the keyframe file. The video prompt then describes motion

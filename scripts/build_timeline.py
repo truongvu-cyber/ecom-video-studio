@@ -26,8 +26,26 @@ SNAP_TOL = 0.045
 MAX_MUSIC_DELAY = 3.0  # music may enter this late so its drop lands on the CTA
 
 
+_ONES = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split()
+_TENS = "_ _ twenty thirty forty fifty sixty seventy eighty ninety".split()
+
+
+def _num_words(n: int) -> list[str]:
+    """0–999 as the words a script would spell them (whisper writes digits: "60" for "sixty")."""
+    if n < 20:
+        return [_ONES[n]]
+    if n < 100:
+        return [_TENS[n // 10]] + ([_ONES[n % 10]] if n % 10 else [])
+    if n < 1000:
+        return [_ONES[n // 100], "hundred"] + (_num_words(n % 100) if n % 100 else [])
+    return [str(n)]
+
+
 def norm(text: str) -> list[str]:
-    return re.findall(r"[a-z0-9']+", text.lower())
+    out = []
+    for t in re.findall(r"[a-z0-9']+", text.lower()):
+        out += _num_words(int(t)) if t.isdigit() else [t]
+    return out
 
 
 def find_dialogue(words: list[dict], target: str, cursor: int) -> tuple[int, int, float]:

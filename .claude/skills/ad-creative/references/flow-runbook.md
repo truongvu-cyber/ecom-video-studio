@@ -75,8 +75,38 @@ executes what the queue says.
   cubs c04 came back projecting a VW logo instead of the Cubs logo. Every clip with a print is
   checked frame by frame (`takes_sheet.py` / `edit/qc/sheet.jpg`) before it is used; a wrong
   print = retry with the product photo first in the ingredients and the print named in the prompt.
+- A **freshly created project** mounts the composer late: the runner polls for the `+` button up
+  to 15 s and picks the project's own tab (never `/about`). After a download, a toast/dialog
+  ("Đã sao chép 1 mục", a `Xong`/`Đóng` button) can stay in the overlay and eat the next click:
+  `close_overlays` presses those buttons first, and `panel_open` clicks `+` a second time if the
+  panel has not appeared after 4 s (second scripted run, cubs-door-light-ugc, 2026-10-27).
+- Omni drifts **outfit and car colour** in hands-only clips when no character sheet is attached
+  (cubs-door-light-ugc c03: black tee and grey car instead of navy henley and blue coupe). Clips
+  where the person's clothes or the car are visible get `mike_sheet.png` / `car_night.png` as
+  ingredients too, not just the keyframe.
 - `scripts/flow_run.py <project> --stage images` then review `frames/`, then `--stage clips`;
   `--only id,id` reruns single jobs, `--dry-run` fills the composer without generating.
+
+## 3c. Names, review and the browser (user rules 2026-10-27)
+
+- **Rename after every result.** Flow names a result after its prompt ("Man stepping out of
+  car"). Right after the download the runner opens the tile menu → `Đổi tên` (dialog with one
+  input `aria-label="Văn bản có thể chỉnh sửa"`, buttons `Xong` / `Huỷ`) and sets the name to the
+  saved file's stem (`keyframe_c3`, `c04_a`, `c04_b`), so the Flow library, `gen_log.jsonl` and
+  the project folder all say the same thing. Older tiles cannot be found by media id after a
+  page reload (thumbnails switch to `flow.google.com/asb/…` URLs), so the rename happens
+  while the tile is fresh, not later.
+- **Review before the next stage.** `scripts/gen_review.py <id>` after each stage; the checks
+  come from `product.json.placement_checks` + the prompt's `Soát` lines (`keyframes.md` §5b).
+- **Chrome stays open.** The runner is a DevTools client of the dedicated Chrome window: if
+  that window is closed, the websocket drops and the run stops at once (nothing is generated
+  or downloaded without it). It may sit behind other windows or on another desktop, the Mac
+  must not sleep, and the user does not click inside it while a run is going. There is no
+  background mode; a headless Chrome would be flagged by Google.
+- **"Hoạt động bất thường".** Flow showed "Không thành công — chúng tôi nhận thấy có hoạt động
+  bất thường" after a burst of scripted actions (12:59, cubs-door-light-ugc). The runner stops
+  on that text without retrying, and the next run starts no sooner than 10 minutes later; if it
+  comes back, the user generates that job by hand in the same window before the script resumes.
 
 ## 4. Stop conditions
 

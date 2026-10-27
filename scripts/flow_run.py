@@ -31,6 +31,9 @@ LABEL = {  # queue value -> Flow label
 }
 WAIT = {"image": 180, "video": 480}
 REFUSAL = re.compile(r"Không thành công|vi phạm chính sách|không thể tạo|policy", re.I)
+# Google flagged the automation itself ("hoạt động bất thường"): stop at once, no retry, and the
+# runner is not started again for at least 10 minutes (runbook §4).
+ABNORMAL = re.compile(r"hoạt động bất thường|unusual activity", re.I)
 
 
 class Stop(Exception):
@@ -44,7 +47,9 @@ class Flow:
         self.dl.mkdir(parents=True, exist_ok=True)
         self.state_path = project / "edit" / "flow_project.json"
         self.state = load_json(self.state_path) if self.state_path.exists() else {"url": None, "uploaded": []}
-        self.c = CDP(pick("flow.google.com"))
+        # the project's own tab first; else any Flow tab that is not the /about page
+        self.c = CDP(pick(self.state["url"]) if self.state.get("url") and any(
+            self.state["url"] in p["url"] for p in pages()) else pick("flow.google.com/project"))
         self.c.call("Page.enable")
         self.c.downloads(str(self.dl))
 
@@ -76,6 +81,13 @@ class Flow:
         """Settings popup / media panel keep a backdrop that eats mouse events: close them for real."""
         for _ in range(4):
             t = self.overlay()
+            # a leftover dialog/toast ("Xong", "Đóng", "Đã sao chép 1 mục") also swallows clicks
+            for label in ("Xong", "Đóng"):
+                b = self.overlay_btn(label)
+                if b:
+                    self.click(b)
+                    time.sleep(0.5)
+                    t = self.overlay()
             if not re.search(r"Khung hình|Hình ảnh \| |Tìm kiếm thành phần|tín dụng", t):
                 return
             # a real click in the gutter between the sidebar and the grid closes popovers;
@@ -139,14 +151,23 @@ class Flow:
     # ---------- references ----------
     def panel_open(self) -> None:
         self.close_overlays()
-        plus = self.rect("[...document.querySelectorAll('button')].find(b=>/Thêm thành phần/.test(b.getAttribute('aria-label')||'')&&b.getBoundingClientRect().width>0)")
+        plus = None
+        for _ in range(30):  # a freshly created project mounts the composer late
+            plus = self.rect("[...document.querySelectorAll('button')].find(b=>/Thêm thành phần/.test(b.getAttribute('aria-label')||'')&&b.getBoundingClientRect().width>0)")
+            if plus:
+                break
+            time.sleep(0.5)
         if not plus:
-            raise Stop("Không thấy nút + (Thêm thành phần)")
+            self.c.shot(self.project / "edit" / "qc" / "flow_fail_plus.jpg")
+            raise Stop(f"Không thấy nút + (Thêm thành phần) trên {self.js('location.href')}")
         self.click(plus)
-        for _ in range(12):  # the panel mounts asynchronously
+        for i in range(16):  # the panel mounts asynchronously
             time.sleep(0.5)
             if self.rect("document.querySelector('input[placeholder*=\"Tìm kiếm thành phần\"]')"):
                 return
+            if i == 7:  # the first click may have been eaten by a closing toast: once more
+                self.close_overlays()
+                self.click(plus)
         self.c.shot(self.project / "edit" / "qc" / "flow_fail_panel.jpg")
         raise Stop(f"Thư viện thành phần không mở (overlay: {self.overlay()[:80]!r}, +: {plus})")
 
@@ -295,6 +316,8 @@ class Flow:
         while time.time() - t0 < WAIT[kind]:
             time.sleep(10)
             txt = self.js("document.body.innerText.slice(0,3000)")
+            if ABNORMAL.search(txt):
+                raise Stop("Flow báo hoạt động bất thường — dừng hẳn, chờ ít nhất 10 phút rồi mới chạy lại")
             if REFUSAL.search(txt):
                 raise Stop("Flow từ chối prompt này (chính sách)")
             ids = self.media_ids()
@@ -305,9 +328,21 @@ class Flow:
                 return f"https://flow-content.google/{kind}/{new[0]}"
         raise Stop(f"Hết {WAIT[kind]} s mà chưa thấy kết quả")
 
-    # ---------- download ----------
-    def download(self, url: str, kind: str, size: str) -> Path:
-        mid = re.search(r"/(?:image|video)/([0-9a-f-]+)", url).group(1)
+    def leave_detail(self) -> bool:
+        """Clicking a tile image opens /project/<id>/edit/<media>; the grid (and its menus) live
+        on /project/<id>. Returns True if it had to navigate back."""
+        if "/edit/" in (self.js("location.href") or ""):
+            self.c.nav(self.state["url"])
+            time.sleep(3)
+            self.guard()
+            return True
+        return False
+
+    # ---------- tile menu ----------
+    def tile_menu(self, mid: str, item: str) -> list[str]:
+        """Hover the tile with media id `mid` (newest tile if not found), open 'Tuỳ chọn khác',
+        click the menu item matching `item`; returns the menu as it was before the click."""
+        self.leave_detail()
         tile = None
         for _ in range(12):
             tile = self.rect("[...document.querySelectorAll('img,video')].find(e=>(e.src||e.currentSrc||'').includes(%s)&&e.getBoundingClientRect().width>100)" % json.dumps(mid))
@@ -321,18 +356,57 @@ class Flow:
         self.close_overlays()
         for _ in range(3):
             self.esc()
+            if self.leave_detail():  # a stray click opened the detail view: back to the grid
+                time.sleep(2)
+                self.close_overlays()
             self.hover(tile)
             more = self.rect("[...document.querySelectorAll('button')].find(b=>/Tuỳ chọn khác/.test(b.getAttribute('aria-label')||'')&&b.getBoundingClientRect().width>0)")
             if more:
                 self.click(more)
-                time.sleep(1.0)
+                time.sleep(1.2)
                 items = self.menu_items()
-                if any("Tải xuống" in i for i in items):
+                if any(item in i for i in items):
                     break
         else:
-            raise Stop("Không mở được menu của tile")
-        self.click(self.menu_item("Tải xuống"))
+            raise Stop(f"Không mở được menu của tile ({item})")
+        self.js("[...document.querySelectorAll('[role=menuitem],.mat-mdc-menu-content button')].find(m=>new RegExp(%s).test(m.innerText))?.scrollIntoView({block:'center'})" % json.dumps(item))
+        time.sleep(0.3)
+        self.click(self.menu_item(item))
         time.sleep(1.2)
+        return items
+
+    def rename(self, url: str, name: str) -> None:
+        """Flow names a result after its prompt ("Man stepping out of car"); the user's rule
+        (2026-10-27) is that every generated asset carries the name it is saved under
+        (keyframe_c3, c04_a) so the library and the project files match. Menu 'Đổi tên' opens a
+        dialog with one input (aria-label "Văn bản có thể chỉnh sửa") and buttons Xong / Huỷ."""
+        mid = re.search(r"/(?:image|video)/([0-9a-f-]+)", url).group(1)
+        self.tile_menu(mid, "Đổi tên")
+        box = self.rect("document.querySelector('.cdk-overlay-container input[aria-label=\"Văn bản có thể chỉnh sửa\"]')")
+        if not box:
+            self.esc()
+            raise Stop("Hộp thoại Đổi tên không mở")
+        self.click(box)
+        self.c.call("Input.dispatchKeyEvent", type="keyDown", key="a", code="KeyA", modifiers=4, commands=["selectAll"])
+        self.c.call("Input.dispatchKeyEvent", type="keyUp", key="a", code="KeyA", modifiers=4)
+        self.c.call("Input.insertText", text=name)
+        time.sleep(0.3)
+        ok = self.rect("[...document.querySelectorAll('.cdk-overlay-container button')].find(b=>b.getBoundingClientRect().width>0"
+                       "&&((b.getAttribute('aria-label')||'')==='Xong'||b.textContent.trim()==='done'))")
+        if not ok:
+            self.esc()
+            raise Stop("Không thấy nút Xong trong hộp thoại Đổi tên")
+        self.click(ok)
+        time.sleep(1.0)
+        got = self.js("(()=>{const e=[...document.querySelectorAll('img,video')].find(e=>(e.src||e.currentSrc||'').includes(%s));"
+                      "const t=e&&(e.closest('[class*=tile],[class*=virtual-item]')||e.parentElement.parentElement);return t?t.innerText:''})()" % json.dumps(mid)) or ""
+        if name not in got:
+            print(f"   (cảnh báo: tile chưa hiện tên {name}: {got[:60]!r})")
+
+    # ---------- download ----------
+    def download(self, url: str, kind: str, size: str) -> Path:
+        mid = re.search(r"/(?:image|video)/([0-9a-f-]+)", url).group(1)
+        self.tile_menu(mid, "Tải xuống")
         sub = self.menu_items()
         choice = next((s for s in sub if s.startswith(size) and "tín dụng" not in s), None)
         if not choice:
@@ -373,7 +447,9 @@ class Flow:
             os.system(f'sips -s format png "{f}" --out "{dest}" >/dev/null')
         else:
             shutil.copy(f, dest)
-        log({"job": job["id"], "url": url.split("?")[0], "file": str(dest.relative_to(self.project)), "settings": {
+        self.rename(url, dest.stem)  # the Flow asset carries the saved file's name
+        print(f"   đổi tên trong Flow -> {dest.stem}")
+        log({"job": job["id"], "url": url.split("?")[0], "file": str(dest.relative_to(self.project)), "flow_name": dest.stem, "settings": {
             "tool": job["tool"], "mode": job.get("mode"), "download": job.get("download")}})
         return dest
 
@@ -417,7 +493,7 @@ def main() -> None:
             except Stop as e:
                 log({"job": job["id"], "attempt": attempt, "error": str(e)})
                 print(f"   DỪNG: {e}")
-                if budget <= 0 or "đăng nhập" in str(e) or "captcha" in str(e).lower():
+                if budget <= 0 or "đăng nhập" in str(e) or "captcha" in str(e).lower() or "bất thường" in str(e):
                     sys.exit(1)
                 budget -= 1
                 print(f"   thử lại ({budget} lần còn lại)")

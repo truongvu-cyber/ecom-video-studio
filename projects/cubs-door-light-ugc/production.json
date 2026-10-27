@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0",
+  "project_id": "cubs-door-light-ugc",
+  "product_ref": "product.json",
+  "platform": "tiktok_reels",
+  "format": "ugc_dialogue",
+  "stage": "rendered",
+  "gen_model": {
+    "image": "nano-banana-2.1",
+    "video": "omni-1.1-flash"
+  },
+  "spec": {
+    "ratio": "9:16",
+    "resolution": "1080x1920",
+    "fps": 24,
+    "target_sec": 15,
+    "safe_zone": {
+      "top": 0.15,
+      "bottom": 0.2
+    }
+  },
+  "audio": {
+    "source": "native",
+    "keep_native": true,
+    "music_duck_db": -12,
+    "export_no_music": true,
+    "target_lufs": -14,
+    "true_peak_db": -1
+  },
+  "music": {
+    "source": "auto",
+    "mood": "warm upbeat hip hop",
+    "bpm_range": [
+      85,
+      120
+    ],
+    "drop_on": "s02"
+  },
+  "captions": {
+    "enabled": true,
+    "style": "word-highlight"
+  },
+  "text_style": {
+    "preset": "pill",
+    "color": "#FF3B3B"
+  },
+  "fx": {
+    "preset": "none",
+    "intensity": 0.5,
+    "sfx": false
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "role": "hook",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.5,
+      "audio_type": "dialogue",
+      "dialogue": "Chicago fans, watch my door.",
+      "overlay": null,
+      "overlay_pos": "auto"
+    },
+    {
+      "id": "s02",
+      "role": "proof",
+      "file_pattern": "c02*.mp4",
+      "gen_sec": 8,
+      "use_sec": 3,
+      "audio_type": "sfx",
+      "overlay": "*WATCH* THIS",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "moment": "calm"
+    },
+    {
+      "id": "s03",
+      "role": "demo",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.1,
+      "audio_type": "dialogue",
+      "dialogue": "Sixty seconds, no tools.",
+      "overlay": null,
+      "overlay_pos": "auto"
+    },
+    {
+      "id": "s04",
+      "role": "demo",
+      "file_pattern": "c03*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.5,
+      "audio_type": "sfx",
+      "overlay": "*PEEL* & STICK",
+      "overlay_pos": "auto",
+      "moment": "peak"
+    },
+    {
+      "id": "s05",
+      "role": "lifestyle",
+      "file_pattern": "c04*.mp4",
+      "gen_sec": 8,
+      "use_sec": 3,
+      "audio_type": "sfx",
+      "overlay": null,
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "moment": "calm"
+    },
+    {
+      "id": "s06",
+      "role": "cta",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2,
+      "audio_type": "dialogue",
+      "dialogue": "Link below.",
+      "overlay": "GET YOURS ↓",
+      "overlay_pos": "auto"
+    }
+  ],
+  "variants": [
+    {
+      "id": "hookB",
+      "overlay_overrides": {
+        "s01": "*NO* WIRING"
+      }
+    },
+    {
+      "id": "hookC",
+      "overlay_overrides": {
+        "s01": "POV: *GAME DAY* PARKING"
+      }
+    }
+  ]
+}

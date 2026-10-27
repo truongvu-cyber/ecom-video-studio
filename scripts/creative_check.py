@@ -9,6 +9,7 @@ Exit 1 on any FAIL.
 """
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
@@ -72,9 +73,56 @@ PATH_VERBS = r"\b(walks? (up|over|in)|comes? (over|up)|steps? in|leans? in|reach
 PHYSICS_NEG = ["passing through", "clipping", "extra fingers", "floating"]
 
 
+def lock(md: str, name: str) -> list[str]:
+    """Text of every lock whose heading starts with `name` (CHARACTER, STYLE, STYLE - day...)."""
+    return [m.group(1) for m in re.finditer(r"\*\*%s[^*]*\*\*:?\s*\n(.+)" % name, md)]
+
+
+def check_world(md: str, product: dict, fails: list[str], warns: list[str]) -> None:
+    """formats.md §4b: with product.json.world, CHARACTER and every STYLE lock carry a cue."""
+    world = product.get("world")
+    if not world:
+        if re.search(r"\b(team|club|fan|fans|jersey|logo)\b", json.dumps(product).lower()):
+            warns.append("product.json không có 'world' dù sản phẩm thuộc đội/brand — thêm world.cues (formats.md §4b)")
+        return
+    cues = [c.lower() for c in world.get("cues", [])]
+    keys = {w for c in cues for w in words(c) if len(w) > 3}  # cue words: "dodger", "pennant", "navy"
+    for name in ("CHARACTER", "STYLE"):
+        locks = lock(md, name)
+        if not locks:
+            continue
+        for text in locks:
+            hit = any(c in text.lower() for c in cues) or len(keys & set(words(text))) >= 2
+            if not hit:
+                fails.append(f"Khoá {name} không mang dấu hiệu nào của world '{world['name']}' ({', '.join(world['cues'][:3])}…) — formats.md §4b")
+
+
+def check_placement(md: str, product: dict, blocks: dict[int, str], keyframes: set[int],
+                    fails: list[str], warns: list[str]) -> None:
+    """keyframes.md §5b: placement_checks exist and every keyframe/clip repeats its own checks."""
+    pcs = product.get("placement_checks") or []
+    if not pcs:
+        fails.append("product.json thiếu placement_checks (vị trí/trạng thái sản phẩm phải đúng) — keyframes.md §5b")
+        return
+    pwords = {w for p in pcs for w in words(p) if len(w) > 3}
+    for n in sorted(keyframes):
+        m = re.search(r"^###\s*Keyframe\s*%d\b.*?(?=^###|^## |\Z)" % n, md, re.M | re.S | re.I)
+        line = m.group(0) if m else ""
+        soat = re.search(r"\*\*Soát trước khi làm video[^*]*\*\*:?\s*(.+)", line)
+        if not soat or len(pwords & set(words(soat.group(1)))) < 2:
+            fails.append(f"Keyframe {n}: dòng 'Soát trước khi làm video' không nhắc lại kiểm tra vị trí sản phẩm (placement_checks)")
+    for n, block in sorted(blocks.items()):
+        soat = re.search(r"\*\*Soát clip[^*]*\*\*:?\s*(.+)", block)
+        if not soat:
+            fails.append(f"Clip {n}: thiếu dòng '**Soát clip:**' (vị trí sản phẩm + hành động phải đúng ở mọi giây)")
+        elif len(pwords & set(words(soat.group(1)))) < 2:
+            fails.append(f"Clip {n}: 'Soát clip' không nhắc lại kiểm tra vị trí sản phẩm (placement_checks)")
+
+
 def check_people(n: int, block: str, fails: list[str], warns: list[str]) -> None:
     prompt = "\n".join(re.findall(r"```[a-z]*\n(.*?)```", block, re.S)).lower()
-    if not re.search(PERSON_WORDS, prompt):
+    # "no person in frame" / "no people" is the opposite of a person being there
+    if not re.search(PERSON_WORDS, re.sub(r"\bno (person|people|one|hands?)\b[^.]*", "", prompt)):
         return
     if REALISM_MARK not in prompt:
         fails.append(f"Clip {n} có người/tay: thiếu khoá REALISM (realism.md §1) dán trong prompt")
@@ -233,6 +281,8 @@ def main() -> None:
 
     check_format(prod, fails, warns)
     check_overlays(prod, fails, warns)
+    check_world(md, product, fails, warns)
+    check_placement(md, product, blocks, keyframes, fails, warns)
 
     print("\n== creative_check ==")
     for f in fails:

@@ -7,6 +7,7 @@ Exit 1 on any error so the agent stops before touching media.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 
 from jsonschema import Draft202012Validator
@@ -51,6 +52,19 @@ def main() -> None:
         ov = s.get("override") or {}
         if "src_in" in ov and "src_out" in ov and ov["src_out"] <= ov["src_in"]:
             errors.append(f"{s['id']}: override.src_out phải lớn hơn src_in")
+
+    # keyframes.md §5b: a generated clip is handed to the editor only after a written pass mark
+    review = project / "edit" / "gen_review.jsonl"
+    if not args.no_clips and (project / "edit" / "gen_log.jsonl").exists():
+        marks = {}
+        if review.exists():
+            for line in review.read_text().splitlines():
+                if line.strip():
+                    j = json.loads(line)
+                    marks[j["job"]] = j["result"]
+        for c in sorted((project / "clips").glob("c*.mp4")):
+            if marks.get(c.stem) != "pass":
+                errors.append(f"{c.name}: chưa được soát 'pass' (gen_review.py --mark {c.stem} pass \"...\")")
 
     music = prod.get("music", {})
     if music.get("source") == "file":
