@@ -63,6 +63,30 @@ FORMATS = {
 }
 MAX_OVERLAY_WORDS = 4
 
+# realism.md (user rule 2026-10-27): a clip with a person, hand or face must carry the REALISM
+# lock, state the blocking, and list the physics negatives.
+PERSON_WORDS = r"\b(man|woman|guy|girl|person|people|friend|he|she|his|her|hand|hands|finger|fingers|face|thumb|palm)\b"
+REALISM_MARK = "every movement obeys physics"          # a phrase only the REALISM lock contains
+BLOCKING_MARK = r"\b(beside|next to|outside|around|behind|in front of|on the (driver|passenger)|one step|stands?|standing|sits?|sitting)\b"
+PATH_VERBS = r"\b(walks? (up|over|in)|comes? (over|up)|steps? in|leans? in|reach(es)? across|runs? to)\b"
+PHYSICS_NEG = ["passing through", "clipping", "extra fingers", "floating"]
+
+
+def check_people(n: int, block: str, fails: list[str], warns: list[str]) -> None:
+    prompt = "\n".join(re.findall(r"```[a-z]*\n(.*?)```", block, re.S)).lower()
+    if not re.search(PERSON_WORDS, prompt):
+        return
+    if REALISM_MARK not in prompt:
+        fails.append(f"Clip {n} có người/tay: thiếu khoá REALISM (realism.md §1) dán trong prompt")
+    neg = " ".join(re.findall(r"\*\*(?:Phủ định|Negative)[^*]*\*\*:?\s*`?([^`\n]+)", block)).lower()
+    missing = [w for w in PHYSICS_NEG if w not in neg]
+    if missing:
+        fails.append(f"Clip {n} có người/tay: negative thiếu {missing} (realism.md §4)")
+    if re.search(PATH_VERBS, prompt) and not re.search(r"\b(around|along|past)\b", prompt):
+        fails.append(f"Clip {n}: có 'walks up/comes over/leans in…' mà không ghi đường đi vòng qua vật cản (realism.md §2)")
+    if not re.search(BLOCKING_MARK, prompt):
+        warns.append(f"Clip {n}: chưa ghi vị trí người so với xe/cửa/vật rắn (realism.md §2)")
+
 
 def check_format(prod: dict, fails: list[str], warns: list[str]) -> None:
     fmt = prod.get("format")
@@ -186,6 +210,7 @@ def main() -> None:
                 warns.append(f"Clip {n} là B-roll: nên ghi 'no speech' trong Audio")
         if "subtitle" not in body:
             fails.append(f"Clip {n}: thiếu 'no subtitles' (Veo hay tự in phụ đề)")
+        check_people(n, blocks[n], fails, warns)
 
     product = load_json(project / prod.get("product_ref", "product.json"))
     for s in prod["shots"]:

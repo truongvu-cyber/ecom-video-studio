@@ -4,7 +4,7 @@ Phần mô tả, hướng dẫn và ghi chú viết bằng tiếng Việt. Phầ
 
 | Công cụ video | Công cụ ảnh | Tỉ lệ | Độ dài | Số clip | Phong cách | Thể loại | Âm thanh |
 |---|---|---|---|---|---|---|---|
-| Veo 3.1 | Nano Banana Pro | 9:16 | ~15 giây, 8 nhát cắt | 4 clip × 8 giây | đêm bãi đỗ xe + garage ban ngày | reveal + hướng dẫn lắp | tắt tiếng gốc, nhạc hip-hop thêm khi dựng |
+| Omni 1.1 Flash (Flow, chế độ Thành phần) | Nano Banana 2.1 | 9:16 | ~15 giây, 8 nhát cắt | 4 clip × 8 giây | đêm bãi đỗ xe + garage ban ngày | reveal + hướng dẫn lắp | tắt tiếng gốc, nhạc hip-hop thêm khi dựng |
 
 **Lưu ý chung:**
 - **Logo chiếu dưới đất luôn có sẵn trong ảnh khung đầu** (lấy từ ảnh sản phẩm thật), video chỉ làm nó sáng lên, mờ đi hoặc camera di chuyển. Không để Veo tự vẽ logo từ đầu, vì nó sẽ vẽ sai chữ.
@@ -18,6 +18,9 @@ a palm-sized matte black square projector unit with a small round lens on its un
 
 **CHARACTER - Mike (nhân vật):**
 man in his early 40s, medium build, light skin, short dark-blond hair, light stubble, navy long-sleeve henley, dark jeans, plain navy baseball cap with no logo
+
+**REALISM (độ chân thực + vật lý, dán vào mọi prompt có người/tay — quy tắc 2026-10-27):**
+Real human being filmed on a phone: natural skin with pores and slight unevenness, real eyes with reflections, hair with individual strands, clothing that creases and hangs with weight. Every movement obeys physics: feet stay on the ground, weight shifts before a step, hands grip objects with correct finger placement and stay on their surfaces, bodies and clothes keep clear of the car, the door, the ground and each other, objects keep their size and weight. One continuous action at real speed.
 
 **STYLE (phong cách, bối cảnh, ánh sáng — cảnh đêm):**
 UGC phone footage, vertical 9:16, a quiet parking lot at night, dark textured asphalt, soft amber streetlights far in the background, a blue coupe with no visible badges or logos, natural contrast, real textures, no color grading
@@ -104,33 +107,36 @@ Audio: quiet night ambience, no speech, no music. No subtitles, no on-screen tex
 
 **Cảnh:** nửa đầu ấn viên pin cuối vào khay và đóng nắp; nửa sau camera lia sang cửa xe, tay lau mặt trong tấm ốp cửa bằng khăn microfiber xám.
 ```
-Close-up, slow pan right. The man's thumb presses the last battery into the tray and he snaps the tray shut. Around the middle of the clip the camera pans slowly to the open car door as his other hand wipes the bottom of the inner door panel with a grey microfiber cloth in two firm strokes.
+Close-up, slow pan right. The man stands on the driveway beside the open driver's door, outside the car, holding the unit at chest height in both hands. His right thumb presses the last battery into the tray and he snaps the tray shut. Around the middle of the clip the camera pans slowly to the open door; his left hand, holding a grey microfiber cloth, rests flat on the bottom of the inner door panel and wipes it in two firm strokes, the hand staying on the surface, the right hand keeping the unit out of frame.
+Real human being filmed on a phone: natural skin with pores and slight unevenness, real eyes with reflections, hair with individual strands, clothing that creases and hangs with weight. Every movement obeys physics: feet stay on the ground, weight shifts before a step, hands grip objects with correct finger placement and stay on their surfaces, bodies and clothes keep clear of the car, the door, the ground and each other, objects keep their size and weight. One continuous action at real speed.
 Audio: click of the battery tray, cloth on plastic, quiet driveway ambience, no speech, no music. No subtitles, no on-screen text.
 ```
-**Phủ định (Negative):** `subtitles, captions, readable battery brand, extra fingers, distorted hands, fast motion, music`
+**Phủ định (Negative):** `subtitles, captions, readable battery brand, fast motion, music, plastic skin, airbrushed, beauty filter, uncanny face, extra fingers, fused fingers, distorted hands, extra limbs, body passing through the car or door, clipping through objects, floating objects, morphing, duplicated person, teleporting, sliding feet, warped background`
 
 ## Clip 3 · 8s · Bóc keo → dán và đóng cửa
 **Khung đầu:** `keyframe_c3.png` · **Lưu video thành:** `c03_a.mp4`
 
 **Cảnh:** nửa đầu bóc hết lớp màng đỏ; nửa sau ấn hộp đèn vào dưới tấm ốp cửa, giữ vài giây rồi buông tay.
 ```
-Close-up, slow tilt up. The man's fingers peel the red film off the adhesive pad in one smooth pull. Around the middle of the clip the camera tilts up to the bottom of the inner door panel as he presses the black unit firmly into place under the panel, holds it for a moment with his palm, then lets go; the unit stays stuck.
+Close-up, slow tilt up. The man stands on the driveway beside the open driver's door, outside the car, holding the unit in his left hand at chest height. His right fingers pinch one corner of the red film and peel it off the adhesive pad in one smooth pull. Around the middle of the clip the camera tilts up to the bottom of the inner door panel; he brings the unit to the panel from the outside, presses it flat against the panel surface with his right palm, holds it for a moment, then lets go; the unit stays stuck to the panel, nothing passes into the panel.
+Real human being filmed on a phone: natural skin with pores and slight unevenness, real eyes with reflections, hair with individual strands, clothing that creases and hangs with weight. Every movement obeys physics: feet stay on the ground, weight shifts before a step, hands grip objects with correct finger placement and stay on their surfaces, bodies and clothes keep clear of the car, the door, the ground and each other, objects keep their size and weight. One continuous action at real speed.
 Audio: soft peel of the film, a firm press, quiet driveway ambience, no speech, no music. No subtitles, no on-screen text.
 ```
-**Phủ định (Negative):** `subtitles, captions, extra fingers, distorted hands, unit falling, fast motion, music`
+**Phủ định (Negative):** `subtitles, captions, unit falling, fast motion, music, plastic skin, airbrushed, beauty filter, uncanny face, extra fingers, fused fingers, distorted hands, extra limbs, body passing through the car or door, clipping through objects, floating objects, morphing, duplicated person, teleporting, sliding feet, warped background`
 
 ## Clip 4 · 8s · Ngoài đời → đóng cửa
 **Khung đầu:** `keyframe_c4.png` · **Lưu video thành:** `c04_a.mp4`
 
 **Cảnh:** nửa đầu Mike nhìn logo, bạn đi tới chỉ xuống đất ngạc nhiên; nửa sau Mike đóng cửa xe, logo mờ dần rồi tắt.
 ```
-Low-angle full shot, static. The man looks down at the glowing logo and grins as his friend walks up behind him and points at it, impressed. Around the middle of the clip the man swings the car door shut and the logo on the asphalt fades out smoothly as the door closes, leaving the dark ground.
+Low-angle full shot, static. Two people only. The man stands on the asphalt outside the open driver's door, one step back from the sill, looking down at the glowing logo and grinning. His friend, a man in his 30s in a dark jacket, walks in from the back of the car along the outside of the door, stops beside the man on the open side of the door, and points down at the logo, impressed; he never passes the door or the sill. Around the middle of the clip the man reaches the door edge with his right hand and swings the door shut; the logo on the asphalt fades out smoothly as the door closes, leaving the dark ground, both men still standing in place.
+Real human being filmed on a phone: natural skin with pores and slight unevenness, real eyes with reflections, hair with individual strands, clothing that creases and hangs with weight. Every movement obeys physics: feet stay on the ground, weight shifts before a step, hands grip objects with correct finger placement and stay on their surfaces, bodies and clothes keep clear of the car, the door, the ground and each other, objects keep their size and weight. One continuous action at real speed.
 Audio: footsteps on asphalt, a car door closing, quiet night ambience, no dialogue, no music. No subtitles, no on-screen text.
 ```
-**Phủ định (Negative):** `subtitles, captions, misspelled or redrawn logo, extra logos, car brand badges, distorted faces, extra people in focus, music`
+**Phủ định (Negative):** `subtitles, captions, misspelled or redrawn logo, extra logos, car brand badges, extra people in focus, music, plastic skin, airbrushed, beauty filter, uncanny face, extra fingers, fused fingers, distorted hands, extra limbs, body passing through the car or door, clipping through objects, floating objects, morphing, duplicated person, teleporting, sliding feet, warped background`
 
 ## Thiết lập khi gen video
-- Cả 4 clip: chế độ **ảnh làm khung đầu** (first frame), 8 giây, dọc 9:16, **1080p** nếu công cụ cho chọn.
+- Cả 4 clip: Omni 1.1 Flash, chế độ **Thành phần** (ingredients): ảnh sản phẩm/hình in trước, keyframe sau; 8 giây, dọc 9:16, tải **1080p** (không chọn tuỳ chọn tính tín dụng).
 - Có ô Negative thì dán dòng "Phủ định"; không có thì bỏ qua.
 - Tiếng clip không dùng: video dùng nhạc hip-hop khi dựng.
 

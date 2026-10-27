@@ -29,6 +29,7 @@ US audience.
 | `references/deliverables.md` | the files you write and their shape |
 | `references/product-analysis.md`, `genres.md`, `styles.md`, `vocabulary.md` | choosing angle, beat pattern, look, words |
 | `references/keyframes.md`, `failure-modes.md`, `models.md` (Veo section), `output-template.md` | writing the prompts |
+| `references/realism.md` | any prompt with a person, hand or face: REALISM lock, blocking rule, action-logic checklist, negatives |
 | `examples/` | a full worked run (Kling) and quick prompts |
 
 Scripts run from the project root with `.venv/bin/python scripts/<name>.py`.
@@ -92,7 +93,9 @@ user approves. "Đổi sang hướng 2" → redo the draft, stop again.
 
 ## Stage 3 — Locks
 
-PRODUCT, CHARACTER (if a person), STYLE, **VOICE** (for c01), AUDIO, NEGATIVE.
+PRODUCT, CHARACTER (if a person), **REALISM** (if a person, a hand or a face
+appears — `references/realism.md` §1, and every such clip states the blocking
+per §2), STYLE, **VOICE** (for c01), AUDIO, NEGATIVE.
 Written once, pasted word for word into every prompt (`SKILL` rules of
 video-prompt-studio Stage 4). PRODUCT includes the print exactly as in the
 design file. Invented people only; no real person's face or voice.

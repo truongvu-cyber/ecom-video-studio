@@ -63,8 +63,20 @@ text style, fx, music mood and BPM, `drop_on`, variants. Universal limits:
 - Montage formats write **two actions into every clip** (first action 0–4 s,
   the camera settles, second action 4–8 s) so one generation yields two shots.
 
+## People: real and physically correct (user rule 2026-10-27)
+
+Every prompt with a person, hand or face carries the **REALISM** lock and
+states the blocking (start position, path around obstacles, which hand on
+which surface) per `realism.md`. A clip where a body passes through the car,
+a door or an object, a hand clips into a panel, or a person appears from
+nowhere is a failed clip and is regenerated with the blocking rewritten.
+`creative_check.py` fails a person clip without the lock or the physics
+negatives.
+
 ## Never
 
+- A person walking, leaning or reaching *through* a solid object, or a
+  destination written without a path when a door, car or table is in between.
 - Text, prices, captions or names as overlay in the video prompt: they go in
   `overlay` for the Editor. The only text in a generated frame is the product's
   real print, coming from the keyframe.
