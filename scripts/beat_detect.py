@@ -108,10 +108,15 @@ def main() -> None:
         f, license_note, score = pick_auto(music, exclude)
         # nothing unused in the library fits the mood: fetch new tracks (user allowed any
         # source for internal use; search leans on what is current) and pick again
-        if (f is None or score < 4) and music.get("allow_fetch", True) and music.get("mood"):  # < 4 = no in-tempo match
+        # user rule 2026-10-27: a fast-cut video needs a fast track — no unused in-tempo track means fetch
+        lo, hi = (music.get("bpm_range") or [0, 999])
+        best_bpm = next((tr.get("bpm") for tr in load_json(MUSIC_LIBRARY / "tags.json").get("tracks", [])
+                         if f is not None and tr["file"] == f.name), None)
+        in_tempo = best_bpm is not None and lo <= best_bpm <= hi
+        if (f is None or not in_tempo) and music.get("allow_fetch", True) and music.get("mood"):
             print(f"Thư viện không còn bài mới hợp '{music['mood']}' (đã loại {len(exclude)} bài project khác dùng), đang tìm nhạc mới...")
-            cmd = [sys.executable, str(Path(__file__).parent / "fetch_music.py"), f"{music['mood']} 2026",
-                   "--mood", music["mood"], "--count", "3"]
+            cmd = [sys.executable, str(Path(__file__).parent / "fetch_music.py"),
+                   f"{music['mood']} {int((lo + hi) / 2)} bpm 2026", "--mood", music["mood"], "--count", "3"]
             if music.get("bpm_range"):
                 cmd += ["--bpm", *map(str, music["bpm_range"])]
             subprocess.run(cmd)

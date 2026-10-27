@@ -67,7 +67,7 @@ class Flow:
 
     def rect(self, js: str):
         v = self.js("(()=>{const e=(%s); if(!e) return null; const r=e.getBoundingClientRect(); if(!r.width) return null;"
-                    "return JSON.stringify({x:r.x+r.width/2,y:r.y+r.height/2,w:r.width})})()" % js)
+                    "return JSON.stringify({x:r.x+r.width/2,y:r.y+r.height/2,w:r.width,h:r.height})})()" % js)
         return json.loads(v) if v else None
 
     def click(self, r: dict) -> None:
@@ -368,7 +368,7 @@ class Flow:
             if not t:
                 raise Stop("Không có tile nào trong lưới")
             tile = {"x": t[0]["x"], "y": t[0]["y"], "w": t[0]["w"], "h": t[0].get("h", 260)}
-        h = tile.get("h", 260)
+        h = tile.get("h") or 340  # tiles are 266–340 px tall depending on the window; the menu button is in the top strip
         items: list[str] = []
         self.close_overlays()
         for _ in range(3):

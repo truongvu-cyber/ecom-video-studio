@@ -334,6 +334,63 @@
         "internal"
       ],
       "expires": null
+    },
+    {
+      "file": "trap-type-beat-profit-freestyle-beat-hard-type-bea-7C087KBJGmc.mp3",
+      "title": "TRAP TYPE BEAT - \"PROFIT\" | FREESTYLE BEAT | HARD TYPE BEAT | FREE RAP INSTRUMENTAL 2026 | FREE BEAT",
+      "source_url": "https://www.youtube.com/watch?v=7C087KBJGmc",
+      "mood": [
+        "sports",
+        "rap",
+        "hype",
+        "fast"
+      ],
+      "bpm": 135.0,
+      "drop_sec": 28.537,
+      "duration": 170.771,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=7C087KBJGmc, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "trap-type-beat-hurry-freestyle-beat-hard-type-beat-F5p3pnU0LUA.mp3",
+      "title": "TRAP TYPE BEAT - \"HURRY\" | FREESTYLE BEAT | HARD TYPE BEAT | FREE RAP INSTRUMENTAL 2026 | FREE BEAT",
+      "source_url": "https://www.youtube.com/watch?v=F5p3pnU0LUA",
+      "mood": [
+        "sports",
+        "rap",
+        "hype",
+        "fast"
+      ],
+      "bpm": 150.5,
+      "drop_sec": 62.856,
+      "duration": 129.904,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=F5p3pnU0LUA, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
+    },
+    {
+      "file": "trap-type-beat-rap-freestyle-beat-hard-type-beat-f-2Yzb89xyR6I.mp3",
+      "title": "TRAP TYPE BEAT - \"RAP\" | FREESTYLE BEAT | HARD TYPE BEAT | FREE RAP INSTRUMENTAL 2026 | FREE BEAT",
+      "source_url": "https://www.youtube.com/watch?v=2Yzb89xyR6I",
+      "mood": [
+        "sports",
+        "rap",
+        "hype",
+        "fast"
+      ],
+      "bpm": 80.0,
+      "drop_sec": 83.685,
+      "duration": 144.126,
+      "license": "INTERNAL ONLY — fetched from https://www.youtube.com/watch?v=2Yzb89xyR6I, rights not cleared for paid ads",
+      "allowed_platforms": [
+        "internal"
+      ],
+      "expires": null
     }
   ]
 }

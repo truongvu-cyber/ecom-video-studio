@@ -264,9 +264,10 @@ FONT_CSS = {
   font-family:FuturaCond,"Arial Narrow","Arial Black",sans-serif; font-weight:800; font-size:132px; line-height:0.92;
   letter-spacing:2px; text-transform:uppercase; color:{ink};
   -webkit-text-stroke:12px {stroke}; paint-order:stroke fill; text-shadow:0 10px 0 rgba(0,0,0,0.5); }}
-.headline span em, .cta span em {{ font-style:normal; color:{accent}; }}
+.headline span em {{ font-style:normal; color:{accent}; }}
 .cta span {{ font-family:FuturaCond,"Arial Narrow",sans-serif; font-weight:800; font-size:84px; letter-spacing:2px;
   text-transform:uppercase; background:{accent}; color:{stroke}; padding:16px 44px; display:inline-block; }}
+.cta span em {{ font-style:normal; color:{ink}; -webkit-text-stroke:3px {stroke}; paint-order:stroke fill; }}
 """,
     "serif": """
 @font-face {{ font-family: DidotB; src: local('Didot-Bold'), local('Didot Bold'), local('Georgia-Bold'); }}

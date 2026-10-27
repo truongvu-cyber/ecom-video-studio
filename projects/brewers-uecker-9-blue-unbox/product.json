@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "product_id": "brewers-uecker-9-blue-unbox",
+  "name": "Brew Crew Uecker #9 Powder Blue Jersey — 2026 World Series / NL Champions patches",
+  "model": "pod",
+  "reference_images": [
+    "frames/product.png"
+  ],
+  "design_files": [],
+  "invariants": [
+    "Powder-blue button-front baseball jersey with gold-and-white trim on the V collar, placket edge and sleeve ends",
+    "Front: script words Brew Crew in gold with a navy outline across the chest, navy number 9 with gold outline below it on the wearer's left side, small navy swoosh on the wearer's right chest",
+    "Wearer's left chest: round World Series 2026 patch (navy diamond, white script, gold 2026); wearer's left sleeve: NATIONAL LEAGUE CHAMPIONS 2026 patch (gold, ball-in-glove monogram)",
+    "Back: UECKER in navy block letters above a large navy number 9 with gold outline, small league logo at the collar, a NATIONAL LEAGUE CHAMPIONS patch on the back of the wearer's right sleeve",
+    "The two large patches at the bottom of the product photo are display callouts, not sewn on the jersey in those places"
+  ],
+  "facts": [
+    {
+      "key": "jersey",
+      "value": "Powder-blue baseball jersey with navy and gold lettering and gold trim",
+      "source": "image"
+    },
+    {
+      "key": "name_number",
+      "value": "UECKER and number 9 on the back, number 9 on the front",
+      "source": "image"
+    },
+    {
+      "key": "patches",
+      "value": "World Series 2026 patch and National League Champions 2026 patch",
+      "source": "image"
+    },
+    {
+      "key": "team_script",
+      "value": "Brew Crew script across the chest",
+      "source": "image"
+    }
+  ],
+  "inferred": [
+    {
+      "key": "self_buyer",
+      "value": "Milwaukee fans 21-40 who want the postseason powder-blue look for game day and nights out"
+    },
+    {
+      "key": "gift_buyer",
+      "value": "Partner buying for a lifelong fan; the Uecker 9 reads as a tribute and a conversation piece"
+    },
+    {
+      "key": "tribute",
+      "value": "UECKER 9 is a tribute to the team's legendary broadcaster; fans buy it for nostalgia"
+    },
+    {
+      "key": "season",
+      "value": "Late October 2026: World Series window, urgency is highest now"
+    },
+    {
+      "key": "desire",
+      "value": "Look great in the team colours; wear the patches that mark this season"
+    }
+  ],
+  "unknown": [
+    "fabric and weight",
+    "sizes",
+    "price",
+    "shipping time",
+    "stitched or printed lettering and patches",
+    "official licensing or authenticity",
+    "whether the team is playing in the 2026 World Series right now"
+  ],
+  "claims": [
+    {
+      "text": "World Series and NL Champions patches",
+      "evidence": "patches"
+    },
+    {
+      "text": "Uecker nine",
+      "evidence": "name_number"
+    }
+  ],
+  "key_trigger": {
+    "what": "the 2026 World Series and NL Champions patches and the UECKER 9 tribute lettering on the powder-blue jersey",
+    "proof_in_3s": "the tissue parts and UECKER 9 fills the frame inside the box, then a macro on the World Series patch",
+    "hook_types": [
+      "curiosity",
+      "result_first",
+      "pov"
+    ],
+    "hook_shot": "s01"
+  },
+  "world": {
+    "name": "Milwaukee Brewers (Brew Crew)",
+    "cues": [
+      "navy baseball cap with a small gold glove-shaped emblem, no lettering, worn backwards",
+      "a powder-blue and gold pennant pinned on the bedroom wall",
+      "a navy-and-gold foam finger leaning on the shelf",
+      "fairy lights and a powder-blue throw pillow on the bed"
+    ]
+  },
+  "placement_checks": [
+    "Brew Crew script is centred across the chest, gold with a navy outline, reads left to right, never mirrored or misspelled",
+    "front number 9 sits below the script on the wearer's left side; back reads UECKER above a large 9",
+    "the round World Series 2026 patch is on the wearer's left chest, the NATIONAL LEAGUE CHAMPIONS 2026 patch on the wearer's left sleeve — never on the stomach or the back",
+    "jersey is powder blue with gold-and-white trim at collar, placket and sleeves; worn open or buttoned — an open jersey splitting the script across the placket is natural, not a fault",
+    "unboxing: the jersey comes out folded with the back (UECKER 9) on top — never inside-out or upside down"
+  ]
+}

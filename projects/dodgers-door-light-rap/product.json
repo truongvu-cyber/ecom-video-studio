@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "product_id": "dodgers-door-light-rap",
+  "name": "Team Logo Car Door Projector Light (Dodgers)",
+  "model": "dropship",
+  "reference_images": [
+    "frames/product_projection.png",
+    "frames/install_steps_grid.png"
+  ],
+  "design_files": [],
+  "invariants": [
+    "Projected logo: the word Dodgers in blue flowing script, a white baseball with red stitches above the letter g, red speed lines trailing down-left from the ball and under the script",
+    "The logo reads left to right for a person standing outside the car facing the open door; never mirrored",
+    "The unit is a small black square box with a round lens, stuck under the inside door panel near its bottom edge, projecting a cone of white light down onto the ground",
+    "Unit holds three AA-size batteries in a tray inside; a red film covers the adhesive pad on its back"
+  ],
+  "facts": [
+    {"key": "projection", "value": "Projects the team logo onto the ground below the open car door", "source": "image"},
+    {"key": "battery", "value": "Battery powered, batteries go into a tray inside the unit", "source": "image"},
+    {"key": "adhesive", "value": "Sticks to the door panel with an adhesive pad (peel the red backing, press on)", "source": "image"},
+    {"key": "install_steps", "value": "Install in 4 steps: insert batteries, prep the surface, remove backing, stick and close", "source": "image"},
+    {"key": "install_time", "value": "Listing says: Install in 60 Seconds / 60-sec install", "source": "image"},
+    {"key": "no_tools", "value": "Listing says: No tools required / No tools needed", "source": "image"},
+    {"key": "fits_all", "value": "Listing says: Fits all vehicles", "source": "image"},
+    {"key": "teams", "value": "Listing says: 30+ MLB Teams", "source": "image"},
+    {"key": "rating", "value": "Listing shows: 4.8 | 981+ fans", "source": "image"},
+    {"key": "tagline", "value": "Listing says: Rep your team every time you step out.", "source": "image"}
+  ],
+  "inferred": [
+    {"key": "self_buyer", "value": "LA baseball fans 20-45 who customize their car, cruise at night and show team pride in parking lots after games"},
+    {"key": "gift_buyer", "value": "Partner or family buying a small wow gift for a Dodgers fan (birthday, Christmas stocking)"},
+    {"key": "pain", "value": "Car mods seem to need wiring or a shop visit"},
+    {"key": "desire", "value": "A flex moment every time the door opens; friends notice the logo"},
+    {"key": "season", "value": "Late October 2026: postseason / World Series window — fan pride and gifting are both high"}
+  ],
+  "unknown": [
+    "brightness",
+    "battery life",
+    "how it turns on (door sensor type)",
+    "price",
+    "shipping time",
+    "waterproof rating",
+    "official licensing or authenticity"
+  ],
+  "claims": [
+    {"text": "No tools", "evidence": "no_tools"},
+    {"text": "60 sec install", "evidence": "install_time"},
+    {"text": "Peel and stick", "evidence": "adhesive"},
+    {"text": "Logo on the ground when you open the door", "evidence": "projection"},
+    {"text": "Fits any car", "evidence": "fits_all"}
+  ],
+  "world": {
+    "name": "Dodgers (Los Angeles baseball)",
+    "cues": [
+      "royal-blue baseball cap with white interlocking letters L and A on the front, flat brim",
+      "white baseball jersey with the word Dodgers in blue script across the chest and a red number below it, worn open over a plain black tee",
+      "a royal-blue rally towel hanging from the rear-view mirror",
+      "tall palm trees and a distant stadium glowing with white floodlights on the horizon",
+      "glossy black sedan with dark tinted windows"
+    ]
+  },
+  "placement_checks": [
+    "the unit is stuck under the inner door panel near its bottom edge, lens pointing down — never on the sill, the seat or the outer door skin",
+    "the logo lies on the ground directly below and just outside the open door edge, not under the seat or the wheel",
+    "the logo reads Dodgers in blue script, ball with red stitches above the g, red speed lines — never mirrored, never another word",
+    "logo visible only while the door is open; dark ground once the door is closed",
+    "the person stands on the ground outside the car or sits in the seat, never across the sill or through the door"
+  ],
+  "key_trigger": {
+    "what": "the Dodgers logo blooming on the ground the instant the car door opens",
+    "proof_in_3s": "the black door is already swinging open, the light cone snaps on and the Dodgers logo blooms sharp and glistening on wet asphalt",
+    "hook_types": ["result_first", "callout", "pov"],
+    "hook_shot": "s01"
+  }
+}

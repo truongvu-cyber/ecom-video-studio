@@ -1,0 +1,190 @@
+{
+  "schema_version": "1.0",
+  "project_id": "brewers-uecker-9-blue-unbox",
+  "product_ref": "product.json",
+  "platform": "tiktok_reels",
+  "format": "hype_montage",
+  "stage": "rendered",
+  "gen_model": {
+    "image": "nano-banana-2.1",
+    "video": "omni-1.1-flash"
+  },
+  "spec": {
+    "ratio": "9:16",
+    "resolution": "1080x1920",
+    "fps": 24,
+    "target_sec": 15,
+    "safe_zone": {
+      "top": 0.15,
+      "bottom": 0.2
+    },
+    "structure": "unbox_reveal"
+  },
+  "audio": {
+    "source": "native",
+    "keep_native": false,
+    "export_no_music": false,
+    "target_lufs": -14,
+    "true_peak_db": -1
+  },
+  "music": {
+    "source": "auto",
+    "mood": "sports rap hype fast",
+    "bpm_range": [
+      120,
+      160
+    ],
+    "drop_on": "s03"
+  },
+  "captions": {
+    "enabled": false,
+    "style": "none"
+  },
+  "text_style": {
+    "preset": "condensed",
+    "color": "#FFC52F"
+  },
+  "fx": {
+    "preset": "hype",
+    "intensity": 0.9,
+    "sfx": true
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "role": "hook",
+      "file_pattern": "c01_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.8,
+      "audio_type": "music_only",
+      "overlay": "*UECKER* 9",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "trigger": true,
+      "override": {
+        "src_in": 0.6,
+        "src_out": 2.4
+      }
+    },
+    {
+      "id": "s02",
+      "role": "proof",
+      "file_pattern": "c01_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.8,
+      "audio_type": "music_only",
+      "overlay": "*IT'S* HERE",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 4.3,
+        "src_out": 6.1
+      }
+    },
+    {
+      "id": "s03",
+      "role": "proof",
+      "file_pattern": "c02_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.4,
+      "audio_type": "music_only",
+      "overlay": "*WORLD SERIES* PATCH",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "speed": 0.75,
+      "override": {
+        "src_in": 0.2,
+        "src_out": 2.0
+      }
+    },
+    {
+      "id": "s04",
+      "role": "proof",
+      "file_pattern": "c02_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.8,
+      "audio_type": "music_only",
+      "overlay": "*NL CHAMPS* 2026",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 6.2,
+        "src_out": 7.9
+      }
+    },
+    {
+      "id": "s05",
+      "role": "proof",
+      "file_pattern": "c03_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.8,
+      "audio_type": "music_only",
+      "overlay": "*BREW* CREW",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 2.6,
+        "src_out": 4.4
+      }
+    },
+    {
+      "id": "s06",
+      "role": "lifestyle",
+      "file_pattern": "c03_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.8,
+      "audio_type": "music_only",
+      "overlay": "*GAME DAY* FIT",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 6.2,
+        "src_out": 7.9
+      }
+    },
+    {
+      "id": "s07",
+      "role": "lifestyle",
+      "file_pattern": "c04_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.0,
+      "audio_type": "music_only",
+      "overlay": "*THAT'S* THE FIT",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 1.2,
+        "src_out": 3.2
+      }
+    },
+    {
+      "id": "s08",
+      "role": "cta",
+      "file_pattern": "c04_a*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.0,
+      "audio_type": "music_only",
+      "overlay": "GET YOURS — *LINK* ↓",
+      "overlay_pos": "bottom",
+      "print_fidelity": "strict",
+      "override": {
+        "src_in": 5.8,
+        "src_out": 7.8
+      }
+    }
+  ],
+  "variants": [
+    {
+      "id": "hookB",
+      "overlay_overrides": {
+        "s01": "*WAIT* FOR THE BACK"
+      }
+    },
+    {
+      "id": "hookC",
+      "overlay_overrides": {
+        "s01": "POV: *YOUR* SERIES FIT"
+      }
+    }
+  ]
+}

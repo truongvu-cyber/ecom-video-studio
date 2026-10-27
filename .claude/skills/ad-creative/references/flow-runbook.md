@@ -166,6 +166,10 @@ executes what the queue says.
 - Omni drifted **night → overcast day** on close-ups and crowd shots (mascot c03, c04) even with a
   night STYLE lock; the keyframe was night. In a fast montage it reads as fine; for a single-scene
   ad, name the time of day in the clip prompt's first sentence as well.
+- **Tile size changes with the window** (266 px tall with 10 per row, 340 px with 5 per row). The
+  menu button sits in the tile's top strip, so the hit-test uses the tile's real height from
+  `rect()` — a hard-coded 260 px missed every button on a 340 px tile (Uecker run: 4 clips
+  rendered, 0 downloaded by the runner, recovered by grid position; no credits lost).
 - **Retry in place.** A tile that says "Không thành công" is retried with its own retry button
   (no recomposing, not charged when refused); if the button is missing the job is recomposed.
 
