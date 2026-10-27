@@ -142,6 +142,18 @@ Follow the Veo section of `models.md` and `house-rules.md`:
    `cNN_a.mp4` in `projects/<id>/clips/` (second try `_b`) → tell ad-editor to
    cut. One tip for Veo. The two alternative directions by name.
 
+## Stage 7 — Generation in Google Flow (scripted)
+
+When the user wants the assets generated for them (not by hand):
+
+1. `.venv/bin/python scripts/gen_queue.py <id>` — the fixed job list (`edit/gen_queue.json`).
+2. `scripts/flow_chrome.sh` — the dedicated signed-in Chrome must be running.
+3. `.venv/bin/python scripts/flow_run.py <id> --stage images` → look at every file in
+   `frames/` against its checks (letters, badges, hands) → `--stage clips`.
+4. Hand over to ad-editor. Everything the runner does is in
+   `references/flow-runbook.md`; a step not in the runbook is not done, and any
+   option priced in credits is never chosen by the script.
+
 ## Changes after delivery
 
 "Đổi hook", "ngắn lại", "thêm cảnh mở hộp": change only what is touched in

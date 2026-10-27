@@ -33,6 +33,17 @@ Trong tab Code, nói với Claude (skill `ad-creative` tự kích hoạt), ví d
 
 Ví dụ đầy đủ một lần chạy: `projects/cubs-car-door-light/` (brief.md, product.json, prompts.md, production.json, format `demo_steps`).
 
+## Gen tự động trong Google Flow (tuỳ chọn)
+
+```bash
+scripts/flow_chrome.sh                                                   # Chrome riêng, đăng nhập Google một lần
+.venv/bin/python scripts/gen_queue.py <project-id>                       # hàng đợi gen từ prompts.md
+.venv/bin/python scripts/flow_run.py <project-id> --stage images         # ảnh nhân vật + keyframe (soát xong mới chạy clip)
+.venv/bin/python scripts/flow_run.py <project-id> --stage clips          # clip Omni 1.1 Flash, tải 1080p vào clips/
+```
+
+Quy trình click-by-click và các điều kiện dừng: `.claude/skills/ad-creative/references/flow-runbook.md`.
+
 ## Chạy Agent 2 (Editor)
 
 ```bash

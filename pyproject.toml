@@ -10,4 +10,5 @@ dependencies = [
     "jsonschema>=4.21",
     "pillow>=10",
     "yt-dlp[default,curl-cffi]>=2025.1",
+    "websocket-client>=1.8",
 ]

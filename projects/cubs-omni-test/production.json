@@ -1,0 +1,167 @@
+{
+  "schema_version": "1.0",
+  "project_id": "cubs-omni-test",
+  "product_ref": "product.json",
+  "platform": "tiktok_reels",
+  "stage": "rendered",
+  "gen_model": {
+    "image": "nano-banana-pro",
+    "video": "veo-3"
+  },
+  "spec": {
+    "ratio": "9:16",
+    "resolution": "1080x1920",
+    "fps": 24,
+    "target_sec": 15,
+    "safe_zone": {
+      "top": 0.15,
+      "bottom": 0.2
+    }
+  },
+  "audio": {
+    "source": "native",
+    "keep_native": false,
+    "export_no_music": false,
+    "target_lufs": -14,
+    "true_peak_db": -1
+  },
+  "music": {
+    "source": "auto",
+    "mood": "upbeat bouncy hip hop",
+    "bpm_range": [
+      80,
+      140
+    ],
+    "drop_on": "s07"
+  },
+  "captions": {
+    "enabled": false,
+    "style": "none"
+  },
+  "text_style": {
+    "preset": "bold",
+    "color": "#FF3B3B"
+  },
+  "fx": {
+    "preset": "hype",
+    "intensity": 0.8,
+    "sfx": true
+  },
+  "shots": [
+    {
+      "id": "s01",
+      "role": "hook",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2,
+      "audio_type": "sfx",
+      "overlay": "OPEN THE *DOOR*…",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "moment": "a",
+      "status": "pending"
+    },
+    {
+      "id": "s02",
+      "role": "proof",
+      "file_pattern": "c01*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.8,
+      "audio_type": "sfx",
+      "overlay": "*GAME DAY* EVERY DAY",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "moment": "b",
+      "status": "pending"
+    },
+    {
+      "id": "s03",
+      "role": "demo",
+      "file_pattern": "c02*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.6,
+      "audio_type": "sfx",
+      "overlay": "1. *BATTERIES*",
+      "overlay_pos": "auto",
+      "moment": "a",
+      "status": "pending"
+    },
+    {
+      "id": "s04",
+      "role": "demo",
+      "file_pattern": "c02*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.6,
+      "audio_type": "sfx",
+      "overlay": "2. *WIPE*",
+      "overlay_pos": "auto",
+      "moment": "b",
+      "status": "pending"
+    },
+    {
+      "id": "s05",
+      "role": "demo",
+      "file_pattern": "c03*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.6,
+      "audio_type": "sfx",
+      "overlay": "3. *PEEL*",
+      "overlay_pos": "auto",
+      "moment": "a",
+      "status": "pending"
+    },
+    {
+      "id": "s06",
+      "role": "demo",
+      "file_pattern": "c03*.mp4",
+      "gen_sec": 8,
+      "use_sec": 1.8,
+      "audio_type": "sfx",
+      "overlay": "4. STICK — *NO TOOLS*",
+      "overlay_pos": "auto",
+      "moment": "b",
+      "status": "pending"
+    },
+    {
+      "id": "s07",
+      "role": "lifestyle",
+      "file_pattern": "c04*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.2,
+      "audio_type": "sfx",
+      "overlay": "*60 SECOND* INSTALL",
+      "overlay_pos": "auto",
+      "print_fidelity": "strict",
+      "speed": 0.75,
+      "moment": "a",
+      "status": "pending"
+    },
+    {
+      "id": "s08",
+      "role": "cta",
+      "file_pattern": "c04*.mp4",
+      "gen_sec": 8,
+      "use_sec": 2.2,
+      "audio_type": "sfx",
+      "overlay": "GET YOURS — *LINK BELOW* ↓",
+      "overlay_pos": "auto",
+      "moment": "b",
+      "status": "pending"
+    }
+  ],
+  "variants": [
+    {
+      "id": "hookB",
+      "overlay_overrides": {
+        "s01": "POV: *YOUR* CAR NOW"
+      }
+    },
+    {
+      "id": "hookC",
+      "overlay_overrides": {
+        "s01": "*WAIT* FOR IT…"
+      }
+    }
+  ],
+  "format": "demo_steps"
+}

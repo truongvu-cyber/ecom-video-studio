@@ -13,3 +13,6 @@ music-library/*.wav
 music-library/*.m4a
 tests/fixtures/*.mp4
 tests/fixtures/*.wav
+
+# Project test nhân bản từ cubs-car-door-light (clone_project.py): frames là bản sao, không đưa vào git
+projects/cubs-omni-test/frames/

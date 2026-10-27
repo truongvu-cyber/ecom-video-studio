@@ -21,6 +21,15 @@ Projects made before the presets existed (Milwaukee jersey) carry no
 `format`; `creative_check` reports that instead of guessing one. Every new
 project must have one.
 
+## 1b. Generation tools (user rule, 2026-10-27)
+
+Images: **Nano Banana 2.1** in Flow. Clips: **Omni 1.1 Flash**, mode
+**Thành phần** (ingredients: keyframe + product photo + design file), 8 s,
+9:16, downloaded at 1080p. Prompts keep the Veo-style structure from
+`models.md` (subject → action → camera → light → audio, colon-form dialogue,
+"no subtitles"); only the tool changes. `references/flow-runbook.md` has the
+click-by-click procedure.
+
 ## 2. The presets
 
 | setting | `ugc_dialogue` | `hype_montage` | `calm_lofi` | `demo_steps` |

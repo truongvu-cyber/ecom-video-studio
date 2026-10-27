@@ -9,8 +9,8 @@ one consistent voice.
 
 | job | default | note |
 | --- | --- | --- |
-| video | **Veo 3 / 3.1** (`--model veo`) | 4, 6 or 8 s per generation; write for **8 s** (1080p, reference jobs) |
-| image (keyframes) | **Nano Banana Pro** (`--image-model nano-banana-pro`) | the user calls it "Nano Banana". If they only have the original Nano Banana: max 3 references, 1K output — tell them keyframes will be soft at 1080p |
+| video | **Omni 1.1 Flash in Google Flow, mode Thành phần** (prompts linted as `--model veo`, same syntax) | 8 s per generation, 9:16, download 1080p; user rule 2026-10-27 (Veo 3.1 Quality costs ~8× more and was dropped) |
+| image (keyframes) | **Nano Banana 2.1 in Flow** (`--image-model nano-banana-pro` for lint limits) | download 2K (1536×2752) |
 
 ## Clip architecture (the core rule)
 
