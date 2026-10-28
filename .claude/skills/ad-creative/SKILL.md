@@ -29,6 +29,7 @@ US audience.
 | `references/deliverables.md` | the files you write and their shape |
 | `references/product-analysis.md`, `genres.md`, `styles.md`, `vocabulary.md` | choosing angle, beat pattern, look, words |
 | `references/keyframes.md`, `failure-modes.md`, `models.md` (Veo section), `output-template.md` | writing the prompts |
+| `references/model-photo.md` | inventing a person: model card (identity + named looks), slot order, camera/light/expression banks, `scripts/model_prompt.py` |
 | `references/realism.md` | any prompt with a person, hand or face: REALISM lock, blocking rule, action-logic checklist, negatives |
 | `references/hooks.md` | Stage 1–2: the key selling trigger (`product.json.key_trigger`), why the first 2 s decide the ad, the hook-type matrix for the 3 variants |
 | `references/ecom-ad-anatomy.md` | Stage 2: the five ad structures (`spec.structure`), proof ladder, CTA rules (one action, last 2 s, platform wording) |
@@ -103,7 +104,9 @@ user approves. "Đổi sang hướng 2" → redo the draft, stop again.
 
 PRODUCT, CHARACTER (if a person — a **new, random person for this project**,
 never one from an earlier project, with its own `_sheet.png` job in Bước 0;
-`formats.md` §4), **REALISM** (if a person, a hand or a face
+`formats.md` §4; the person is first written as a **model card**
+`cast/<name>.json` and `scripts/model_prompt.py` prints the CHARACTER lock, the
+sheet prompt and the person lines of each keyframe — `references/model-photo.md`), **REALISM** (if a person, a hand or a face
 appears — `references/realism.md` §1, and every such clip states the blocking
 per §2), STYLE, **VOICE** (for c01), AUDIO, NEGATIVE.
 Written once, pasted word for word into every prompt (`SKILL` rules of

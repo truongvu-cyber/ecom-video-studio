@@ -304,9 +304,12 @@ class Flow:
         self.js("(()=>{const f=document.querySelector('.ProseMirror'); f.focus(); document.execCommand('selectAll',false,null); document.execCommand('delete',false,null);})()")
         self.c.call("Input.insertText", text=text)
         time.sleep(0.6)
-        got = self.js("document.querySelector('.ProseMirror').innerText.length")
-        if abs(got - len(text)) > 5:
-            raise Stop(f"Prompt nhập thiếu ({got}/{len(text)} ký tự)")
+        # compare without whitespace: ProseMirror turns every newline into a paragraph, so
+        # innerText counts each line break twice (an 8-line prompt read 7 chars "too long")
+        got = self.js("document.querySelector('.ProseMirror').innerText.replace(/\\s+/g,'').length")
+        want = len(re.sub(r"\s+", "", text))
+        if abs(got - want) > 5:
+            raise Stop(f"Prompt nhập thiếu ({got}/{want} ký tự, không tính khoảng trắng)")
 
     def media_ids(self) -> dict[str, str]:
         """{media id: kind} for every tile. A video tile shows a poster under /image/<same id>,

@@ -104,6 +104,13 @@ Never pick a colour that is not already on screen.
   has no sheet block, and a sheet file identical to another project's.
   Reference photos of the real product are the only files that travel
   between projects.
+- **The person is built from a model card (user request 2026-10-27).** Identity
+  slots (subject, build, skin, face, eyes, hair, marks, accessories, fan item,
+  outfit) and named looks (shot, setting, expression, pose, camera, light,
+  background, focus, quality) live in `projects/<id>/cast/<name>.json`;
+  `scripts/model_prompt.py` assembles the lock, the sheet and the look prompts
+  in a fixed order and fails missing slots, banned words and a wrong fan item
+  (`references/model-photo.md`).
 
 ## 4b. World rule — the person and the place belong to the product (user rule 2026-10-27)
 
