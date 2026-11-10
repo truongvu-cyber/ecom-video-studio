@@ -60,7 +60,7 @@ class Pipeline(unittest.TestCase):
         cls.tmp = Path(tempfile.mkdtemp(prefix="evs-test-"))
         cls.project = cls.tmp / "demo-hoodie"
         shutil.copytree(ROOT / "projects" / "demo-hoodie", cls.project)
-        cls.first = run("edit_pipeline.py", str(cls.project), "--no-variants")
+        cls.first = run("edit_pipeline.py", str(cls.project))
         cls.plan = json.loads((cls.project / "edit" / "edit-plan.json").read_text()) \
             if (cls.project / "edit" / "edit-plan.json").exists() else None
         cls.final = cls.project / "out" / "final_demo-hoodie.mp4"
@@ -106,8 +106,14 @@ class Pipeline(unittest.TestCase):
         for s in prod["shots"]:
             s["transition"] = {"s02": "blackflash", "s04": "flicker", "s05": "wipe"}.get(s["id"], "cut")
         p.write_text(json.dumps(prod, ensure_ascii=False, indent=2))
-        res = run("edit_pipeline.py", str(self.project), "--from", "timeline", "--no-variants")
+        prod["variants"] = [{"id": "hookB", "overlay_overrides": {"s01": "New hook"}}]
+        p.write_text(json.dumps(prod, ensure_ascii=False, indent=2))
+        res = run("edit_pipeline.py", str(self.project), "--from", "timeline")
         self.assertEqual(res.returncode, 0, res.stdout[-800:] + res.stderr[-800:])
+        # the working loop renders the main version only; approving without the variants is refused
+        self.assertFalse((self.project / "out" / "final_demo-hoodie_hookB.mp4").exists())
+        self.assertIn("hookB", run("approve.py", str(self.project)).stderr)
+        self.assertTrue((self.project / "edit" / "qc" / "cuts.jpg").exists())
         plan = json.loads((self.project / "edit" / "edit-plan.json").read_text())
         fps = plan["fps"]
         start = {s["shot"]: round(s["tl_start"] * fps) for s in plan["segments"]}
@@ -130,6 +136,35 @@ class Pipeline(unittest.TestCase):
 
         self.assertLess(lum[b], dark)  # wipe: covered on its first frame, open after 0.6 s
         self.assertGreater(lum[b + round(0.7 * fps)], lum[b + round(0.2 * fps)])
+
+
+    def test_7_beats_and_plan_sheet(self) -> None:
+        p = self.project / "production.json"
+        prod = json.loads(p.read_text())
+        want = {"s02": 4, "s04": 2.5}
+        for s in prod["shots"]:
+            s.pop("transition", None)
+            if s["id"] in want:
+                s["beats"] = want[s["id"]]
+        p.write_text(json.dumps(prod, ensure_ascii=False, indent=2))
+        before = self.final.stat().st_mtime
+        res = run("edit_pipeline.py", str(self.project), "--from", "timeline", "--to", "plan")
+        self.assertEqual(res.returncode, 0, res.stdout[-800:] + res.stderr[-800:])
+        self.assertTrue((self.project / "edit" / "qc" / "plan.jpg").exists())
+        self.assertEqual(self.final.stat().st_mtime, before, "--to plan must not render")
+        plan = json.loads((self.project / "edit" / "edit-plan.json").read_text())
+        beat = 60.0 / plan["music"]["bpm"]
+        seg = {s["shot"]: s for s in plan["segments"]}
+        cut = {c["after"]: c for c in plan["cuts"]}
+        for sid, n in want.items():
+            self.assertLessEqual(abs(cut[sid]["off_ms"]), 45, cut[sid])
+            length = seg[sid]["tl_end"] - seg[sid]["tl_start"]
+            # exactly n beats when the shot starts on the grid, never more than one beat short of it
+            self.assertLessEqual(length, n * beat + 0.05, (sid, length))
+            self.assertGreater(length, (n - 1) * beat, (sid, length))
+        on_grid = abs(cut["s01"]["off_ms"]) <= 45
+        if on_grid:
+            self.assertAlmostEqual(seg["s02"]["tl_end"] - seg["s02"]["tl_start"], 4 * beat, delta=0.05)
 
 
 class Gates(unittest.TestCase):

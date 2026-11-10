@@ -48,6 +48,51 @@ def sheet(video: Path, times: list[tuple[float, str]], plan: dict, dest: Path) -
     canvas.save(dest, quality=88)
 
 
+def check_cuts(video: Path, plan: dict, dest: Path) -> list[str]:
+    """Every planned cut against the rendered frames -> edit/qc/cuts.jpg + drift findings.
+
+    One decode of the final file. A cut is reported when the picture does not change on its
+    planned frame but does change 1-3 frames away (the cut drifted); cuts between two parts of
+    the same still picture show no change anywhere and are left alone. The sheet shows the two
+    frames before the cut and the two after it, which is where transitions go wrong.
+    """
+    import numpy as np
+
+    fps, w, h = plan["fps"], 90, 160
+    raw = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-i", str(video), "-an", "-vf", f"scale={w}:{h}",
+                          "-pix_fmt", "rgb24", "-f", "rawvideo", "-"], capture_output=True).stdout
+    frames = np.frombuffer(raw, dtype=np.uint8).reshape(-1, h, w, 3)
+    if len(frames) < 4:
+        return []
+    diff = np.abs(np.diff(frames.astype(np.float32), axis=0)).mean(axis=(1, 2, 3))  # diff[i]: frame i -> i+1
+    found = []
+    segs = plan["segments"][1:]
+    font = ImageFont.truetype(FONT, 13)
+    cols = 4
+    rows = (len(segs) + cols - 1) // cols
+    cell_w, cell_h = w * 4 + 10, h + 20
+    canvas = Image.new("RGB", (cols * cell_w, max(1, rows) * cell_h), "#111")
+    for k, s in enumerate(segs):
+        cut = round(s["tl_start"] * fps)
+        if not 2 <= cut < len(frames) - 1:
+            continue
+        here = diff[cut - 1]
+        tr = s.get("transition") or "cut"
+        if tr in ("cut", "zoom", "whip", "slide", "flash", "glitch"):  # effects that keep the cut on its frame
+            lo, hi = max(0, cut - 4), min(len(diff), cut + 3)
+            around = {i + 1: diff[i] for i in range(lo, hi) if i != cut - 1}
+            other = max(around, key=around.get)
+            if around[other] > 12 and here < around[other] * 0.4:
+                found.append(f"{s['shot']}: hình đổi ở khung {other}, kế hoạch là khung {cut} (lệch {other - cut:+d} khung)")
+        x0, y0 = (k % cols) * cell_w, (k // cols) * cell_h
+        for j, f in enumerate((cut - 2, cut - 1, cut, cut + 1)):
+            canvas.paste(Image.fromarray(frames[f]), (x0 + j * w + (6 if j >= 2 else 0), y0 + 20))
+        ImageDraw.Draw(canvas).text((x0 + 3, y0 + 3), f"→{s['shot']} khung {cut} ({cut / fps:.2f}s) {tr}", font=font, fill="white")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    canvas.save(dest, quality=88)
+    return found
+
+
 def main() -> None:
     project = project_dir(sys.argv[1])
     prod = load_json(project / "production.json")
@@ -102,8 +147,12 @@ def main() -> None:
             times.append((o["start"] + 0.4, f"chữ {o['shot']}"))
         times = sorted(times)
         sheet(video, times, plan, qc_dir / "sheet.jpg")
+        review += check_cuts(video, plan, qc_dir / "cuts.jpg")
         for s in strict:
             grab(video, (s["tl_start"] + s["tl_end"]) / 2, qc_dir / f"print_{s['shot']}.jpg")
+    declared = [v["id"] for v in plan.get("variants") or [] if v.get("overlay_overrides")]
+    if declared and not all((project / "out" / f"final_{pid}_{v}.mp4").exists() for v in declared):
+        notes.append(f"Bản làm việc: chưa xuất biến thể hook {declared} (chạy thêm --final khi chốt)")
 
     verdict = "REJECT" if reject else ("REVIEW" if review else "PASS")
     lines = [f"# Edit report — {pid}", "", f"**Kết luận QC: {verdict}**", ""]
@@ -130,7 +179,7 @@ def main() -> None:
     rejected = [f"{f} ({'; '.join(a['issues'])})" for f, a in takes.items() if a["reject"]]
     if rejected:
         lines += ["", "## Take bị loại", *[f"- {r}" for r in rejected]]
-    lines += ["", "Ảnh kiểm tra: `edit/qc/sheet.jpg`" + (", `edit/qc/print_*.jpg`" if strict else "")]
+    lines += ["", "Ảnh kiểm tra: `edit/qc/plan.jpg` (trước render), `edit/qc/sheet.jpg`, `edit/qc/cuts.jpg` (2 khung trước và sau mỗi nhát cắt)" + (", `edit/qc/print_*.jpg`" if strict else "")]
     (project / "out" / "edit-report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     save_json(qc_dir / "qc.json", {"verdict": verdict, "reject": reject, "review": review, "notes": notes})
     if verdict != "REJECT" and prod.get("stage") != "approved":

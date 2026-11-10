@@ -357,7 +357,13 @@
           "use_sec": {
             "type": "number",
             "exclusiveMinimum": 0,
-            "description": "Thời lượng dùng trong video cuối"
+            "description": "Thời lượng dùng trong video cuối (ước lượng khi có beats)"
+          },
+          "beats": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "multipleOf": 0.5,
+            "description": "Độ dài cảnh tính bằng nhịp nhạc (0.5 = nửa nhịp). Editor đặt nhát cắt đúng lên lưới beat thật; thay cho việc tự tính use_sec + override.src_out. Không dùng cho cảnh thoại còn tiếng."
           },
           "audio_type": {
             "enum": [

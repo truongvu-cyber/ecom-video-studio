@@ -50,8 +50,10 @@ Chrome riêng phải mở suốt lúc chạy (runner điều khiển cửa sổ 
 ## Chạy Agent 2 (Editor)
 
 ```bash
-.venv/bin/python scripts/edit_pipeline.py <project-id>                  # validate → inspect → transcribe → beats → timeline → render → qc
-.venv/bin/python scripts/edit_pipeline.py <project-id> --from timeline  # sau khi sửa production.json
+.venv/bin/python scripts/edit_pipeline.py <project-id>                  # validate → inspect → transcribe → beats → timeline → plan → render → qc
+.venv/bin/python scripts/edit_pipeline.py <project-id> --from timeline --to plan  # vài giây: kế hoạch + edit/qc/plan.jpg, chưa render
+.venv/bin/python scripts/edit_pipeline.py <project-id> --from timeline  # sau khi sửa production.json: chỉ bản chính (~1 phút)
+.venv/bin/python scripts/edit_pipeline.py <project-id> --from timeline --final  # khi chốt: thêm các biến thể hook
 .venv/bin/python tests/make_fixtures.py                                 # tạo project giả demo-hoodie để test
 .venv/bin/python tests/fake_clips.py <project-id>                       # clip giả theo production.json (test nối Agent 1 → 2)
 ALLOW_TEST_MUSIC=1 .venv/bin/python scripts/edit_pipeline.py <id>       # cho phép nhạc test tổng hợp (không dùng cho quảng cáo thật)
@@ -61,7 +63,7 @@ ALLOW_TEST_MUSIC=1 .venv/bin/python scripts/edit_pipeline.py <id>       # cho ph
 
 Kết quả: `out/final_<id>.mp4`, `out/final_<id>_no-music.mp4`, `out/final_<id>_<variant>.mp4` (biến thể hook), `out/edit-report.md`, ảnh kiểm tra `edit/qc/sheet.jpg`.
 
-Các bước: validate → inspect (chọn take) → takes (ảnh từng giây của mọi clip) → moments (đo chuyển động, tìm lúc đổi hành động) → transcribe → beats → timeline → render (tự lưu bản cũ vào `out/vN/`, tự xuất `preview_*`) → qc. Duyệt: `.venv/bin/python scripts/approve.py <project-id>`.
+Các bước: validate → inspect (chọn take) → takes (ảnh từng giây của mọi clip) → moments (đo chuyển động, tìm lúc đổi hành động) → transcribe → beats → timeline → plan (tấm soát `edit/qc/plan.jpg` trước khi render) → render (tự lưu bản cũ vào `out/vN/`, tự xuất `preview_*`) → qc. Duyệt: `.venv/bin/python scripts/approve.py <project-id>`.
 
 Mỗi project thuộc một `format` cố định (`ugc_dialogue`, `hype_montage`, `calm_lofi`, `demo_steps`, xem `.claude/skills/ad-creative/references/formats.md`); `creative_check.py` kiểm tra các trường dựng khớp preset.
 

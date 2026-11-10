@@ -220,14 +220,46 @@ def layout(segments: list[dict]) -> float:
     return t
 
 
+def beat_pos(grid: list[float], interval: float, t: float) -> float:
+    """Where t lies on the beat grid, as a fractional beat index (extends past both ends)."""
+    if t <= grid[0]:
+        return (t - grid[0]) / interval
+    if t >= grid[-1]:
+        return len(grid) - 1 + (t - grid[-1]) / interval
+    i = max(k for k, b in enumerate(grid) if b <= t)
+    return i + (t - grid[i]) / (grid[i + 1] - grid[i])
+
+
+def beat_time(grid: list[float], interval: float, p: float) -> float:
+    if p <= 0:
+        return grid[0] + p * interval
+    if p >= len(grid) - 1:
+        return grid[-1] + (p - (len(grid) - 1)) * interval
+    i = int(p)
+    return grid[i] + (p - i) * (grid[i + 1] - grid[i])
+
+
+def beats_end(grid: list[float], interval: float, start: float, n: float) -> float:
+    """End of a shot that lasts n beats (shots[].beats). A start on a beat or half beat counts from
+    there; a start between beats (the first shot before the music lands) ends on the n-th beat after it."""
+    p = beat_pos(grid, interval, start)
+    near = round(p * 2) / 2
+    p0 = near if abs(beat_time(grid, interval, near) - start) <= SNAP_TOL else float(int(p // 1))
+    return beat_time(grid, interval, p0 + n)
+
+
 def snap_cuts(segments: list[dict], beats_tl: list[float], interval: float) -> None:
+    grid = sorted(beats_tl)
     for k, s in enumerate(segments):
         layout(segments)
         t = s["tl_end"]
-        near = [b for b in beats_tl if abs(b - t) <= interval / 2]
-        if not near:
-            continue
-        b = min(near, key=lambda x: abs(x - t))
+        if s.get("beats") and len(grid) > 1:
+            b = beats_end(grid, interval, s["tl_start"], s["beats"])
+        else:
+            near = [b for b in beats_tl if abs(b - t) <= interval / 2]
+            if not near:
+                continue
+            b = min(near, key=lambda x: abs(x - t))
         want = (b - t) * s["speed"]
         lo, hi = s["out_min"] - s["src_out"], s["out_max"] - s["src_out"]
         delta = min(max(want, lo), hi)
@@ -311,6 +343,18 @@ def main() -> None:
             seg["out_max"] = take["duration"]
             if take["duration"] - ov["src_in"] < shot["use_sec"]:
                 issues.append(f"{shot['id']}: từ giây {ov['src_in']} clip chỉ còn {take['duration'] - ov['src_in']:.1f}s")
+        if shot.get("beats"):
+            if "src_out" in ov:
+                issues.append(f"{shot['id']}: có cả beats và override.src_out — giữ src_out, bỏ beats")
+            elif shot["audio_type"] == "dialogue" and keep_native:
+                issues.append(f"{shot['id']}: beats không áp dụng cho cảnh thoại còn tiếng")
+            elif not music.get("file"):
+                issues.append(f"{shot['id']}: beats cần có nhạc — dùng use_sec")
+            else:
+                # length in beats, counted on the real grid: free to be shorter than MIN_SHOT
+                seg["beats"] = float(shot["beats"])
+                seg["out_min"] = seg["src_in"] + 0.08 * seg["speed"]
+                seg["out_max"] = take["duration"]
         seg.update({"shot": shot["id"], "role": shot["role"], "take": take_name, "transition": shot.get("transition"),
                     "audio_type": shot["audio_type"], "overlay": shot.get("overlay"),
                     "overlay_pos": shot.get("overlay_pos", "top"),
@@ -376,13 +420,21 @@ def main() -> None:
                 cuts.append({"after": s["shot"], "at": round(s["tl_end"], 3), "beat": None,
                              "off_ms": None, "on_beat": None})
                 continue
-            b = min(beats_tl, key=lambda x: abs(x - s["tl_end"]))
+            marks = beats_tl
+            if (s.get("beats") or 0) % 1:  # a half-beat shot is on time when it ends between two beats
+                marks = beats_tl + [(a + b) / 2 for a, b in zip(beats_tl, beats_tl[1:])]
+            b = min(marks, key=lambda x: abs(x - s["tl_end"]))
             cuts.append({"after": s["shot"], "at": round(s["tl_end"], 3),
                          "beat": round(b, 3), "off_ms": round((s["tl_end"] - b) * 1000),
                          "on_beat": abs(s["tl_end"] - b) <= SNAP_TOL})
 
     for s in segments:
-        if (s["src_out"] - s["src_in"]) / s["speed"] < MIN_SHOT:
+        if s.get("beats") and beats_tl:
+            want = beats_end(sorted(beats_tl), 60.0 / music["bpm"], s["tl_start"], s["beats"])
+            if abs(want - s["tl_end"]) > SNAP_TOL:
+                issues.append(f"{s['shot']}: clip không đủ dài cho {s['beats']:g} nhịp từ giây {s['src_in']:.2f} "
+                              f"(thiếu {want - s['tl_end']:.2f}s) — lùi src_in hoặc giảm beats")
+        if (s["src_out"] - s["src_in"]) / s["speed"] < MIN_SHOT and not s.get("beats"):
             issues.append(f"{s['shot']}: cảnh chỉ dài {(s['src_out'] - s['src_in']):.2f}s, quá ngắn")
 
     captions = []

@@ -10,8 +10,18 @@ Dựng video từ clip có sẵn tiếng (Veo 3). **Không lồng tiếng, khôn
 Mọi lệnh chạy từ thư mục gốc dự án `ecom-video-studio/` bằng Python của `.venv`:
 
 ```bash
-.venv/bin/python scripts/edit_pipeline.py <project-id>                  # chạy trọn
-.venv/bin/python scripts/edit_pipeline.py <project-id> --from timeline  # sau khi sửa production.json
+.venv/bin/python scripts/edit_pipeline.py <project-id>                             # chạy trọn, chỉ render bản chính
+.venv/bin/python scripts/edit_pipeline.py <project-id> --from timeline --to plan   # vài giây: chỉ dựng kế hoạch + edit/qc/plan.jpg
+.venv/bin/python scripts/edit_pipeline.py <project-id> --from timeline             # sau khi sửa production.json (~1 phút)
+.venv/bin/python scripts/edit_pipeline.py <project-id> --from timeline --final     # khi đã chốt: thêm các biến thể hook
+```
+
+**Vòng làm việc (bắt buộc, để không render lại nhiều lần):** sửa `production.json` → `--to plan` → đọc `edit/qc/plan.jpg` (mỗi cảnh 3 khung của đúng đoạn nguồn sẽ dùng, khung vàng = chỗ chữ sẽ nằm, dòng đỏ = nhát cắt lệch beat) → lặp tới khi tấm này đúng → render một lần → đọc `edit/qc/sheet.jpg` và `edit/qc/cuts.jpg` → `--final` chỉ khi người dùng đã chốt bản chính. `approve.py` từ chối nếu còn thiếu biến thể.
+
+**Độ dài cảnh theo nhịp:** với format cắt theo nhạc, ghi `shots[].beats` (số nhịp, `0.5` = nửa nhịp) + `override.src_in`; không tự tính `use_sec`/`override.src_out` từ danh sách beat. Editor đặt nhát cắt lên lưới beat thật, kể cả cảnh ngắn hơn 0,8 s. `use_sec` khi đó chỉ là ước lượng.
+
+```bash
+.venv/bin/python scripts/edit_pipeline.py <project-id> --quality draft             # ít khác biệt về thời gian; mặc định delivery
 ```
 
 `<project-id>` là tên thư mục trong `projects/`.
@@ -38,7 +48,7 @@ Trước khi quyết định cắt ở đâu, giữ bao lâu, chữ đặt đâu
 5. **beats** — dò beat và drop của nhạc.
 6. **timeline** — thứ tự ưu tiên khi cắt: (1) không cắt vào lời thoại, (2) giữ mạch kể và độ dài dự kiến, (3) trúng beat. Nhạc có thể vào muộn tối đa 3s để drop trùng CTA. Đọc mục `CHÚ Ý` và `cắt ... lệch` trong output.
 7. **render** — ffmpeg cắt/ghép + mix âm thanh (cân âm lượng từng clip, hạ nhạc khi có thoại, −14 LUFS), HyperFrames vẽ phụ đề từng chữ, chữ overlay, CTA → `out/final_<id>.mp4` và `out/final_<id>_no-music.mp4`.
-8. **qc** — kiểm kỹ thuật + `out/edit-report.md` + `edit/qc/sheet.jpg`.
+8. **qc** — kiểm kỹ thuật + `out/edit-report.md` + `edit/qc/sheet.jpg` + `edit/qc/cuts.jpg` (2 khung trước và 2 khung sau mỗi nhát cắt; tự báo REVIEW khi hình đổi lệch khung so với kế hoạch).
 9. **Tự duyệt thành phẩm (bắt buộc trước khi giao).** Đọc `edit/qc/sheet.jpg` (vạch đỏ là vùng an toàn) và `edit/qc/print_*.jpg`. Lỗi thường gặp và cách sửa:
    - Chữ overlay đè mặt người hoặc sản phẩm → đổi `overlay_pos` của shot (`top`/`center`/`lower`), chạy lại `--from timeline`.
    - Chữ hoặc phụ đề nằm ngoài vạch đỏ → báo lại, không giao.
@@ -51,13 +61,13 @@ Chỉ sửa đúng phần được nhắc, rồi chạy lại từ bước thấ
 
 | Yêu cầu | Sửa trong production.json | Chạy lại từ |
 |---|---|---|
-| "Cảnh 2 ngắn/dài hơn" | `shots[].use_sec` | timeline |
+| "Cảnh 2 ngắn/dài hơn" | `shots[].beats` (video cắt theo nhạc) hoặc `shots[].use_sec` | timeline |
 | "Cắt chỗ này sớm hơn" | `shots[].override.src_in/src_out` (giây trong clip nguồn) | timeline |
 | "Lấy đoạn sau / đoạn động nhất / đoạn tĩnh của clip" | `shots[].moment: "b" / "peak" / "calm"` (đọc từ `edit/moments.json`) | timeline |
 | "Cảnh này chậm lại (slow-mo) / nhanh lên" | `shots[].speed: 0.6–0.8` cho reveal, `1.2–1.3` cho bước lắp; không dùng cho cảnh thoại còn tiếng | timeline |
 | "Chữ tự tránh mặt/sản phẩm" | `overlay_pos: "auto"` (đo dải khung thưa chi tiết nhất; sai thì đặt tay) | timeline |
 | "Thêm/bớt tiếng whoosh, impact" | `fx.sfx: true/false` (mặc định bật khi `fx.preset = hype`) | render |
-| "Ra 3 bản hook để test" | `variants: [{id, overlay_overrides: {s01: "chữ mới"}}]` → `out/final_<id>_<variant>.mp4`; `--no-variants` để bỏ qua khi sửa nhanh | render |
+| "Ra 3 bản hook để test" | `variants: [{id, overlay_overrides: {s01: "chữ mới"}}]` → chạy với `--final` → `out/final_<id>_<variant>.mp4` (mặc định chỉ render bản chính) | render |
 | "Đổi chữ / đổi vị trí chữ" | `overlay`, `overlay_pos` (`top`/`center`/`lower`/`bottom`; với cảnh CTA, `overlay_pos` dời luôn nút CTA) | timeline |
 | "Dùng take khác" | `chosen_take` | inspect |
 | "Đổi nhạc" | `music.file` hoặc `music.mood` + `source: auto` | beats |

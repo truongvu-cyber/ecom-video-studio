@@ -24,6 +24,10 @@ def main() -> None:
     final = project / "out" / f"final_{prod['project_id']}.mp4"
     if not final.exists():
         sys.exit("Không thấy out/final_*.mp4")
+    missing = [v["id"] for v in prod.get("variants") or [] if v.get("overlay_overrides")
+               and not (project / "out" / f"final_{prod['project_id']}_{v['id']}.mp4").exists()]
+    if missing:
+        sys.exit(f"Chưa xuất biến thể hook {missing}: chạy edit_pipeline.py <project> --from timeline --final")
     prod["stage"] = "approved"
     save_json(project / "production.json", prod)
     report = project / "out" / "edit-report.md"
