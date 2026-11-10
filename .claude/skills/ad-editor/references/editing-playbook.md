@@ -97,6 +97,9 @@ same effect; the first frame has none (the hook needs nothing in front of it).
 | `slide` | vertical push | into the CTA, into a step in a list | emotional beats |
 | `glitch` | jittered offsets + inverted flicker | hype/streetwear once or twice per video, on a slam | kids, gifts, calm, print shots |
 | `dip` | dip to black | calm/luxury scene change, end of an act | fast formats |
+| `blackflash` | 2 black frames right before the cut | a run of beat cuts that needs a pulse (reference TikTok ZSphFWgGm, 2026-11-07) | two cuts in a row closer than 0.5 s |
+| `flicker` | the whole shot stays dark and blinks brighter four times | the shot right before the drop: the next cut is the reveal | a shot with overlay text (it is hidden), shots under 1 s |
+| `wipe` | the shot is uncovered left to right, text included | end card on black with the CTA text | a shot with a moving picture |
 
 `fx.preset`: `hype` = transitions + decaying shake after flash/whip/zoom/glitch + beat
 pulses; `clean` = transitions only; `none` = plain cuts. Speed ramps (`speed` 0.6–0.8)

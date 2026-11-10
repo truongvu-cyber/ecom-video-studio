@@ -13,9 +13,11 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import os
 import re
 import shutil
 import subprocess
+import time
 from pathlib import Path
 
 from common import BRAND, HYPERFRAMES, MUSIC_LIBRARY, load_json, loudness, media_info, project_dir, run
@@ -38,9 +40,12 @@ def cut_segments(project: Path, plan: dict, work: Path) -> Path:
         # Veo usually delivers 720p: a light unsharp after the upscale brings edges back
         sharpen = ",unsharp=5:5:0.6:5:5:0.0" if src_h[s["take"]] < h else ""
         vf = (f"trim=start={s['src_in']}:duration={dur},setpts=(PTS-STARTPTS)/{s['speed']},"
-              f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1{sharpen},fps={fps}")
+              f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1{sharpen},fps={fps},"
+              f"tpad=stop_mode=clone:stop=3")
+        # Exact frame count from the timeline: otherwise each segment rounds up and cuts drift off the beat.
+        frames = round(s["tl_end"] * fps) - round(s["tl_start"] * fps)
         out = work / f"seg{i:02d}.mp4"
-        run(["ffmpeg", "-y", "-v", "error", "-i", str(src), "-an", "-vf", vf,
+        run(["ffmpeg", "-y", "-v", "error", "-i", str(src), "-an", "-vf", vf, "-frames:v", str(frames),
              "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-pix_fmt", "yuv420p", str(out)])
         parts.append(out)
     lst = work / "segments.txt"
@@ -230,20 +235,6 @@ def brand() -> dict:
     return load_json(p) if p.exists() else {}
 
 
-_OLD_BOLD_CSS = """
-@font-face {{ font-family: Impact; src: local('Impact'); }}
-.headline span {{ background:none; padding:0 10px; display:inline-block; transform:rotate(-3deg);
-  font-family:Impact,"Arial Black",sans-serif; font-weight:400; font-size:100px; line-height:1.0;
-  letter-spacing:1px; text-transform:uppercase; color:{accent};
-  -webkit-text-stroke:16px {stroke}; paint-order:stroke fill;
-  text-shadow:0 12px 0 rgba(0,0,0,0.55), 0 0 40px rgba(0,0,0,0.45); }}
-.headline span em, .cta span em {{ font-style:normal; color:{ink}; }}
-.cta span {{ font-family:Impact,"Arial Black",sans-serif; font-weight:400; font-size:76px; letter-spacing:1px;
-  text-transform:uppercase; background:{accent}; color:{stroke}; border:7px solid {stroke};
-  box-shadow:0 12px 0 {stroke}; padding:18px 46px; display:inline-block; transform:rotate(-2deg); }}
-"""
-
-
 FONT_CSS = {
     # preset -> CSS for .headline span / .cta span (editing-playbook §5b)
     "bold": """
@@ -319,14 +310,37 @@ def cut_fx(plan: dict, k: float, preset: str) -> tuple[list[str], str]:
     """Cut effects drawn on the base video (HyperFrames/GSAP), one per segment transition
     (editing-playbook §6b): flash (white hit + punch), whip (horizontal rush with blur), zoom
     (punch-in from a blur), slide (vertical push), glitch (jittered offsets + inverted flicker),
-    dip (dip to black), cut (nothing). preset 'hype' adds the shake and beat pulses on top.
+    dip (dip to black), blackflash (2 black frames right before the cut), flicker (the whole shot
+    sits in the dark and blinks brighter four times, so the next cut lands as the reveal), wipe
+    (the shot is uncovered left to right, text included), cut (nothing). preset 'hype' adds the shake and beat pulses on top.
     The base video stays slightly overscaled (BASE) so shake and whips never show the edge."""
     BASE = 1.06
     js = [f'gsap.set("#base",{{scale:{BASE},transformOrigin:"50% 45%"}});']
     segs = plan["segments"]
+    fps, W = plan["fps"], plan["width"]
+    at = lambda f: (f - 0.5) / fps  # half a frame early: frame f shows the change, frame f-1 never does
     for seg in segs[1:]:
         t = seg["tl_start"]
         tr = seg.get("transition") or "cut"
+        cut = round(t * fps)  # the frame this shot starts on (cut_segments counts frames the same way)
+        if tr == "blackflash":
+            js.append(f'tl.set("#dip",{{opacity:0.97}},{at(cut - 2):.4f});')
+            js.append(f'tl.set("#dip",{{opacity:0}},{at(cut):.4f});')
+        elif tr == "flicker":
+            end = round(seg["tl_end"] * fps)
+            js.append(f'tl.set("#dip",{{opacity:1}},{at(cut):.4f});')
+            pulses = [0.16, 0.26, 0.4, 0.6]  # brightness of each blink, measured on the reference
+            first = cut + min(4, (end - cut) // 5)
+            step = (end - 2 - first) / (len(pulses) - 1)
+            for i, g in enumerate(pulses):
+                f = first + round(step * i)
+                js.append(f'tl.set("#dip",{{opacity:{1 - g:.2f}}},{at(f):.4f});')
+                js.append(f'tl.set("#dip",{{opacity:1}},{at(f + 2):.4f});')
+            js.append(f'tl.set("#dip",{{opacity:0}},{at(end):.4f});')
+        elif tr == "wipe":
+            js.append(f'tl.set("#wipe",{{opacity:1,x:-90}},{at(cut):.4f});')
+            js.append(f'tl.to("#wipe",{{x:{W},duration:0.58,ease:"none"}},{at(cut):.4f});')
+            js.append(f'tl.set("#wipe",{{opacity:0}},{at(cut) + 0.6:.4f});')
         if tr == "flash":
             js.append(f'tl.fromTo("#flash",{{opacity:{min(0.85, 0.7 * k):.2f}}},{{opacity:0,duration:0.14,ease:"power2.out",immediateRender:false}},{t:.3f});')
             js.append(f'tl.fromTo("#base",{{scale:{BASE + 0.16 * k:.3f},filter:"blur({8 * k:.1f}px)"}},{{scale:{BASE},filter:"blur(0px)",duration:0.3,ease:"power3.out",immediateRender:false}},{t:.3f});')
@@ -358,8 +372,10 @@ def cut_fx(plan: dict, k: float, preset: str) -> tuple[list[str], str]:
     return js, layers
 
 
-def hype_fx(plan: dict, k: float) -> tuple[list[str], str]:  # kept for callers
-    return cut_fx(plan, k, "hype")
+# on top of the text: the wipe uncovers the picture and its lettering together
+WIPE_LAYER = ('<div id="wipe" class="clip" data-start="0" data-duration="{T}" style="position:absolute;top:0;left:0;'
+              'width:calc(100% + 90px);height:100%;opacity:0;pointer-events:none;'
+              'background:linear-gradient(to right,rgba(0,0,0,0) 0,#000 90px);"></div>')
 
 
 def composition(plan: dict, hf: Path) -> None:
@@ -405,6 +421,8 @@ def composition(plan: dict, hf: Path) -> None:
     if fx.get("preset") in ("hype", "clean") or any(s.get("transition") not in (None, "cut") for s in plan["segments"]):
         js_fx, flash_el = cut_fx(plan, float(fx.get("intensity", 1)), fx.get("preset", "clean"))
         els.insert(0, flash_el)
+        if any(s.get("transition") == "wipe" for s in plan["segments"]):
+            els.append(WIPE_LAYER.format(T=T))
         js = js_fx + js  # effects first so text tweens stay on top
     page = f"""<!doctype html>
 <html lang="en" data-resolution="portrait">
@@ -503,11 +521,18 @@ def main() -> None:
     (project / "out").mkdir(exist_ok=True)
     archive_previous(project / "out")
 
-    print("1/4 cắt và ghép hình...")
+    t0 = [time.monotonic()]
+
+    def lap(msg: str) -> None:
+        now = time.monotonic()
+        print(f"{msg}  (+{now - t0[0]:.0f}s)", flush=True)
+        t0[0] = now
+
+    lap("1/4 cắt và ghép hình...")
     base = cut_segments(project, plan, work)
     shutil.move(base, hf / "base.mp4")
 
-    print("2/4 dựng âm thanh...")
+    lap("2/4 dựng âm thanh...")
     native = native_audio(project, plan, work)
     music = music_track(plan, work)
     sfx = sfx_track(plan, work)
@@ -519,34 +544,39 @@ def main() -> None:
     if (plan["audio"].get("export_no_music", True) and plan["audio"].get("keep_native", True)) or not music:
         mixes["no-music"] = master([native, *extra], plan, work / "mix_nomusic.wav")
 
-    print("3/4 vẽ phụ đề và chữ (HyperFrames)...")
+    lap("3/4 vẽ phụ đề và chữ (HyperFrames)...")
     composition(plan, hf)
     visual = project / "edit" / "visual.mp4"
-    render_overlay(hf, visual, plan["fps"], args.quality)
+    jobs = [(hf, visual)]
+    variants = [v for v in ([] if args.no_variants else plan.get("variants", [])) if v.get("overlay_overrides")]
+    for v in variants:
+        overrides = v["overlay_overrides"]
+        print(f"   biến thể {v['id']}: đổi chữ {', '.join(overrides)}")
+        plan_v = {**plan, "overlays": [{**o, "text": overrides.get(o["shot"], o["text"])} for o in plan["overlays"]]}
+        hf_v = project / "edit" / f"hf_{v['id']}"
+        shutil.rmtree(hf_v, ignore_errors=True)
+        hf_v.mkdir(parents=True)
+        os.link(hf / "base.mp4", hf_v / "base.mp4")
+        composition(plan_v, hf_v)
+        jobs.append((hf_v, project / "edit" / f"visual_{v['id']}.mp4"))
+    # one after another: HyperFrames already uses every core, side-by-side renders were slower
+    # (measured 2026-11-10: 208 s against 168 s for three versions of a 15 s video)
+    for d, o in jobs:
+        render_overlay(d, o, plan["fps"], args.quality)
+    for d, _ in jobs[1:]:
+        shutil.rmtree(d, ignore_errors=True)
 
-    print("4/4 xuất file...")
+    lap("4/4 xuất file...")
     outputs = []
     for name, audio in mixes.items():
         out = project / "out" / (f"final_{pid}.mp4" if name == "final" else f"final_{pid}_no-music.mp4")
         mux(visual, audio, out)
         outputs.append(out)
-
-    variants = [] if args.no_variants else plan.get("variants", [])
     main_audio = mixes.get("final") or next(iter(mixes.values()))
     for v in variants:
-        overrides = v.get("overlay_overrides") or {}
-        if not overrides:
-            continue
-        print(f"   biến thể {v['id']}: đổi chữ {', '.join(overrides)}")
-        plan_v = {**plan, "overlays": [{**o, "text": overrides.get(o["shot"], o["text"])} for o in plan["overlays"]]}
-        composition(plan_v, hf)
-        visual_v = project / "edit" / f"visual_{v['id']}.mp4"
-        render_overlay(hf, visual_v, plan["fps"], args.quality)
         out = project / "out" / f"final_{pid}_{v['id']}.mp4"
-        mux(visual_v, main_audio, out)
+        mux(project / "edit" / f"visual_{v['id']}.mp4", main_audio, out)
         outputs.append(out)
-    if variants:
-        composition(plan, hf)  # leave the main composition on disk for inspection
 
     # a small copy that fits chat/phone upload limits; the full-quality file stays final_*
     main_out = project / "out" / f"final_{pid}.mp4"
@@ -555,6 +585,7 @@ def main() -> None:
              "-preset", "medium", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart",
              str(project / "out" / f"preview_{pid}.mp4")])
     shutil.rmtree(work, ignore_errors=True)
+    lap("xong")
     for o in outputs:
         print("->", o.relative_to(project))
 

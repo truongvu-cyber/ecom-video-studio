@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -35,6 +36,7 @@ def main() -> None:
     args = ap.parse_args()
 
     names = [s for s, _ in STEPS]
+    took: list[str] = []
     for name, script in STEPS[names.index(args.start):]:
         print(f"\n=== {name} ===", flush=True)
         cmd = [sys.executable, str(HERE / script), args.project]
@@ -42,8 +44,11 @@ def main() -> None:
             cmd += ["--quality", args.quality]
             if args.no_variants:
                 cmd.append("--no-variants")
+        t0 = time.monotonic()
         if subprocess.run(cmd).returncode != 0:
             sys.exit(f"Dừng ở bước {name}")
+        took.append(f"{name} {time.monotonic() - t0:.0f}s")
+    print("\nThời gian: " + " · ".join(took))
 
 
 if __name__ == "__main__":

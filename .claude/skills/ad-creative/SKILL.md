@@ -5,10 +5,10 @@ description: Agent 1 (Creative) — từ sản phẩm người dùng đưa (ản
 
 # ad-creative
 
-You turn a product into a ready-to-generate video plan. You write prompts; you
-do not generate images or video. The user generates them, drops the clips in
-`projects/<id>/clips/`, and `ad-editor` cuts the final ad from your
-`production.json`.
+You turn a product into a ready-to-generate video plan. Images and clips are
+generated in Google Flow, either by the user by hand or by `scripts/flow_run.py`
+(Stage 7); the clips land in `projects/<id>/clips/`, and `ad-editor` cuts the
+final ad from your `production.json`.
 
 This skill extends the user's `video-prompt-studio` (its references are in
 `references/`, its checkers in `tools/`). Where they disagree, **house rules
@@ -22,7 +22,7 @@ US audience.
 
 | file | read it when |
 | --- | --- |
-| `references/house-rules.md` | always — Veo 3 + Nano Banana Pro, one dialogue clip + B-roll, lengths |
+| `references/house-rules.md` | always — Omni 1.1 Flash (mode Thành phần) + Nano Banana 2.1 in Google Flow, one dialogue clip + B-roll, lengths |
 | `references/product-truth.md` | mode A, and every run (product.json, claims) |
 | `references/pod-customize.md` | POD / personalized products; any shot with a printed name, number or logo |
 | `references/reference-video.md` | mode C |
@@ -33,7 +33,6 @@ US audience.
 | `references/realism.md` | any prompt with a person, hand or face: REALISM lock, blocking rule, action-logic checklist, negatives |
 | `references/hooks.md` | Stage 1–2: the key selling trigger (`product.json.key_trigger`), why the first 2 s decide the ad, the hook-type matrix for the 3 variants |
 | `references/ecom-ad-anatomy.md` | Stage 2: the five ad structures (`spec.structure`), proof ladder, CTA rules (one action, last 2 s, platform wording) |
-| `examples/` | a full worked run (Kling) and quick prompts |
 
 Scripts run from the project root with `.venv/bin/python scripts/<name>.py`.
 
@@ -113,7 +112,7 @@ Written once, pasted word for word into every prompt (`SKILL` rules of
 video-prompt-studio Stage 4). PRODUCT includes the print exactly as in the
 design file. Invented people only; no real person's face or voice.
 
-## Stage 4 — Keyframes (Nano Banana Pro)
+## Stage 4 — Keyframes (Nano Banana 2.1)
 
 One `### Keyframe N` per clip, from the product photo (+ design file, +
 character sheet when a person repeats), per `keyframes.md` §3 and
@@ -121,14 +120,14 @@ character sheet when a person repeats), per `keyframes.md` §3 and
 check each keyframe against the real product **letter by letter** before
 animating it.
 
-## Stage 5 — Video prompts (Veo 3)
+## Stage 5 — Video prompts (Omni 1.1 Flash, written in Veo syntax)
 
 Follow the Veo section of `models.md` and `house-rules.md`:
 
 - `## Clip 1 · 8s · Dialogue (A-roll)` — Veo Ingredients with keyframe_c1 +
   product photo (+ design file); all lines in colon form without quotes, with
   silence before, between and after the lines.
-- `## Clip N · 8s · <role>` — first-frame image-to-video from keyframe_cN; one
+- `## Clip N · 8s · <role>` — mode Thành phần (ingredients) with keyframe_cN first (user rule 2026-10-27: every clip); one
   action, one slow move; `Audio: <real sounds>, quiet room tone, no speech, no music.`
 - Every clip: `no subtitles, no on-screen text`, a `**Negative:**` line, and
   `**Save the video as:** cNN_a.mp4`.
@@ -154,7 +153,7 @@ Follow the Veo section of `models.md` and `house-rules.md`:
    project paths and do not open on the user's phone or web view.
 4. Deliver in chat (short): files written; work order — save product photo +
    design → generate keyframes in Nano Banana → check them letter by letter →
-   generate clips in Veo (c01 with Ingredients, others first-frame) → save as
+   generate clips in Flow with Omni 1.1 Flash, mode Thành phần → save as
    `cNN_a.mp4` in `projects/<id>/clips/` (second try `_b`) → tell ad-editor to
    cut. One tip for Veo. The two alternative directions by name.
 

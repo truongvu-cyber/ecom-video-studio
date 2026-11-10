@@ -10,7 +10,7 @@ model's limits in models.json:
 
   - length for the model, vague filler words, speed words on the subject
   - more than one camera move in a single-shot clip, multi-shot on a model
-    that cannot do it, Hailuo bracket commands over three
+    that cannot do it
   - text, logos and prices asked of the model, crowds of subjects
   - unproven claims (named brands and IP only with --check-names)
   - Veo dialogue in quotes (burns subtitles), lines too long for the clip
@@ -24,9 +24,8 @@ FAIL means fix before generating. WARN means fix it or know why not.
 Exit code 1 when anything FAILs.
 
 Usage
-  python3 prompt_lint.py prompts.md --model kling3 --target 30
+  python3 prompt_lint.py prompts.md --model veo --target 15
   python3 prompt_lint.py prompts.md --model veo --json
-  pbpaste | python3 prompt_lint.py - --model seedance
 
 Standard library only.
 """
@@ -257,8 +256,7 @@ def lint_clip(c, model, key, locks):
 
     fast = [w for w in SPEED if has(body, w)]
     if fast:
-        lvl = "FAIL" if key.startswith("seedance") and "fast" in fast else "WARN"
-        add(lvl, f"Speed words on the subject: {', '.join(fast)}. They warp faces and limbs; move the camera or cut instead.")
+        add("WARN", f"Speed words on the subject: {', '.join(fast)}. They warp faces and limbs; move the camera or cut instead.")
 
     multi = bool(TIMECODE.search(p))
     moves = sorted({m.replace("-", " ") for m in MOVES if has(body, m)})
@@ -271,11 +269,6 @@ def lint_clip(c, model, key, locks):
     i2v = re.search(r"keyframe|\.(png|jpe?g|webp)|photo|last frame", c.get("first_frame", ""), re.I)
     if not i2v and not any(has(low, t) for t in LIGHT):
         add("WARN", "No light described. Light changes quality more than any other line.")
-
-    if key == "hailuo":
-        n = len(re.findall(r"\[(push|pull|pan|tilt|zoom|truck|pedestal|shake|tracking|static)[^\]]*\]", low))
-        if n > 3:
-            add("WARN", f"{n} bracket camera commands; Hailuo follows at most three.")
 
     texty = [pat for pat in TEXT_ASKS if re.search(pat, clean)]
     if texty:

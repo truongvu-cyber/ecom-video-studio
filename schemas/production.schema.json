@@ -432,6 +432,9 @@
           "transition": {
             "enum": [
               "cut",
+              "blackflash",
+              "flicker",
+              "wipe",
               "flash",
               "whip",
               "zoom",

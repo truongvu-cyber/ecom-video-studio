@@ -7,11 +7,13 @@ Follows ad-creative/references/flow-runbook.md step by step:
   -> attach references -> type the prompt -> real-click generate -> wait for the new
   media URL -> download (images 2K, videos 1080p, never a credit-priced option)
   -> save under the queue's name (next free suffix if taken) -> log to edit/gen_log.jsonl.
-Stops on: sign-in/captcha page, refusal text, retry budget spent, download timeout.
+Stops on: creative_check FAIL (before anything is sent), sign-in/captcha page, refusal text,
+retry budget spent, download timeout.
 """
 from __future__ import annotations
 
 import argparse
+import subprocess
 import json
 import os
 import re
@@ -236,7 +238,15 @@ class Flow:
             raise Stop(f"Không tìm thấy {name} trong thư viện để gắn vào prompt")
         self.click(tile)
         time.sleep(0.8)
-        add = self.rect("[...document.querySelectorAll('button')].find(b=>/Thêm vào câu lệnh/.test(b.textContent)&&b.getBoundingClientRect().width>0)")
+        add = None
+        for _ in range(4):  # with many files in the library the button can take a moment (roulette run: 3 jobs lost)
+            add = self.rect("[...document.querySelectorAll('button')].find(b=>/Thêm vào câu lệnh/.test(b.textContent)&&b.getBoundingClientRect().width>0)")
+            if add:
+                break
+            time.sleep(1.5)
+            if _ == 1:
+                self.click(tile)
+                time.sleep(0.8)
         if not add:
             raise Stop("Không thấy nút 'Thêm vào câu lệnh'")
         self.click(add)
@@ -315,7 +325,7 @@ class Flow:
         """{media id: kind} for every tile. A video tile shows a poster under /image/<same id>,
         so ids are compared (signed URLs change) and the kind comes from the play icon."""
         return json.loads(self.js("""JSON.stringify(Object.fromEntries([...document.querySelectorAll('img,video,source')]
-            .map(e=>[(e.src||e.currentSrc||'').match(/(?:flow-content\\.google|storage\\.googleapis\\.com\\/ai-sandbox-videofx)\\/(?:image|video)\\/([0-9a-f-]{36})/)||[], e])
+            .map(e=>[((e.closest('[data-media-id]')||{dataset:{}}).dataset.mediaId?[0,e.closest('[data-media-id]').dataset.mediaId]:((e.src||e.currentSrc||'').match(/(?:flow-content\\.google|storage\\.googleapis\\.com\\/ai-sandbox-videofx)\\/(?:image|video)\\/([0-9a-f-]{36})/)||[])), e])
             .filter(([m])=>m.length).map(([m,e])=>{const t=e.closest('[class*=tile], [class*=virtual-item]')||e.parentElement;
             const isVideo=e.tagName==='VIDEO'||/play_circle/.test(t.innerText||'')||/\\/video\\//.test(e.src||'');
             return [m[1], isVideo?'video':'image'];})))"""))
@@ -361,8 +371,9 @@ class Flow:
         self.leave_detail()
         tile = rect
         for _ in range(0 if rect else 12):
-            tile = self.rect("(()=>{const e=[...document.querySelectorAll('img,video,source')].find(e=>(e.src||e.currentSrc||'').includes(%s));"
-                             "return e&&(e.closest('flow-grid-tile-container')||e)})()" % json.dumps(mid))
+            # bring the tile into view first: a scrolled grid gives negative coordinates (and the hover misses)
+            tile = self.rect("(()=>{const e=[...document.querySelectorAll('img,video,source')].find(e=>(e.src||e.currentSrc||'').includes(%s)||(e.closest('[data-media-id]')||{dataset:{}}).dataset.mediaId===%s);"
+                             "const c=e&&(e.closest('flow-grid-tile-container')||e); if(c) c.scrollIntoView({block:'center'}); return c})()" % (json.dumps(mid), json.dumps(mid)))
             if tile:
                 break
             time.sleep(5)
@@ -382,7 +393,7 @@ class Flow:
             self.hover(tile)
             # every tile has its own 'Tuỳ chọn khác' (top-right corner of the tile): take the one inside this tile
             more = self.rect("[...document.querySelectorAll('button')].find(b=>{if(!/Tuỳ chọn khác/.test(b.getAttribute('aria-label')||''))return false;"
-                             "const r=b.getBoundingClientRect();return r.width>0&&Math.abs(r.x+r.width/2-%f)<%f&&Math.abs(r.y+r.height/2-%f)<%f})"
+                             "const r=b.getBoundingClientRect();return r.width>0&&Math.abs(r.x+r.width/2-(%f))<%f&&Math.abs(r.y+r.height/2-(%f))<%f})"
                              % (tile["x"], tile["w"] / 2 + 2, tile["y"], h / 2 + 2))
             if more:
                 self.click(more)
@@ -422,8 +433,8 @@ class Flow:
         self.click(ok)
         time.sleep(1.0)
         if mid:
-            got = self.js("(()=>{const e=[...document.querySelectorAll('img,video')].find(e=>(e.src||e.currentSrc||'').includes(%s));"
-                          "const t=e&&e.closest('flow-grid-tile-container');return t?t.innerText:''})()" % json.dumps(mid)) or ""
+            got = self.js("(()=>{const e=[...document.querySelectorAll('img,video')].find(e=>(e.src||e.currentSrc||'').includes(%s)||(e.closest('[data-media-id]')||{dataset:{}}).dataset.mediaId===%s);"
+                          "const t=e&&e.closest('flow-grid-tile-container');return t?t.innerText:''})()" % (json.dumps(mid), json.dumps(mid))) or ""
             if name not in got:
                 print(f"   (cảnh báo: tile chưa hiện tên {name}: {got[:60]!r})")
 
@@ -542,7 +553,7 @@ class Flow:
             return JSON.stringify(tiles.map(({t})=>{const txt=norm(t.innerText);
               const pct=(txt.match(/\\b(\\d{1,3})%%/)||[])[1]||null;
               const kind=t.querySelector('flow-video-tile')?'video':(t.querySelector('flow-image-tile')?'image':null);
-              const ids=[...t.querySelectorAll('img,video,source')].map(e=>((e.src||e.currentSrc||'').match(/(?:flow-content\\.google|storage\\.googleapis\\.com\\/ai-sandbox-videofx)\\/(?:image|video)\\/([0-9a-f-]{36})/)||[])[1]).filter(Boolean);
+              const ids=[...t.querySelectorAll('img,video,source')].map(e=>(((e.closest('[data-media-id]')||{dataset:{}}).dataset.mediaId?[0,e.closest('[data-media-id]').dataset.mediaId]:((e.src||e.currentSrc||'').match(/(?:flow-content\\.google|storage\\.googleapis\\.com\\/ai-sandbox-videofx)\\/(?:image|video)\\/([0-9a-f-]{36})/)||[])))[1]).filter(Boolean);
               const r=t.getBoundingClientRect();
               return {kind, pct, ids:[...new Set(ids)], text:txt.slice(0,60), x:r.x+r.width/2, y:r.y+r.height/2, w:r.width, h:r.height};}));})()""" % n)
         return json.loads(v or "[]")
@@ -558,6 +569,8 @@ class Flow:
         if t["pct"] is not None:
             return t["pct"], None
         ids = [i for i in t["ids"] if i not in taken]
+        if not ids and not t["ids"] and kind == "video" == t.get("kind") and "play_circle" in (t.get("text") or ""):
+            return None, f"pos:{index}"  # Flow 2026-10-31: finished video tiles show no media id, only their place in the grid
         return None, (ids[0] if ids and t.get("kind") == kind else None)
 
     def finish(self, job: dict, mid: str | None, log, rect: dict | None = None) -> Path:
@@ -573,7 +586,8 @@ class Flow:
             dest = dest.with_name(f"{m.group(1)}_{chr(ord(m.group(2)) + 1)}{suf}" if m else f"{stem}_b{suf}")
         self.rename(url, dest.stem, rect)
         self.download(url, kind, job.get("download", "1K" if kind == "image" else "1080p"), rect, wait=False)
-        self.pending_dl.append({"stem": dest.stem, "dest": dest, "kind": kind, "t": time.time()})
+        self.pending_dl.append({"stem": dest.stem, "dest": dest, "kind": kind, "t": time.time(), "mid": mid,
+                                "size": job.get("download", "1K" if kind == "image" else "1080p")})
         self.made.add(dest.stem)
         print(f"   {job['id']}: đổi tên trong Flow -> {dest.stem}, đang tải nền -> {dest.relative_to(self.project)}")
         log({"job": job["id"], "url": url, "file": str(dest.relative_to(self.project)), "flow_name": dest.stem,
@@ -604,6 +618,27 @@ class Flow:
             if not self.pending_dl or time.time() >= t_end:
                 return
             time.sleep(3)
+
+    def redownload_missing(self) -> None:
+        """A download fired while the next job was being composed can be lost silently (dodgers/yankees
+        discovery runs: c01 rendered and renamed, file never arrived). Re-fire it once on the tile that
+        holds the same media id, wait, and name every file that is still missing."""
+        if not self.pending_dl:
+            return
+        for d in list(self.pending_dl):
+            tile = next((t for t in self.grid_tiles(30) if d.get("mid") in t["ids"]), None)
+            if not tile:
+                continue
+            print(f"   tải lại {d['stem']} (lần tải đầu không về)")
+            try:
+                self.download(None, d["kind"], d["size"], tile, wait=False)
+            except Stop as e:
+                print(f"   không tải lại được {d['stem']}: {e}")
+            d["t"] = time.time()
+            time.sleep(3)
+        self.collect_downloads(wait=240)
+        for d in self.pending_dl:
+            print(f"   CẢNH BÁO: {d['stem']} vẫn chưa tải về — clip đã có trong Flow, tải tay hoặc chạy lại phần tải, KHÔNG gen lại")
 
     def retry_tile(self, index: int) -> bool:
         """Press the failed tile's own retry button (no recomposing). True if it was pressed."""
@@ -702,7 +737,10 @@ class Flow:
                     taken.add(mid)
                     print(f"   {jid}: xong sau {int(elapsed)} s")
                     try:
-                        self.finish(job, mid, log)
+                        if mid.startswith("pos:"):
+                            self.finish(job, None, log, self.grid_tiles()[int(mid[4:])])
+                        else:
+                            self.finish(job, mid, log)
                     except Stop as e:
                         # the result exists and is paid for: never regenerate because a menu did not
                         # open — try finishing the same tile again on the next polls
@@ -746,6 +784,7 @@ class Flow:
         if self.pending_dl:
             print(f"   chờ {len(self.pending_dl)} file tải nền...")
             self.collect_downloads(wait=300)
+        self.redownload_missing()
         print("Hàng đợi xong.")
 
 
@@ -756,6 +795,8 @@ def main() -> None:
     ap.add_argument("--only", default="", help="job ids, comma separated")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--serial", action="store_true", help="một job một lúc (chế độ cũ)")
+    ap.add_argument("--skip-check", default="", metavar="LÝ DO",
+                    help="gen dù creative_check FAIL; lý do được ghi vào edit/gen_log.jsonl")
     args = ap.parse_args()
 
     project = project_dir(args.project)
@@ -765,11 +806,22 @@ def main() -> None:
             and (args.stage == "all" or (args.stage == "images") == (j["kind"] == "image"))]
     if not jobs:
         sys.exit("Không có job nào khớp")
+    # Nothing is generated from prompts that fail the creative rules (ad-creative Stage 6):
+    # the check runs here so a chained command cannot walk past its FAIL.
+    check = subprocess.run([sys.executable, str(Path(__file__).parent / "creative_check.py"), str(project)],
+                           capture_output=True, text=True)
+    fails = [l for l in check.stdout.splitlines() if l.lstrip().startswith("FAIL")]
+    if check.returncode != 0 and not args.skip_check:
+        print("\n".join(fails) or check.stdout[-800:] + check.stderr[-800:])
+        sys.exit("creative_check FAIL: sửa prompt trước khi gen (hoặc --skip-check \"lý do\")")
     try:
         pages()
     except Exception:
         sys.exit("Flow Chrome chưa chạy: scripts/flow_chrome.sh")
     logf = (project / "edit" / "gen_log.jsonl").open("a", encoding="utf-8")
+    if check.returncode != 0:
+        logf.write(json.dumps({"t": datetime.now().isoformat(timespec="seconds"), "skip_check": args.skip_check,
+                               "fails": fails}, ensure_ascii=False) + "\n")
 
     def log(d: dict) -> None:
         logf.write(json.dumps({"t": datetime.now().isoformat(timespec="seconds"), **d}, ensure_ascii=False) + "\n")

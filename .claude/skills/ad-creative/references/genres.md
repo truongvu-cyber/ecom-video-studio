@@ -140,4 +140,4 @@ motion around an empty space.
 - MID beats -> demo / proof clips, one main action each.
 - CTA beat -> a clean end clip with room for the overlay text in the top 15% or
   bottom 20% safe zones.
-- `shotplan.py` does the packing; you choose the action and camera for each clip.
+- Every clip is one 8 s generation (`house-rules.md`); you choose the action and camera for each clip.

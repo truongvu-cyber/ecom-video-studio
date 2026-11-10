@@ -1,4 +1,4 @@
-# House rules: Veo 3 + Nano Banana, built for the Editor
+# House rules: Omni 1.1 Flash + Nano Banana 2.1 in Google Flow, built for the Editor
 
 These rules override the defaults in `product-analysis.md` and `models.md`
 (which assume Kling). They exist because Agent 2 (ad-editor) cuts the clips
@@ -21,7 +21,7 @@ across the timeline.
 | clip | what | how to generate | audio | production.json |
 | --- | --- | --- | --- | --- |
 | `c01` | **A-roll / dialogue**: one person talks to camera with the product | Veo **Ingredients / reference images** (keyframe_c01 + product photo + design file), not first-frame: first-frame jobs often come back without sound | all spoken lines + room tone | 2-3 shots share `file_pattern: "c01*.mp4"`, `audio_type: dialogue`, each with its own `dialogue` line |
-| `c02`… | **B-roll**: product close-up, personalization moment, unboxing, worn/used, lifestyle | **first-frame image-to-video** from `keyframe_cN.png` (best product fidelity) | real sound of the action (fabric, paper, click) + room tone, **no speech, no music** | `audio_type: sfx` (or `music_only` when the sound adds nothing) |
+| `c02`… | **B-roll**: product close-up, personalization moment, unboxing, worn/used, lifestyle | mode **Thành phần** with `keyframe_cN.png` as the first ingredient (user rule 2026-10-27: every clip goes through Thành phần) | real sound of the action (fabric, paper, click) + room tone, **no speech, no music** | `audio_type: sfx` (or `music_only` when the sound adds nothing) |
 
 Why one dialogue clip: within one generation Veo keeps one voice; across
 generations the voice changes even with the same description. A VOICE lock is

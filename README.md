@@ -2,8 +2,8 @@
 
 Hai agent làm video quảng cáo ecommerce (POD customize, dropshipping), chạy trong tab Code của app Claude desktop.
 
-- **Agent 1 · Creative** (`.claude/skills/ad-creative`): sản phẩm → `product.json` (Product Truth) → concept (dừng chờ duyệt) → ảnh khung đầu Nano Banana + prompt Veo 3 + `production.json`.
-- **Agent 2 · Editor** (`.claude/skills/ad-editor`): clip Veo 3 → chọn take, cắt theo lời thoại + beat, hạ nhạc, phụ đề, CTA → MP4 9:16 (có nhạc + không nhạc) + `edit-report.md`.
+- **Agent 1 · Creative** (`.claude/skills/ad-creative`): sản phẩm → `product.json` (Product Truth) → concept (dừng chờ duyệt) → prompt ảnh khung đầu (Nano Banana 2.1) + prompt clip (Omni 1.1 Flash, chế độ Thành phần, trong Google Flow) + `production.json`.
+- **Agent 2 · Editor** (`.claude/skills/ad-editor`): clip 8 giây từ Flow → chọn take, cắt theo lời thoại + beat, hạ nhạc, phụ đề, CTA → MP4 9:16 (có nhạc + không nhạc) + `edit-report.md`.
 
 ## Cấu trúc
 
@@ -11,7 +11,7 @@ Hai agent làm video quảng cáo ecommerce (POD customize, dropshipping), chạ
 schemas/        production.schema.json, product.schema.json
 scripts/        script Python Agent 2 gọi (chạy bằng .venv/bin/python)
 brand/          brand.json, logo, font
-music-library/  nhạc có license + tags.json
+music-library/  nhạc tải về CHỈ DÙNG NỘI BỘ (chưa có license đăng quảng cáo) + tags.json
 projects/<id>/  refs/ frames/ clips/ edit/ out/ + product.json, brief.md, prompts.md, production.json
 ```
 
@@ -31,14 +31,14 @@ Trong tab Code, nói với Claude (skill `ad-creative` tự kích hoạt), ví d
 .venv/bin/python scripts/creative_check.py <project-id>                 # kiểm tra prompts.md + production.json trước khi gen
 ```
 
-Ví dụ đầy đủ một lần chạy: `projects/cubs-car-door-light/` (brief.md, product.json, prompts.md, production.json, format `demo_steps`).
+Ví dụ đầy đủ một lần chạy: `projects/cubs-car-door-light/` trong git (brief.md, product.json, prompts.md, production.json, format `demo_steps`).
 
-## Gen tự động trong Google Flow (tuỳ chọn)
+## Gen tự động trong Google Flow
 
 ```bash
 scripts/flow_chrome.sh                                                   # Chrome riêng, đăng nhập Google một lần
 .venv/bin/python scripts/gen_queue.py <project-id>                       # hàng đợi gen từ prompts.md
-.venv/bin/python scripts/flow_run.py <project-id>                        # cả hàng đợi: upload 1 lượt, gen song song (4), clip chạy ngay khi keyframe về
+.venv/bin/python scripts/flow_run.py <project-id>                        # (tự chạy creative_check trước, FAIL là dừng) cả hàng đợi: upload 1 lượt, gen song song (4), clip chạy ngay khi keyframe về
 .venv/bin/python scripts/flow_run.py <project-id> --stage images         # chỉ ảnh (soát xong mới --stage clips); --serial = từng job một
 .venv/bin/python scripts/gen_review.py <project-id>                      # edit/qc/gen_review.jpg + danh sách soát vị trí sản phẩm
 .venv/bin/python scripts/gen_review.py <project-id> --mark c03 fail "…"  # ghi kết quả soát; clip chưa 'pass' thì validate chặn
@@ -71,4 +71,10 @@ Tư duy chuyên gia nằm trong `.claude/skills/ad-creative/references/viral-pla
 
 ## Quy ước clip
 
-Đặt tên clip theo shot và take: `clips/c01_a.mp4`, `clips/c01_b.mp4`. Lời thoại gom vào một clip Veo 8 giây; nhiều shot có thể dùng chung clip đó.
+Đặt tên clip theo shot và take: `clips/c01_a.mp4`, `clips/c01_b.mp4`. Lời thoại gom vào một clip 8 giây; nhiều shot có thể dùng chung clip đó.
+
+## Giới hạn hiện tại
+
+- Chỉ chạy trên macOS (font hệ thống, `say`, mlx-whisper cho Apple Silicon), một người dùng, một máy.
+- `flow_run.py` điều khiển giao diện web Google Flow; Flow đổi giao diện là runner phải sửa (xem `flow-runbook.md`).
+- Test: `.venv/bin/python -m unittest discover tests -v` (khoảng 90 giây; dựng project giả rồi kiểm tra nhát cắt đúng khung, hiệu ứng đúng khung, chọn take, độ to âm thanh, cổng schema và cổng creative_check). Chưa có test cho runner Flow và cho `creative_check` trên prompt thật; chưa có CI.

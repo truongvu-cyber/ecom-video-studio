@@ -175,10 +175,17 @@ executes what the queue says.
   the second host, so c01 rendered but was never seen, timed out after 480 s and was submitted again (12 credits
   lost). The regex in `grid_tiles` / `new_media` now accepts both hosts, and the timeout line prints the job's own
   tile, not tile 0.
+- **Lost first download (dodgers/yankees discovery runs, 2026-10-28).** Twice the first clip rendered and was
+  renamed, but its file never arrived; the run ended with "Hàng đợi xong" and no warning. The download had been
+  fired while the next job was being composed. `redownload_missing()` now re-fires each missing download once on
+  the tile holding the same media id, waits, and prints a CẢNH BÁO line for anything still missing. A missing
+  file is never a reason to regenerate: the clip is already in Flow.
 - **Retry in place.** A tile that says "Không thành công" is retried with its own retry button
   (no recomposing, not charged when refused); if the button is missing the job is recomposed.
 
 ## 4. Stop conditions
+
+- **Before anything is sent:** `flow_run.py` runs `creative_check.py`; any FAIL stops the run. `--skip-check "<reason>"` overrides it and writes the reason and the FAIL lines to `edit/gen_log.jsonl` (use only when the user says so).
 
 Stop and report (never retry blindly): a sign-in or captcha page; a refusal
 ("không thành công", policy text); the retry budget spent; a download that
