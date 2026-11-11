@@ -1,0 +1,106 @@
+{
+  "name": "flicker-cinematic",
+  "summary": "Cắt thẳng theo nhịp, một đoạn tối nhấp nháy trước cú drop, chớp đen 2 khung trước vài nhát cắt, kết bằng chữ quét hiện trên nền đen",
+  "source": {
+    "url": "https://vt.tiktok.com/ZSphFWgGm/",
+    "project": "tt-ref-ZSphFWgGm",
+    "date": "2026-11-07",
+    "note": "đo từ video mẫu: tối 1,4 s nhấp nháy sáng dần, chớp đen 1-2 khung trước nhát cắt, logo thu nhanh, chữ hiện từ trái sang phải"
+  },
+  "verdict": "pending",
+  "verdict_note": "đã dựng doorlight-cowboys-flicker; người dùng chưa nói duyệt",
+  "use_when": [
+    "sản phẩm có hình phát sáng hoặc logo nổi trên nền tối",
+    "người dùng đưa nhạc có đoạn dồn rồi bùng"
+  ],
+  "avoid_when": [
+    "cảnh có người nói",
+    "sản phẩm cần đọc chữ in suốt video (đoạn tối che mất)",
+    "format chill"
+  ],
+  "format": "hype_montage",
+  "length_sec": [
+    13,
+    16
+  ],
+  "music": {
+    "bpm": [
+      110,
+      130
+    ],
+    "character": "nhạc của chính video mẫu khi người dùng yêu cầu; có đoạn lặng hoặc dồn 1,5 s trước khi bùng",
+    "drop": "shot ngay sau cảnh flicker"
+  },
+  "rhythm_beats": {
+    "hook": [
+      2,
+      2
+    ],
+    "dark": [
+      3
+    ],
+    "after_drop": [
+      2,
+      1,
+      1,
+      2,
+      1,
+      4
+    ],
+    "fast_run": [
+      0.5,
+      3.5,
+      0.5,
+      1.5,
+      0.5,
+      0.5,
+      1
+    ],
+    "end_card": "phần còn lại của nhạc, 4-5 nhịp"
+  },
+  "effects": {
+    "max_effects": 9,
+    "types": [
+      "flicker",
+      "zoom",
+      "blackflash",
+      "wipe"
+    ],
+    "where": [
+      {
+        "transition": "flicker",
+        "on": "cảnh ngay trước drop, không có chữ",
+        "why": "nén lại trước khi bùng"
+      },
+      {
+        "transition": "zoom",
+        "on": "shot drop, và shot cuối trước màn kết",
+        "why": "cú drop; logo thu nhanh"
+      },
+      {
+        "transition": "blackflash",
+        "on": "tối đa 5 nhát cắt sau drop, không hai cái cách nhau dưới 0,5 s",
+        "why": "nhịp đập theo nhạc"
+      },
+      {
+        "transition": "wipe",
+        "on": "màn kết nền đen",
+        "why": "chữ CTA hiện từ trái sang phải"
+      }
+    ]
+  },
+  "text": {
+    "preset": "bold",
+    "rule": "hook 2 cảnh đầu, mỗi cảnh 2 từ; không chữ từ đoạn tối tới hết phần cắt nhanh; CTA một dòng giữa màn kết đen"
+  },
+  "pictures": [
+    "5 clip không người hoặc chỉ thấy chân, máy luôn chuyển động",
+    "một cận cảnh, một toàn cảnh, một top-down của cùng sản phẩm",
+    "một clip đen 3 s cho màn kết"
+  ],
+  "fx": {
+    "preset": "clean",
+    "sfx": false
+  },
+  "example_project": "doorlight-cowboys-flicker"
+}

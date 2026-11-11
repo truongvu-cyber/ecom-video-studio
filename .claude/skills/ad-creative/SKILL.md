@@ -32,6 +32,7 @@ US audience.
 | `references/model-photo.md` | inventing a person: model card (identity + named looks), slot order, camera/light/expression banks, `scripts/model_prompt.py` |
 | `references/realism.md` | any prompt with a person, hand or face: REALISM lock, blocking rule, action-logic checklist, negatives |
 | `references/hooks.md` | Stage 1–2: the key selling trigger (`product.json.key_trigger`), why the first 2 s decide the ad, the hook-type matrix for the 3 variants |
+| `references/ideation.md` | Stage 2, before anything else: read the taste log and the style library, write ten ideas from six families, cut, score, let the user pick (`ideas.md`) |
 | `references/ecom-ad-anatomy.md` | Stage 2: the five ad structures (`spec.structure`), proof ladder, CTA rules (one action, last 2 s, platform wording) |
 
 Scripts run from the project root with `.venv/bin/python scripts/<name>.py`.
@@ -71,8 +72,18 @@ Look at every photo. **First name the key selling trigger** (`hooks.md` §2 →
 product cannot be identified, or a personalization claim the ad depends on is
 unconfirmed. Otherwise decide and list assumptions.
 
-## Stage 2 — Direction and story draft → STOP
+## Stage 2 — Ideas, direction and story draft → STOP
 
+- **Ideas first** (`references/ideation.md`): run `scripts/taste.py show` and
+  `scripts/styles.py list`, write `ideas.md` (ten ideas, at least six families, the cut tests,
+  the scores) and show the five best. Stop there unless the user already gave the direction;
+  the rest of this stage is for the idea they pick.
+- **Name the edit style**: `production.json.style` is a recipe from `styles/` (or two, the
+  first one leading). Its rhythm in beats and its `effects.max_effects` go into the plan as
+  they are; pictures, words and people are new. No recipe fits → say so and describe the cut
+  in `brief.md`; after the user has seen the result it becomes a new recipe.
+- **Write down every verdict** the user gives, in their words, the moment they give it:
+  `scripts/taste.py add --about … --verdict … --quote "…" --lesson "…" --project <id> --style <name>`.
 - Choose the **format** from `references/formats.md` §1 (`ugc_dialogue`,
   `hype_montage`, `calm_lofi`, `demo_steps`) and take every edit setting from
   its preset row; the colour, character, music-keyword and file-naming rules
@@ -97,7 +108,7 @@ unconfirmed. Otherwise decide and list assumptions.
 **Stop and ask for approval.** Show in chat, short: the 3-second proof, the
 chosen direction and why, the story table, hook, assumptions, generation cost,
 two alternative directions. Do not write keyframe or video prompts before the
-user approves. "Đổi sang hướng 2" → redo the draft, stop again.
+user approves. "Đổi sang hướng 2" → redo the draft from that idea in `ideas.md`, stop again.
 
 ## Stage 3 — Locks
 

@@ -75,6 +75,17 @@ Tư duy chuyên gia nằm trong `.claude/skills/ad-creative/references/viral-pla
 
 Đặt tên clip theo shot và take: `clips/c01_a.mp4`, `clips/c01_b.mp4`. Lời thoại gom vào một clip 8 giây; nhiều shot có thể dùng chung clip đó.
 
+## Gu, phong cách dựng và ý tưởng
+
+```bash
+.venv/bin/python scripts/taste.py show                      # sổ gu: lời nhận xét nguyên văn của người dùng (taste/log.jsonl, chỉ trên máy)
+.venv/bin/python scripts/taste.py add --about edit --verdict change --quote "…" --lesson "…"
+.venv/bin/python scripts/styles.py list                     # thư viện công thức dựng (styles/*.json), đo từ video mẫu và bản đã duyệt
+.venv/bin/python scripts/styles.py draft <project> refs/<video>.mp4   # công thức nháp từ một video mẫu đã analyze_ref
+```
+
+Agent 1 viết `ideas.md` (10 ý, 6 họ, xem `references/ideation.md`) trước khi chọn hướng. Agent 2 mặc định cắt thẳng; hiệu ứng có hạn mức và phải ghi lý do (`editing-playbook.md` §6).
+
 ## Giới hạn hiện tại
 
 - Chỉ chạy trên macOS (font hệ thống, `say`, mlx-whisper cho Apple Silicon), một người dùng, một máy.

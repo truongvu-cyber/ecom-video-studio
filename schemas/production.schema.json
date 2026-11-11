@@ -249,7 +249,12 @@
         },
         "sfx": {
           "type": "boolean",
-          "description": "Whoosh trước + impact tại mỗi nhát cắt, riser vào drop. Mặc định bật khi preset = hype."
+          "description": "Whoosh trước + impact tại các nhát cắt CÓ hiệu ứng, riser vào drop. Mặc định bật khi preset = hype."
+        },
+        "max_effects": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Hạn mức số nhát cắt có hiệu ứng. Bỏ trống = 1 hiệu ứng mỗi 4 nhát cắt, tối thiểu 2. Chỉ nâng khi phong cách đã chọn (styles/) cần."
         }
       }
     },
@@ -269,6 +274,13 @@
           "default": "word-highlight"
         }
       }
+    },
+    "style": {
+      "description": "Công thức dựng trong styles/ (styles.py list); mảng = pha trộn, phần tử đầu là chính",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      ]
     },
     "variants": {
       "type": "array",
@@ -448,7 +460,11 @@
               "glitch",
               "dip"
             ],
-            "description": "Chuyển cảnh VÀO shot này (editing-playbook §6b). Bỏ trống = Editor chọn theo format + vai trò shot"
+            "description": "Chuyển cảnh VÀO shot này (editing-playbook §6b). Bỏ trống = cắt thẳng (Editor chỉ tự thêm zoom vào shot drop)"
+          },
+          "transition_why": {
+            "type": "string",
+            "description": "Lý do của hiệu ứng này (cú drop, đổi bối cảnh, mở màn kết...). Bắt buộc khi transition khác cut."
           },
           "trigger": {
             "type": "boolean",

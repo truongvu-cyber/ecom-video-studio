@@ -170,7 +170,8 @@ def sfx_bank() -> dict:
 
 
 def sfx_track(plan: dict, work: Path) -> Path | None:
-    """Whoosh before + impact on every cut, a riser into the drop (fx.sfx)."""
+    """Whoosh before + impact on the cuts that carry an effect, a riser into the drop (fx.sfx).
+    A plain cut gets no sound: the music's own beat is its sound."""
     import numpy as np
     import soundfile as sf
 
@@ -189,7 +190,7 @@ def sfx_track(plan: dict, work: Path) -> Path | None:
         if e > s:
             buf[s:e] += y[: e - s]
 
-    cuts = [s["tl_start"] for s in plan["segments"][1:]]
+    cuts = [s["tl_start"] for s in plan["segments"][1:] if (s.get("transition") or "cut") != "cut"]
     for t in cuts:
         put("whoosh", t - 0.30, 0.9 * k)
         put("impact", t, 1.0 * k)

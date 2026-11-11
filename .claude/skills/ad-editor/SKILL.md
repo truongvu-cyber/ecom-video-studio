@@ -26,6 +26,18 @@ Mọi lệnh chạy từ thư mục gốc dự án `ecom-video-studio/` bằng P
 
 `<project-id>` là tên thư mục trong `projects/`.
 
+## Trước khi dựng: gu của người dùng và phong cách đã chọn
+
+```bash
+.venv/bin/python scripts/taste.py show --about edit     # và --about music: lời người dùng đã duyệt, đã chê, đã yêu cầu sửa
+.venv/bin/python scripts/styles.py show <tên>           # công thức của production.json.style: nhịp theo beat, hiệu ứng nằm ở đâu và vì sao
+```
+
+- Dựng theo công thức: `rhythm_beats` thành `shots[].beats`, `effects.where` thành `shots[].transition` + `transition_why`, `effects.max_effects` thành `fx.max_effects`. Không thêm hiệu ứng ngoài công thức.
+- Mặc định mọi nhát cắt là cắt thẳng; hiệu ứng có hạn mức và phải có lý do (`references/editing-playbook.md` §6). Tấm `plan.jpg` in số hiệu ứng đã dùng trên hạn mức.
+- Người dùng nhận xét gì về bản dựng (duyệt, chê, yêu cầu sửa) thì ghi ngay nguyên văn: `scripts/taste.py add --about edit|music --verdict … --quote "…" --lesson "…" --project <id> --style <tên>`. `approve.py <id> "<lời người dùng>"` tự ghi mục duyệt.
+- Video mẫu mới do người dùng gửi: sau `analyze_ref.py`, chạy `scripts/styles.py draft <project> refs/<file>` rồi điền các TODO từ `sheet.jpg`; công thức thành chính thức khi người dùng đã xem một bản dựng theo nó.
+
 ## Đầu vào cần có
 
 - `projects/<id>/production.json` (đúng `schemas/production.schema.json`) và `product.json`

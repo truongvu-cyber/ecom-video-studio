@@ -138,6 +138,30 @@ class Pipeline(unittest.TestCase):
         self.assertGreater(lum[b + round(0.7 * fps)], lum[b + round(0.2 * fps)])
 
 
+    def test_8_effects_are_plain_by_default_and_budgeted(self) -> None:
+        p = self.project / "production.json"
+        prod = json.loads(p.read_text())
+        for s in prod["shots"]:
+            s.pop("transition", None)
+            s.pop("transition_why", None)
+        prod["format"] = "hype_montage"  # used to put an effect on every cut
+        p.write_text(json.dumps(prod, ensure_ascii=False, indent=2))
+        res = run("build_timeline.py", str(self.project))
+        self.assertEqual(res.returncode, 0, res.stdout[-600:] + res.stderr[-600:])
+        plan = json.loads((self.project / "edit" / "edit-plan.json").read_text())
+        effects = [s["transition"] for s in plan["segments"] if s["transition"] != "cut"]
+        self.assertLessEqual(len(effects), 1, effects)  # only the punch into the drop shot
+        self.assertFalse([i for i in plan["issues"] if "hiệu ứng" in i], plan["issues"])
+
+        for s in prod["shots"][1:]:
+            s["transition"] = "flash" if s.get("print_fidelity") != "strict" else "zoom"
+        prod["shots"][1]["transition_why"] = "cú drop"
+        p.write_text(json.dumps(prod, ensure_ascii=False, indent=2))
+        run("build_timeline.py", str(self.project))
+        issues = json.loads((self.project / "edit" / "edit-plan.json").read_text())["issues"]
+        self.assertTrue(any("hạn mức" in i for i in issues), issues)  # 4 effects on 4 cuts, budget 2
+        self.assertEqual(sum("chưa ghi lý do" in i for i in issues), 3, issues)
+
     def test_7_beats_and_plan_sheet(self) -> None:
         p = self.project / "production.json"
         prod = json.loads(p.read_text())
@@ -205,6 +229,31 @@ class Gates(unittest.TestCase):
         self.assertNotEqual(res.returncode, 0)
         self.assertIn("creative_check FAIL", res.stdout + res.stderr)
         self.assertFalse((self.project / "edit" / "gen_log.jsonl").exists())
+
+    def test_style_library_is_complete(self) -> None:
+        import styles
+        found = styles.recipes()
+        self.assertGreaterEqual(len(found), 5)
+        for d in found:
+            if d["_file"].startswith("_draft-"):
+                continue
+            self.assertEqual(d["_missing"], [], d["_file"])
+            self.assertEqual(d["name"] + ".json", d["_file"])
+            self.assertIn(d["verdict"], ("approved", "pending", "rejected"))
+            self.assertIsInstance(d["effects"]["max_effects"], int)
+
+    def test_taste_log_keeps_the_quote(self) -> None:
+        log = self.tmp / "taste.jsonl"
+        env = {**ENV, "TASTE_LOG": str(log)}
+        quote = "Chuyển cảnh nhiều quá, bỏ bớt"
+        add = subprocess.run([PY, str(SCRIPTS / "taste.py"), "add", "--about", "edit", "--verdict", "change",
+                              "--quote", quote, "--lesson", "ít hiệu ứng hơn", "--style", "flicker-cinematic"],
+                             capture_output=True, text=True, env=env)
+        self.assertEqual(add.returncode, 0, add.stderr)
+        self.assertEqual(json.loads(log.read_text().splitlines()[0])["quote"], quote)
+        show = subprocess.run([PY, str(SCRIPTS / "taste.py"), "show", "--about", "edit"], capture_output=True, text=True, env=env)
+        self.assertIn(quote, show.stdout)
+        self.assertIn("ít hiệu ứng hơn", show.stdout)
 
     def test_prompt_lint_knows_only_the_house_models(self) -> None:
         lint = ROOT / ".claude" / "skills" / "ad-creative" / "tools" / "prompt_lint.py"

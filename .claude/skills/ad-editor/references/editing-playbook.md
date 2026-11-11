@@ -73,20 +73,27 @@ the viewer must read; ≤ 4 words per slam; a 4-word slam stays ≥ 1.7 s; keep 
 inside the safe zone and off the face/print (§5). `creative_check` warns when the preset
 is outside the format's set.
 
-## 6. Cut effects and sound effects
+## 6. Cut effects and sound effects — a budget, not a default (user rule 2026-11-10)
 
-`fx: hype` adds flash, punch, shake and beat pulses; `fx.sfx` adds a whoosh
-before and an impact on every cut and a riser into the drop. Use them for
-hype/montage formats. Do **not** use them on calm formats (lo-fi, ASMR,
-gift reveals): there the cut itself is the effect and the best transition is
-a plain cut on the beat. `intensity` 0.6 is a good middle ground for
-"energetic but not aggressive".
+The plain cut on the beat is the default and usually the best transition. An effect is a
+statement: *this cut is different from the others*. Used on every cut it says nothing.
 
-## 6b. Transitions — the right one for the cut (user rule 2026-10-27)
+- **Default:** every cut is `cut`. The Editor adds one thing by itself: `zoom` into the
+  `music.drop_on` shot.
+- **An effect needs a reason** written in `shots[].transition_why`: the drop, a change of
+  place or time, the reveal, the end card. "It looks cool" is not a reason. No reason → the
+  plan reports it.
+- **Budget:** one effect per four cuts, at least two per video. A style recipe that is built
+  on effects (`styles/`, e.g. `flicker-cinematic`) raises it with `fx.max_effects`; the plan
+  sheet shows used/budget.
+- **At most two effect types per video** unless the style recipe lists more; the same type
+  twice in a row only for `blackflash` (it is a pulse).
+- `fx: hype` adds shake after an effect and a small zoom on beats; `fx.sfx` adds a whoosh and
+  an impact **only on cuts that carry an effect**, and a riser into the drop. Calm formats
+  (lo-fi, ASMR, gift reveals) use neither.
+- `intensity` 0.6 is a good middle ground for "energetic but not aggressive".
 
-Every cut has a transition INTO the next shot (`shots[].transition`, else the Editor
-assigns one from `build_timeline.TRANSITION_CYCLE`). Two neighbouring cuts never use the
-same effect; the first frame has none (the hook needs nothing in front of it).
+## 6b. Transitions — the right one for the cut
 
 | transition | what it does | use when | avoid when |
 | --- | --- | --- | --- |

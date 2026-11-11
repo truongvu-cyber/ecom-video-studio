@@ -1,0 +1,57 @@
+{
+  "name": "its-just-a",
+  "summary": "Một câu giữ suốt video ('IT'S JUST A <PRODUCT>') trên ba cảnh dài: mở hộp bình thường, rồi kết quả bừng lên đúng cú drop, rồi người dùng nhìn vào ống kính",
+  "source": {
+    "url": "https://www.instagram.com/reel/Depcu3ZJlao/",
+    "project": "justalight-cowboys",
+    "date": "2026-10-31",
+    "note": "phân tích reel hushmode.usa 'It's just a hoodie'"
+  },
+  "verdict": "pending",
+  "verdict_note": "2026-10-31 người dùng \"Ok\" cho bản thử Cowboys; chưa trả lời việc làm cho đội khác",
+  "use_when": [
+    "sản phẩm nhỏ, bị coi thường, có một khoảnh khắc 'wow'",
+    "quà tặng"
+  ],
+  "avoid_when": [
+    "cần liệt kê tính năng",
+    "video cắt nhanh"
+  ],
+  "format": "calm_lofi",
+  "length_sec": [
+    13,
+    15
+  ],
+  "music": {
+    "bpm": [
+      60,
+      140
+    ],
+    "character": "một bài quen tai có cú vào rõ; bản thử dùng nhạc Giáng sinh",
+    "drop": "cảnh 2, lúc kết quả hiện"
+  },
+  "rhythm_beats": "3 cảnh dài, tính bằng giây: 6,0 · 3,5 · 4,5; chỉ nhát cắt vào cảnh 2 cần trúng drop",
+  "effects": {
+    "max_effects": 1,
+    "types": [
+      "zoom"
+    ],
+    "where": [
+      {
+        "transition": "zoom",
+        "on": "cảnh 2",
+        "why": "cú drop, kết quả hiện"
+      }
+    ]
+  },
+  "text": {
+    "preset": "bold",
+    "rule": "đúng một câu ≤ 5 từ, giữ nguyên vị trí trên cả ba cảnh; không CTA trong hình, CTA nằm ở caption"
+  },
+  "pictures": [
+    "top-down mở hộp trơn không nhãn, sản phẩm nhỏ trên lòng bàn tay",
+    "kết quả ở cỡ lớn: tối rồi bừng sáng",
+    "một người (nhân vật mới) nhìn xuống kết quả rồi nhìn ống kính"
+  ],
+  "example_project": "justalight-cowboys (không còn trên máy)"
+}

@@ -17,3 +17,6 @@ tests/fixtures/*.wav
 # Ảnh frames giữ trên máy, không đẩy lên repo công khai (user 2026-10-27).
 # Các file frames đã commit trước đó vẫn được git theo dõi.
 projects/*/frames/
+
+# Sổ gu: lời nhận xét nguyên văn của người dùng, giữ trên máy
+taste/log.jsonl

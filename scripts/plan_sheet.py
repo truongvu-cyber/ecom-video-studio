@@ -76,7 +76,8 @@ def main() -> None:
             d.text((x0 + 4, y0 + 21), f"tl {s['tl_start']:.2f}-{s['tl_end']:.2f} ({s['tl_end'] - s['tl_start']:.2f}s) · "
                    f"{s.get('transition') or 'cut'}{beat}", font=small, fill=colour)
         ImageDraw.Draw(canvas).text((4, rows * cell_h + 5), f"{plan['project_id']} · {plan['total_sec']}s · khung vàng = vị trí chữ · "
-                                    f"đỏ = cắt lệch beat hoặc lỗi · {len(plan['issues'])} chú ý", font=small, fill=WHITE)
+                                    f"đỏ = cắt lệch beat hoặc lỗi · hiệu ứng {plan['effects']['used']}/{plan['effects']['cuts']} nhát cắt "
+                                    f"(hạn mức {plan['effects']['budget']}) · {len(plan['issues'])} chú ý", font=small, fill=WHITE)
     dest = project / "edit" / "qc" / "plan.jpg"
     dest.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(dest, quality=88)

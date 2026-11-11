@@ -1,0 +1,56 @@
+{
+  "name": "zip-reveal",
+  "summary": "Một hành động biến hình của sản phẩm được chờ đợi: 'WAIT FOR THE ZIP', khép đúng cú drop, rồi các trạng thái tiếp theo mỗi cảnh một bước",
+  "source": {
+    "url": "https://www.instagram.com/p/DeVuGpIJONV/",
+    "project": "hoodie-cowboys-star",
+    "date": "2026-11-06",
+    "note": "video cách dùng do người dùng gửi; ý tưởng 'Khép ngôi sao' của agent"
+  },
+  "verdict": "pending",
+  "verdict_note": "đã gửi bản thử; người dùng chưa nói duyệt",
+  "use_when": [
+    "quần áo hoặc đồ vật có thao tác đổi hình: kéo khoá, gập, lật, bật"
+  ],
+  "avoid_when": [
+    "sản phẩm tĩnh"
+  ],
+  "format": "hype_montage",
+  "length_sec": [
+    12,
+    15
+  ],
+  "music": {
+    "bpm": [
+      110,
+      130
+    ],
+    "character": "riff rock sân vận động, vào đều rồi bùng (bản thử: Seven Nation Army)",
+    "drop": "cảnh 2, lúc hình khép kín"
+  },
+  "rhythm_beats": "tính bằng giây ở bản thử: 3,0 · 2,0 · 2,5 · 2,4 · 2,5 · 1,4; mọi nhát cắt trên nhịp",
+  "effects": {
+    "max_effects": 2,
+    "types": [
+      "zoom"
+    ],
+    "where": [
+      {
+        "transition": "zoom",
+        "on": "cảnh 2",
+        "why": "cú drop, hình khép kín"
+      }
+    ]
+  },
+  "text": {
+    "preset": "bold",
+    "rule": "chữ ở dưới khi có mặt người (đã từng che mắt nhân vật); hook 4 từ, mỗi bước 2-3 từ, cảnh drop không chữ"
+  },
+  "pictures": [
+    "cận ngực: tay kéo khoá, hình in tách đôi rồi khép",
+    "mỗi trạng thái tiếp theo một cảnh, cắt cận từ cùng clip",
+    "xoay lưng cho hình in sau",
+    "nhìn lại ống kính ở cảnh CTA"
+  ],
+  "example_project": "hoodie-cowboys-star"
+}

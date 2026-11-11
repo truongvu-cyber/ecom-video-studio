@@ -81,37 +81,35 @@ def script_spelling(heard: list[dict], line: str) -> list[dict]:
     return out
 
 
-# editing-playbook §6b: the transition INTO a shot, by format and role, unless the shot names one.
-# Cycles so two neighbouring cuts never use the same effect; the payoff gets zoom, the CTA slide.
-TRANSITION_CYCLE = {
-    "hype_montage": ["flash", "whip", "zoom", "glitch", "flash", "slide"],
-    "demo_steps": ["flash", "slide", "zoom", "flash", "slide", "zoom"],
-    "ugc_dialogue": ["cut", "cut", "zoom", "cut", "cut", "zoom"],
-    "calm_lofi": ["cut", "dip", "cut", "dip"],
-}
-
-
+# editing-playbook §6b (user rule 2026-11-10: effects only where they mean something, never on
+# every cut). A cut is plain unless the shot names a transition and says why; the only effect the
+# Editor adds by itself is the punch into the drop shot.
 def assign_transitions(segments: list[dict], fmt: str | None, drop_on: str | None) -> None:
-    cycle = TRANSITION_CYCLE.get(fmt or "", ["cut"])
-    k = 0
     for i, seg in enumerate(segments):
         strict = seg.get("print_fidelity") == "strict"
         if seg.get("transition"):
             if strict and seg["transition"] in ("flash", "glitch"):
                 seg["transition"] = "zoom"  # §6b: flash bleaches, glitch inverts the lettering
-            continue
-        if i == 0:
-            seg["transition"] = "cut"  # the first frame is the hook: nothing in front of it
-        elif seg["shot"] == drop_on:
+        elif i and seg["shot"] == drop_on:
             seg["transition"] = "zoom" if fmt != "calm_lofi" else "dip"
-        elif seg["role"] == "cta":
-            seg["transition"] = "slide" if fmt in ("hype_montage", "demo_steps") else "cut"
+            seg["transition_why"] = "cú drop của nhạc"
         else:
-            tr = cycle[k % len(cycle)]
-            k += 1
-            if strict and tr in ("flash", "glitch"):
-                tr = "whip" if (i % 2) else "zoom"
-            seg["transition"] = tr
+            seg["transition"] = "cut"
+
+
+def effect_budget(segments: list[dict], fx: dict, issues: list[str]) -> dict:
+    """How many cuts carry an effect, against the budget: fx.max_effects (set from the style
+    recipe) or one effect per four cuts, at least two."""
+    cuts = max(0, len(segments) - 1)
+    used = [s for s in segments[1:] if s["transition"] != "cut"]
+    budget = int(fx.get("max_effects", max(2, round(cuts / 4))))
+    if len(used) > budget:
+        issues.append(f"{len(used)} hiệu ứng trên {cuts} nhát cắt, hạn mức {budget}: bỏ bớt, hoặc ghi fx.max_effects "
+                      f"theo phong cách đã chọn (editing-playbook §6b)")
+    for s in used:
+        if not (s.get("transition_why") or "").strip():
+            issues.append(f"{s['shot']}: hiệu ứng '{s['transition']}' chưa ghi lý do (shots[].transition_why)")
+    return {"used": len(used), "budget": budget, "cuts": cuts}
 
 
 def dialogue_segment(shot: dict, words: list[dict], dur: float, cursor: int, issues: list[str]):
@@ -356,6 +354,7 @@ def main() -> None:
                 seg["out_min"] = seg["src_in"] + 0.08 * seg["speed"]
                 seg["out_max"] = take["duration"]
         seg.update({"shot": shot["id"], "role": shot["role"], "take": take_name, "transition": shot.get("transition"),
+                    "transition_why": shot.get("transition_why"),
                     "audio_type": shot["audio_type"], "overlay": shot.get("overlay"),
                     "overlay_pos": shot.get("overlay_pos", "top"),
                     "cta_pos": shot.get("overlay_pos"),  # CTA keeps its own spot unless set
@@ -363,6 +362,7 @@ def main() -> None:
         segments.append(seg)
 
     assign_transitions(segments, prod.get("format"), (prod.get("music") or {}).get("drop_on"))
+    effects = effect_budget(segments, prod.get("fx") or {}, issues)
     total = layout(segments)
     # music time m plays at timeline time  m - offset + delay  (delay = music enters late)
     offset, delay, cuts, beats_tl = 0.0, 0.0, [], []
@@ -484,6 +484,7 @@ def main() -> None:
         "format": prod.get("format"),
         "text_style": prod.get("text_style", {"preset": "pill"}),
         "fx": prod.get("fx", {"preset": "none"}),
+        "effects": effects,
         "beats_tl": [round(b, 3) for b in beats_tl if 0 <= b <= total],
         "variants": prod.get("variants", []),
     }
@@ -499,6 +500,7 @@ def main() -> None:
             print(f"cắt sau {c['after']} lúc {c['at']}s: trước khi nhạc vào")
         else:
             print(f"cắt sau {c['after']} lúc {c['at']}s: {'trúng beat' if c['on_beat'] else 'lệch'} {c['off_ms']}ms")
+    print(f"Hiệu ứng: {effects['used']}/{effects['cuts']} nhát cắt (hạn mức {effects['budget']})")
     print(f"Tổng {total:.2f}s, nhạc vào lúc {delay:.2f}s (phát từ giây {offset:.2f} của bài)")
     for i in issues:
         print("CHÚ Ý:", i)

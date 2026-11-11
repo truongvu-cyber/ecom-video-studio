@@ -347,6 +347,21 @@ def main() -> None:
     check_sheet_realism(md, fails, warns)
     check_placement(md, product, blocks, keyframes, fails, warns)
 
+    style = prod.get("style")
+    names = [style] if isinstance(style, str) else (style or [])
+    if not names:
+        warns.append("production.json chưa ghi 'style' (công thức dựng trong styles/, xem scripts/styles.py list)")
+    for n in names:
+        if not (ROOT / "styles" / f"{n}.json").exists():
+            fails.append(f"style '{n}' không có trong styles/ (scripts/styles.py list)")
+    ideas = project / "ideas.md"
+    if not ideas.exists():
+        warns.append("Thiếu ideas.md: bước nghĩ rộng 10 ý trước khi chọn hướng (ideation.md)")
+    elif "direction given by the user" not in ideas.read_text(encoding="utf-8"):
+        n_ideas = len(re.findall(r"^\s*(?:~~)?\d+\s*·", ideas.read_text(encoding="utf-8"), re.M))
+        if n_ideas < 10:
+            warns.append(f"ideas.md mới có {n_ideas} ý, cần 10 ý thuộc ít nhất 6 họ (ideation.md §2)")
+
     print("\n== creative_check ==")
     for f in fails:
         print("FAIL:", f)

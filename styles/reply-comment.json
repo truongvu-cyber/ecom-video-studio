@@ -1,0 +1,54 @@
+{
+  "name": "reply-comment",
+  "summary": "Trả lời một bình luận hỏi đội: logo của đội đó bừng sáng ('<TEAM>? YES.'), bóc, dán, logo lần nữa kèm CTA",
+  "source": {
+    "project": "mlb-door-light-replies / nfl-door-light-replies",
+    "date": "2026-10-28",
+    "note": "công thức lấy từ mô tả của reply_series.py; project gốc không còn trên máy"
+  },
+  "verdict": "approved",
+  "verdict_note": "2026-10-28 người dùng: \"Dựng bạn như hiện tại và làm cho đủ tất cả các đội mlb\", sau đó làm NFL; mọi video trong loạt đều phải có thẻ bình luận",
+  "use_when": [
+    "một listing nhiều đội, cần nhiều video từ cùng kho clip",
+    "kéo bình luận hỏi đội"
+  ],
+  "avoid_when": [
+    "chỉ có một mẫu"
+  ],
+  "format": "demo_steps",
+  "length_sec": [
+    7,
+    9
+  ],
+  "music": {
+    "bpm": [
+      120,
+      160
+    ],
+    "character": "cả loạt dùng chung một bài để thành 'sound' của loạt",
+    "drop": "cảnh 1, lúc logo bừng"
+  },
+  "rhythm_beats": "4 cảnh, mỗi cảnh số nhịp nguyên; mọi video trong loạt bắt đầu cùng một nhịp của bài",
+  "effects": {
+    "max_effects": 1,
+    "types": [
+      "zoom"
+    ],
+    "where": [
+      {
+        "transition": "zoom",
+        "on": "cảnh 1 hoặc cảnh logo cuối",
+        "why": "logo bừng sáng"
+      }
+    ]
+  },
+  "text": {
+    "preset": "bold",
+    "rule": "'<TEAM>? *YES.*' · 'NO *TOOLS*' · '60 *SEC*' · CTA; 25% trên cùng để trống cho thẻ bình luận"
+  },
+  "pictures": [
+    "clip logo của từng đội bừng sáng dưới cửa xe",
+    "hai clip lắp dùng chung: bóc màng đỏ, dán vào ốp cửa"
+  ],
+  "needs": "thẻ bình luận trước đây vẽ bằng reply_series.py (đã chuyển vào Thùng rác 2026-11-10)"
+}

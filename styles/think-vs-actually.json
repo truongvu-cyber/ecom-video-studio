@@ -1,0 +1,82 @@
+{
+  "name": "think-vs-actually",
+  "summary": "Hai nửa đối lập bằng chữ: 'WHAT PEOPLE THINK WE SELL' (hộp đèn, lắp đặt) rồi 'WHAT WE ACTUALLY SELL' (logo bừng sáng) đúng cú drop",
+  "source": {
+    "project": "cowboys-door-light-thinkvs",
+    "date": "2026-10-30",
+    "note": "công thức lấy lại từ nhật ký phiên; project gốc không còn trên máy"
+  },
+  "verdict": "approved",
+  "verdict_note": "2026-10-31 người dùng: \"Ok xong style này\" sau khi làm 20 video MLB + NFL",
+  "use_when": [
+    "sản phẩm trông tầm thường khi cầm trên tay nhưng kết quả gây bất ngờ",
+    "cần một công thức lặp lại cho nhiều đội"
+  ],
+  "avoid_when": [
+    "sản phẩm mà hình thức chính là điểm bán (áo, quà tặng)"
+  ],
+  "format": "hype_montage",
+  "length_sec": [
+    13,
+    16
+  ],
+  "music": {
+    "bpm": [
+      80,
+      130
+    ],
+    "character": "anthem thể thao có lời, rock hoặc rap (người dùng chọn Remember the Name và Seven Nation Army)",
+    "drop": "shot 'ACTUALLY'"
+  },
+  "rhythm_beats": {
+    "hook_trigger": [
+      2
+    ],
+    "think": [
+      4,
+      4
+    ],
+    "vs": [
+      3,
+      4
+    ],
+    "actually": [
+      6
+    ],
+    "all_teams": [
+      4
+    ],
+    "cta": [
+      6
+    ]
+  },
+  "effects": {
+    "max_effects": 2,
+    "types": [
+      "zoom"
+    ],
+    "where": [
+      {
+        "transition": "zoom",
+        "on": "shot 'ACTUALLY'",
+        "why": "cú drop"
+      }
+    ],
+    "note": "bản gốc không ghi lại hiệu ứng từng nhát cắt"
+  },
+  "text": {
+    "preset": "bold",
+    "rule": "cùng một câu giữ qua 2 cảnh 'THINK'; 'VS...' một cảnh; '*NO* TOOLS · *60* SEC' ở cảnh lắp; 'ALL *32* TEAMS' ở cảnh nhiều logo; CTA 'COMMENT *<TEAM>* FOR THE LINK'"
+  },
+  "pictures": [
+    "shot đầu 2 nhịp là logo đã sáng (trigger)",
+    "cảnh hộp đèn trên tay, phát nhanh 1,4-1,6x",
+    "cảnh bóc màng và dán",
+    "logo bừng sáng dưới cửa",
+    "loạt 8 logo đội đổi mỗi nửa nhịp"
+  ],
+  "variants": [
+    "WHAT MY WIFE *THINKS* I BOUGHT / WHAT I *ACTUALLY* BOUGHT"
+  ],
+  "needs": "cảnh loạt logo trước đây dựng bằng roulette.py (đã chuyển vào Thùng rác 2026-11-10)"
+}

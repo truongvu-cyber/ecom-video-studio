@@ -1,6 +1,6 @@
 """Mark a project approved once the user says so.
 
-Usage: approve.py <project>
+Usage: approve.py <project> ["<lời duyệt nguyên văn của người dùng>"]
 Refuses when the last QC verdict is REJECT or no render exists; records the
 approval in production.json (stage) and in out/edit-report.md.
 """
@@ -30,6 +30,11 @@ def main() -> None:
         sys.exit(f"Chưa xuất biến thể hook {missing}: chạy edit_pipeline.py <project> --from timeline --final")
     prod["stage"] = "approved"
     save_json(project / "production.json", prod)
+    from taste import add as taste_add
+    style = prod.get("style")
+    taste_add({"date": date.today().isoformat(), "about": "style", "verdict": "approved",
+               "quote": sys.argv[2] if len(sys.argv) > 2 else "(duyệt bằng approve.py, không kèm lời)",
+               "project": prod["project_id"], "style": style[0] if isinstance(style, list) else style})
     report = project / "out" / "edit-report.md"
     if report.exists():
         report.write_text(report.read_text(encoding="utf-8").rstrip() +
